@@ -12,11 +12,61 @@ class Donation extends Model
     protected $guarded = [];
     protected $fillable = ['user_id', 'anonymous', 'campaign_id'];
     
+    
+    // statuses -----------------------------------------------------------------------------------
+    public function isPending() {
+        $this->allPayments->contains(function($aPayment){
+            return $aPayment->isPending();
+        });
+    }
+    
+    public function isProcessing() {
+        $this->allPayments->contains(function($aPayment){
+            return $aPayment->isProcessing();
+        });
+    }
+    
+    /*
+     * to get isComplete() variant, reverse the function.
+     */
+    public function isNotComplete() {
+        $this->allPayments->contains(function($aPayment){
+            return !$aPayment->isComplete();
+        });
+    }
+    
+    /*
+     * to-do: implement later
+     */
+    public function isFailed() {
+        
+    }
+    
+    /*
+     * to-do: implement later
+     */
+    public function isCanceled() {
+        
+    }
+    // statuses end -----------------------------------------------------------------------------------
+    
+    
+    
     public function campaign() {
         return $this->belongsTo(Campaign::class);
     }
     
+    /*
+     * returns only those payments under a donation whitch are completed
+     */
     public function payments() {
+        return $this->hasMany(Payment::class)->whereStatus('Processing')->orWhere('status', 'Complete');
+    }
+
+    /*
+     * returns all payments under a donation without any filter by status
+     */
+    public function allPayments() {
         return $this->hasMany(Payment::class);
     }
     
@@ -33,8 +83,10 @@ class Donation extends Model
      * within a donation
      */
     public function totalPayableAmount() {
+        # only those payament entry will be counted which atatus is processing or complete.
         return $this->payments->sum(function ($aPayment) {
-            return $aPayment->amount - (($aPayment->amount/100)*20);
+//            return $aPayment->amount - (($aPayment->amount/100)*5);
+            return $aPayment->amount;
         });
     }
     

@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Oporajoy Crowd Funding') }}</title>
+    <title>{{ $title?? '' }}</title>
     
     <!-- icons -->
-    <link href="{{ asset('images/favicon.ico') }}" rel="shortcut icon">
+    <link href="{{ asset('images/logo-b.png') }}" rel="shortcut icon">
     <link href="{{ asset('css/materialdesignicons.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="https://unicons.iconscout.com/release/v3.0.6/css/line.css" rel="stylesheet">
     <!-- Fonts -->

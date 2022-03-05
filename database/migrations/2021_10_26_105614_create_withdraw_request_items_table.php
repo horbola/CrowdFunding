@@ -19,8 +19,10 @@ class CreateWithdrawRequestItemsTable extends Migration
             $table->foreignId('campaign_id');
             $table->decimal('requested_amount')->default(0);
             $table->decimal('paid_amount')->default(0);
-            // 0.pending, 1.approved, 2.blocked
-            $table->tinyInteger('status');
+            // 1.pending, 2.funded, 3.blocked
+            $table->tinyInteger('status')->default(1);
+            // 1.yes, 2.no
+            $table->boolean('currently_blocked')->default(false);
             $table->longText('block_msg')->nullable();
             $table->timestamps();
         });

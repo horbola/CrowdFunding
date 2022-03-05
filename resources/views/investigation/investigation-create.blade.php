@@ -44,7 +44,6 @@
                                     <div class="col-12">
                                         <div class="license-agrement">
                                             <div class="row">
-                                                
                                                 <div class="form-group form-row {{ $errors->has('investigation-report')? 'has-error':'' }}">
                                                     <label for="description" class="col-12 form-label pt-md-2">Investigation Report<span class="text-danger">*</span></label>
                                                     <div class="col-12">
@@ -53,11 +52,9 @@
                                                             <textarea name="text_report" class="form-control description ps-5" rows="8" required>{{ old('investigation-report') }}</textarea>
                                                         </div>
                                                         {!! $errors->has('investigation-report')? '<p class="help-block">'.$errors->first('investigation-report').'</p>':'' !!}
-                                                        <p class="text-info"> @lang('app.description_info_text')</p>
+                                                        <!--<p class="text-info"> @lang('app.description_info_text')</p>-->
                                                     </div>
                                                 </div>
-                                                
-                                                
                                                 
                                                 <div class="col-12">
                                                     <div class="mb-3">

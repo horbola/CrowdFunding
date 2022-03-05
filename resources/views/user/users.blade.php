@@ -13,16 +13,40 @@
         </div><!--end col-->
 
         <div class="col-lg-4 col-md-5 mt-4 mt-sm-0 pt-2 pt-sm-0">
-            <div class="form custom-form">
-                <div class="mb-0">
-                    <select class="form-select form-control" aria-label="Default select example" id="Sortbylist-job">
-                        <option selected>Sort by latest</option>
-                        <option>Sort by popularity</option>
-                        <option>Sort by rating</option>
-                        <option>Sort by price: low to high</option>
-                        <option>Sort by price: high to low</option>
-                    </select>
-                </div>
+            <!-- SEARCH -->
+            <div class="widget">
+                <form action="{{-- Illuminate\Support\Facades\Route::current() --}}" method="get">
+                    <div class="input-group mb-3 border rounded border-primary">
+                        <input type="hidden" name="searching" value="1">
+                        <input type="text" id="search-campaign" name="q" class="form-control border-0" value="{{request()->q}}" placeholder="Search Keywords...">
+                        <button type="submit" class="input-group-text bg-white border-0" id="searchsubmit"><i class="uil uil-search"></i></button>
+                    </div>
+                </form>
+                <script>
+                    $(function(){
+                        var searching = "{{ request('searching') }}";
+                        if(searching){
+                            $('#search-campaign').focus();
+                            var val = $('#search-campaign').val();
+                            $('#search-campaign').val('');
+                            $('#search-campaign').val(val);
+                        }
+                    });
+                            
+                    // this function doesn't work for global keyupp proroperty.
+                    function delay(fn, ms) {
+                        let timer = 0;
+                        return function (...args) {
+                            clearTimeout(timer);
+                            timer = setTimeout(fn.bind(this, ...args), ms || 0);
+                        };
+                    }
+                    ;
+
+                    $('#search-campaign').keyup(delay(function (e) {
+                        $('#searchsubmit').click();
+                    }, 1000));
+                </script>
             </div>
         </div><!--end col-->
     </div><!--end row-->

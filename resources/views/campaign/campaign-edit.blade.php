@@ -8,7 +8,7 @@
         <div class="row">
             <div class="col">
                 <div id="createCampaignForm">
-                    <form action="{{ route('campaign.update', $campaign->id) }}" method="post" enctype="multipart/form-data">
+                    <form action="{{ route('campaign.update', ['id' => $campaign->id]) }}" method="post" enctype="multipart/form-data">
                         @csrf
                         @method('put')
                         <legend class="text-center mb-5">@lang('app.campaign_info')</legend>
@@ -25,7 +25,7 @@
                                     @endforeach
 
                                 </select>
-                                {!! $errors->has('country_id')? '<p class="help-block">'.$errors->first('country_id').'</p>':'' !!}
+                                {!! $errors->has('country_id')? '<p class="help-block text-bold text-danger">'.$errors->first('country_id').'</p>':'' !!}
                             </div>
                         </div>
                         -->
@@ -35,7 +35,7 @@
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="text" class="form-control ps-5" id="title" value="{{$campaign->title}}" name="title" placeholder="@lang('app.title')" maxlength="255">
-                                {!! $errors->has('title')? '<p class="help-block">'.$errors->first('title').'</p>':'' !!}
+                                {!! $errors->has('title')? '<p class="help-block text-bold text-danger">'.$errors->first('title').'</p>':'' !!}
                                 <p class="text-info"> @lang('app.great_title_info')</p>
                             </div>
                         </div>
@@ -50,7 +50,7 @@
                                     <option value="{{ $category->id }}">{{ $category->category_name }}</option>
                                     @endforeach
                                 </select>
-                                {!! $errors->has('category')? '<p class="help-block">'.$errors->first('category').'</p>':'' !!}
+                                {!! $errors->has('category')? '<p class="help-block text-bold text-danger">'.$errors->first('category').'</p>':'' !!}
                             </div>
                         </div>
 
@@ -59,7 +59,7 @@
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <textarea name="short_description" class="form-control ps-5" rows="3" cols="50" maxlength="300">{{$campaign->short_description}}</textarea>
-                                {!! $errors->has('short_description')? '<p class="help-block">'.$errors->first('short_description').'</p>':'' !!}
+                                {!! $errors->has('short_description')? '<p class="help-block text-bold text-danger">'.$errors->first('short_description').'</p>':'' !!}
                             </div>
                         </div>
 
@@ -72,7 +72,7 @@
                                     <textarea id="description" name="description" class="form-control description ps-5">{{$campaign->description}}</textarea>
                                     <!--<div id="description"></div> this is for ckeditor-->
                                 </div>
-                                {!! $errors->has('description')? '<p class="help-block">'.$errors->first('description').'</p>':'' !!}
+                                {!! $errors->has('description')? '<p class="help-block text-bold text-danger">'.$errors->first('description').'</p>':'' !!}
                                 <p class="text-info"> @lang('app.description_info_text')</p>
                             </div>
                         </div>
@@ -82,7 +82,7 @@
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="file" class="form-control ps-5" id="feature_image" value="{{$campaign->feature_image}}" name="feature_image" placeholder="@lang('app.feature_image')">
-                                {!! $errors->has('feature_image')? '<p class="help-block">'.$errors->first('feature_image').'</p>':'' !!}
+                                {!! $errors->has('feature_image')? '<p class="help-block text-bold text-danger">'.$errors->first('feature_image').'</p>':'' !!}
                                 <p class="text-info"> @lang('app.video_info_text')</p>
                             </div>
                         </div>
@@ -92,7 +92,7 @@
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="file" class="form-control ps-5" id="album" value="" name="album[]" multiple placeholder="Album">
-                                {!! $errors->has('album')? '<p class="help-block">'.$errors->first('album').'</p>':'' !!}
+                                {!! $errors->has('album')? '<p class="help-block text-bold text-danger">'.$errors->first('album').'</p>':'' !!}
                                 <p class="text-info">Upload image in jpg, png, gif format. These images supplement the feature image</p>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="text" class="form-control ps-5" id="feature_video" value="{{$campaign->feature_video}}" name="feature_video" placeholder="@lang('app.feature_video')">
-                                {!! $errors->has('feature_video')? '<p class="help-block">'.$errors->first('feature_video').'</p>':'' !!}
+                                {!! $errors->has('feature_video')? '<p class="help-block text-bold text-danger">'.$errors->first('feature_video').'</p>':'' !!}
                                 <p class="text-info"> @lang('app.video_info_text')</p>
                             </div>
                         </div>
@@ -114,7 +114,7 @@
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="file" class="form-control ps-5" id="documents" value="" name="documents[]" multiple placeholder="Documents">
-                                {!! $errors->has('documents')? '<p class="help-block">'.$errors->first('documents').'</p>':'' !!}
+                                {!! $errors->has('documents')? '<p class="help-block text-bold text-danger">'.$errors->first('documents').'</p>':'' !!}
                                 <p class="text-info">You can select more than one file of type jpg, png, gif, pdf</p>
                             </div>
                         </div>
@@ -129,7 +129,7 @@
                                 <div class="alert alert-info mt-2">
                                     <i class="fa fa-money"></i> @lang('app.you_will_get') {{ 'put the amount' }}% @lang('app.of_total_raised')
                                 </div>
-                                {!! $errors->has('goal')? '<p class="help-block">'.$errors->first('goal').'</p>':'' !!}
+                                {!! $errors->has('goal')? '<p class="help-block text-bold text-danger">'.$errors->first('goal').'</p>':'' !!}
                             </div>
                         </div>
 
@@ -150,7 +150,7 @@
                                 </label>
                                 --}}
 
-                                {!! $errors->has('end_method')? '<p class="help-block">'.$errors->first('end_method').'</p>':'' !!}
+                                {!! $errors->has('end_method')? '<p class="help-block text-bold text-danger">'.$errors->first('end_method').'</p>':'' !!}
                                 <p class="text-info"> @lang('app.end_method_info_text')</p>
                             </div>
                         </div>
@@ -160,7 +160,7 @@
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="text" class="form-control ps-5" id="start_date" value="{{$campaign->start_date}}" name="start_date" placeholder="@lang('app.start_date')">
-                                {!! $errors->has('start_date')? '<p class="help-block">'.$errors->first('start_date').'</p>':'' !!}
+                                {!! $errors->has('start_date')? '<p class="help-block text-bold text-danger">'.$errors->first('start_date').'</p>':'' !!}
                             </div>
                         </div>
                         <div class="form-group form-row {{ $errors->has('end_date')? 'has-error':'' }}">
@@ -168,7 +168,7 @@
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="text" class="form-control ps-5" id="end_date" value="{{$campaign->end_date}}" name="end_date" placeholder="@lang('app.end_date')">
-                                {!! $errors->has('end_date')? '<p class="help-block">'.$errors->first('end_date').'</p>':'' !!}
+                                {!! $errors->has('end_date')? '<p class="help-block text-bold text-danger">'.$errors->first('end_date').'</p>':'' !!}
                             </div>
                         </div>
 
@@ -177,7 +177,7 @@
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="text" class="form-control ps-5" id="min_amount" value="{{$campaign->min_amount}}" name="min_amount" placeholder="@lang('app.min_amount')">
-                                {!! $errors->has('min_amount')? '<p class="help-block">'.$errors->first('min_amount').'</p>':'' !!}
+                                {!! $errors->has('min_amount')? '<p class="help-block text-bold text-danger">'.$errors->first('min_amount').'</p>':'' !!}
                             </div>
                         </div>
 
@@ -186,7 +186,7 @@
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="text" class="form-control ps-5" id="max_amount" value="{{$campaign->max_amount}}" name="max_amount" placeholder="@lang('app.max_amount')">
-                                {!! $errors->has('max_amount')? '<p class="help-block">'.$errors->first('max_amount').'</p>':'' !!}
+                                {!! $errors->has('max_amount')? '<p class="help-block text-bold text-danger">'.$errors->first('max_amount').'</p>':'' !!}
                             </div>
                         </div>
 
@@ -195,7 +195,7 @@
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="number" class="form-control ps-5" id="recommended_amount" value="{{$campaign->recommended_amount}}" name="recommended_amount" placeholder="@lang('app.recommended_amount')">
-                                {!! $errors->has('recommended_amount')? '<p class="help-block">'.$errors->first('recommended_amount').'</p>':'' !!}
+                                {!! $errors->has('recommended_amount')? '<p class="help-block text-bold text-danger">'.$errors->first('recommended_amount').'</p>':'' !!}
                             </div>
                         </div>
 
@@ -204,13 +204,13 @@
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="text" class="form-control ps-5" id="amount_prefilled" value="{{$campaign->amount_prefilled}}" name="amount_prefilled" placeholder="@lang('app.amount_prefilled')">
-                                {!! $errors->has('amount_prefilled')? '<p class="help-block">'.$errors->first('amount_prefilled').'</p>':'' !!}
+                                {!! $errors->has('amount_prefilled')? '<p class="help-block text-bold text-danger">'.$errors->first('amount_prefilled').'</p>':'' !!}
                                 <p class="text-info"> @lang('app.amount_prefilled_info_text')</p>
 
                             </div>
                         </div>
 
-                        <input type="hidden" name="adminCampaignMenu" value="{{ $request->adminCampaignMenu }}">
+                        <input type="hidden" name="adminCampaignMenu" value="{{ request()->adminCampaignMenu }}">
                         <div class="form-group form-row">
                             <div class="col-sm-12 col-md-3 offset-md-3 d-grid d-md-block">
                                 <button type="submit" class="btn btn-primary">Complete Edition</button>

@@ -1,25 +1,9 @@
 
+platform version:
+Apache/2.4.46 (Win64) OpenSSL/1.1.1j PHP/8.0.3
+Database client version: libmysql - mysqlnd 8.0.3
+Laravel Framework 8.40.0
 
-name: rolen rony
-id: rolena2z@gmail.com
-pass: P_L2Zsbz8Yy.B@Z
 
-name: saif khan faysal
-id: saifkhanfaysall@gmail.com
-pass: P_L2Zsbz8Yy.B@Z
-
-name: 
-id: 
-pass: 
-
-name: 
-id: 
-pass: 
-
-name: 
-id: 
-pass: 
-
-name: 
-id: 
-pass: 
+watch this out to solve htaccess file:
+https://laracasts.com/discuss/channels/laravel/laravel-5-only-home-page-route-working-on-live-server?page=1

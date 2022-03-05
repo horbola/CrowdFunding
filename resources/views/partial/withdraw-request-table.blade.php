@@ -1,4 +1,7 @@
 <div id="withdraw-request-table" class="table-responsive bg-white shadow rounded">
+    @php
+        use App\Library\Helper;
+    @endphp
     <table class="display table mb-0 table-center" style="width:100%">
         <thead>
             <tr>
@@ -15,15 +18,21 @@
             <tr>
                 @php $serial++ @endphp
                 <td>{{$serial}}</td>
-                <td>{{$wRequest->created_at}}</td>
-                <td>{{$wRequest->totalRequestAmount()}}</td>
-                <td>{{$wRequest->totalPaidAmount()}}</td>
+                <td><small class="text-muted">{{ App\Library\Helper::formattedTime($wRequest->created_at) }}</small></td>
+                <td>{{ Helper::formatMoneyFigure($wRequest->totalRequestAmount()) }}</td>
+                <td>{{ Helper::formatMoneyFigure($wRequest->totalPaidAmount()) }}</td>
                 <td>
                     @php
-                        $ap = $adminPending?? false;
+                        $aPen = $adminPending?? false;
+                        $aComp = $adminComp?? false;
+                        $aCan = $adminCan?? false;
                     @endphp
-                    @if($ap)
-                        <a href="{{route('withdrawRequest.showToAdmin', ['id' => $wRequest->id])}}">View more</a>
+                    @if($aPen)
+                        <a href="{{route('withdrawRequest.showPendingToAdmin', ['id' => $wRequest->id])}}">View</a>
+                    @elseif($aComp)
+                        <a href="{{route('withdrawRequest.showCompletedToAdmin', ['id' => $wRequest->id])}}">View</a>
+                    @elseif($aCan)
+                        <a href="{{route('withdrawRequest.showCancelledToAdmin', ['id' => $wRequest->id])}}">View</a>
                     @else
                         <a href="{{route('withdrawRequest.show', ['id' => $wRequest->id])}}">View</a>
                     @endif

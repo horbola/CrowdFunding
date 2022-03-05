@@ -16,8 +16,10 @@ class Admin
      * @return mixed
      */
     public function handle(Request $request, Closure $next){
+        $menuName = 'investigate';
+        $title = '';
         if(Auth::user()->is_admin !== 1){
-            return response()->view('platform.admin-check');
+            return response()->view('platform.admin-check', compact('title', 'menuName'));
         }
         return $next($request);
     }

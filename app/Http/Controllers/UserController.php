@@ -2,19 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+
 use Intervention\Image\Facades\Image;
 
 use App\Models\User;
+use App\Models\UserExtra;
+use App\Models\Address;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\Country;
 use App\Models\Donation;
 use App\Models\Campaign;
+use App\Mail\VolunteerRequest;
 
 
 
@@ -23,98 +30,194 @@ use App\Models\Campaign;
 class UserController extends Controller {
 
     /**
-     * shows users panel from which different types of users will viewed.
+     * shows users panel from which different types of users will be viewed by admin.
      */
     public function indexUsersPanel(Request $request) {
-        return view('user.users-panel')->with(compact('request'));
+        $title = 'Users Panel';
+        $menuName = 'users';
+        return view('user.users-panel', compact('request', 'title', 'menuName'));
     }
     
-    public function indexAllUsers() {
-        // User::all() returns a collection instance on which there is no pagination.
-        $users = User::paginate(4);
-        return view('user.users', compact('users'));
+    public function adminUserSearch($status=null){
+        $rules = ['q' => 'string:500', 'searching' => 'integer:1'];
+        $validated = request()->validate($rules);
+
+        if( is_numeric($validated['q']) ){
+            $users = new Collection();
+            $userExtra = UserExtra::where('phone', 'like', "%{$validated['q']}%")->
+                    orWhere('nid', 'like', "%{$validated['q']}%")->paginate(15)->withQueryString();
+            if ($userExtra->getCollection()->count()) {
+                foreach ($userExtra->getCollection() as $ue) {
+                    if( isset($status) ){
+                        $user = User::where('id', $ue->user_id)->whereActiveStatus($status)->get()->first();
+                        $users->push($user);
+                    }
+                    else {
+                        $user = User::where('id', $ue->user_id)->get()->first();
+                        $users->push($user);
+                    }
+                }
+            }
+            return $users = $userExtra->setCollection($users);
+        }
+        else {
+            if( isset($status) ){
+                return $users = User::where(function($query) use ($validated) {
+                    $query->where('name', 'like', "%{$validated['q']}%")->
+                    orWhere('email', 'like', "%{$validated['q']}%");
+                })->where('active_status', $status)->paginate(15)->withQueryString();
+            }
+            else return $users = User::where('name', 'like', "%{$validated['q']}%")->
+                    orWhere('email', 'like', "%{$validated['q']}%")->paginate(15)->withQueryString();
+        }
     }
     
-    public function indexBlockedUsers() {
+    /**
+     * shows all users registered to this platform to an admin
+     */
+    public function indexAllUsers(Request $request) {
+        $title = 'All Users';
+        $menuName = 'users';
+        $users = User::paginate(15);
+        if (request()->searching) {
+            $title = 'Searching All Users';
+            $users = $this->adminUserSearch(null);
+        }
+        
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
+    }
+    
+    public function indexBlockedUsers(Request $request) {
+        $title = 'Blocked Users';
+        $menuName = 'users';
         // 0:pending, 1:active, 2:malicous, 3:blocked, 4:left
-        $users = User::whereActiveStatus(3)->paginate(4);
-        return view('user.users', compact('users'));
+        $users = User::whereActiveStatus(3)->paginate(15);
+        if (request()->searching) {
+            $title = 'Searching Blocked Users';
+            $users = $this->adminUserSearch(3);
+        }
+        
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
     }
     
-    public function indexActiveUsers() {
+    public function indexActiveUsers(Request $request) {
+        $title = 'Active Users';
+        $menuName = 'users';
         // 0:pending, 1:active, 2:malicous, 3:blocked, 4:left
-        $users = User::whereActiveStatus(1)->paginate(4);
-        return view('user.users', compact('users'));
+        $users = User::whereActiveStatus(1)->paginate(15);
+        if (request()->searching) {
+            $title = 'Searching Active Users';
+            $users = $this->adminUserSearch(1);
+        }
+        
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
     }
     
-    public function indexMalicousUsers() {
+    public function indexMalicousUsers(Request $request) {
+        $title = 'Malicous Users';
+        $menuName = 'users';
         $users = User::whereActiveStatus(2)->paginate(4);
-        return view('user.users', compact('users'));
+        if (request()->searching) {
+            $title = 'Searching Malicous Users';
+            $users = $this->adminUserSearch(2);
+        }
+        
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
     }
     
-    public function indexLeftUsers() {
-        $users = User::whereActiveStatus(4)->paginate(4);
-        return view('user.users', compact('users'));
+    public function indexLeftUsers(Request $request) {
+        $title = 'Left Users';
+        $menuName = 'users';
+        $users = User::whereActiveStatus(4)->paginate(15);
+        if (request()->searching) {
+            $title = 'Searching Left Users';
+            $users = $this->adminUserSearch(4);
+        }
+        
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
     }
     
-    public function indexPausedUsers() {
+    public function indexPausedUsers(Request $request) {
+        $menuName = 'users';
+        $title = 'Paused Users';
         $users = User::whereActiveStatus(5)->paginate(4);
-        return view('user.users', compact('users'));
+        if (request()->searching) {
+            $title = 'Searching Paused Users';
+            $users = $this->adminUserSearch(5);
+        }
+        
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
     }
     
     
     
     
     
-    
-    public function indexGuests() {
-        $users = User::all()->filter(function($user, $key){
+    /*
+     * this method isn't used now. there mey be no easy way to detect the guest users
+     */
+    public function indexGuests(Request $request) {
+        $menuName = 'users';
+        $title = 'Guest Users';
+        $users = User::paginate(15);
+        $usersCollect = $users->getCollection()->filter(function($user, $key){
             return $user->hasRole('guest');
         });
-        return view('user.users', compact('users'));
+        $users->setCollection($usersCollect);
+        
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
     }
     
-    public function indexDonors() {
-        $donations = Donation::all()->unique('user_id');
-        $users = $donations->map(function($donation, $key){
+    public function indexDonors(Request $request) {
+        $menuName = 'users';
+        $title = 'Donors';
+        $donations = Donation::paginate(15);
+        $usersCollect = $donations->getCollection()->unique('user_id')->map(function($donation, $key){
             return $donation->donor;
         });
-        return view('user.users', compact('users'));
+        $users = $donations->setCollection($usersCollect);
+        
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
     }
     
     public function indexCampaigners() {
-        $campaigns = Campaign::all()->unique('user_id');
-        $users = $campaigns->map(function($campaign, $key){
+        $title = 'Campaigners';
+        $menuName = 'users';
+        $campaigns = Campaign::paginate(15);
+        $usersCollect = $campaigns->getCollection()->unique('user_id')->map(function($campaign, $key){
             return $campaign->campaigner;
         });
-        return view('user.users', compact('users'));
+        $users = $campaigns->setCollection($usersCollect);
+        
+        return view('user.users', compact('users', 'title', 'menuName'));
     }
-    
-//    public function indexCampaigners() {
-//        $users = User::all()->filter(function($user, $key){
-//            return $user->hasRole('campaigner');
-//        });
-//        return view('user.users', compact('users'));
-//    }
-//    
+ 
     public function indexVolunteerRequests() {
-        $users = User::whereIsVolunteer(1)->get();
-        return view('user.users', compact('users'));
+        $title = 'Volunteer Requests';
+        $menuName = 'users';
+        $users = User::whereIsVolunteer(1)->paginate(15);
+        return view('user.users', compact('users', 'title', 'menuName'));
     }
     
     public function indexVolunteers() {
-        $users = User::whereIsVolunteer(2)->get();
-        return view('user.users', compact('users'));
+        $title = 'Volunteers';
+        $menuName = 'users';
+        $users = User::whereIsVolunteer(2)->paginate(15);
+        return view('user.users', compact('users', 'title', 'menuName'));
     }
     
-    public function indexStaffs() {
-        $users = User::whereIsAdmin(1)->get();
-        return view('user.users', compact('users'));
+    public function indexStaffs(Request $request) {
+        $title = 'Admins';
+        $menuName = 'users';
+        $users = User::whereIsAdmin(1)->paginate(15);
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
     }
     
-    public function indexSuper() {
-        $users = User::whereIsSuper(1)->get();
-        return view('user.users', compact('users'));
+    public function indexSuper(Request $request) {
+        $title = 'Super People';
+        $menuName = 'users';
+        $users = User::whereIsSuper(1)->paginate(15);
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
     }
     
     
@@ -122,24 +225,37 @@ class UserController extends Controller {
     
     
     
-    public function indexTopDonors() {
-        return view('user.users', compact('users'));
+    public function indexTopDonors(Request $request) {
+        $title = 'Top Donors';
+        $menuName = 'users';
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
     }
     
-    public function indexTopActives() {
-        return view('user.users', compact('users'));
+    public function indexTopActives(Request $request) {
+        $title = 'Top Actie Users';
+        $menuName = 'users';
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
     }
     
-    public function indexTopSupporters() {
-        return view('user.users', compact('users'));
+    public function indexTopSupporters(Request $request) {
+        $title = 'Top Supporters';
+        $menuName = 'users';
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
     }
     
-    public function indexTopVisiters() {
-        return view('user.users', compact('users'));
+    public function indexTopVisiters(Request $request) {
+        $title = 'Top Visitors';
+        $menuName = 'users';
+        return view('user.users', compact('request', 'users', 'title', 'menuName'));
     }
     
 
     
+    
+    public function showMenu() {
+        $menuName = '';
+        return view('layout.dashboard-menu', compact('menuName'));
+    }
     
     /**
      * 
@@ -147,45 +263,24 @@ class UserController extends Controller {
      * 
      * shows a single user's details
      */
-    public function show(Request $request, $id=0) {
+    public function show(Request $request) {
         $title = 'Dashboard';
+        $menuName = 'profile';
         $user = Auth::user();
         // if there's an id means this request is coming from admin
         // else is coming from client.
-        if($id){
-            $user = User::find($id);
-        }
-        //$address = Address::where('user_id', $user->id)->get();
-        $user->user_type = $user->roleDesc('super', 'staff', 'voluntier', 'campaigner', 'donor', 'guest');
-
-        if(!$user->gender){
-            $user->gender = 'Not Defined';
+        if($request->id){
+            $title = 'User Profile';
+            $user = User::find($request->id);
         }
         
-        if(!$user->userExtra->phone){
-            $user->phone = 'Not Provided';
-        }else $user->phone = $user->userExtra->phone;
-        
-        
-        if($user->currentAddress()->country && $user->currentAddress()->country->nicename){
-            $user->countryNiceName = $user->currentAddress()->country->nicename;
-        }
-        else {
-            $user->countryNiceName = 'Not Provided';
-        }
-        
-        return view('user.profile')->with(compact('request', 'user', 'title'));
-    }
-    
-    public function showAdmin() {
-        return view('admin.profile')->with('page', 'admin-profile');
+        return view('user.profile', compact('user', 'title', 'menuName'));
     }
     
     /**
      * generates a register form
      */
     public function create() {}
-
     
     /**
      * make a new user entry in the users table
@@ -198,124 +293,170 @@ class UserController extends Controller {
     /**
      * admin gets edit user form
      */
-    public function edit(Request $request, $id=0) {
+    public function edit(Request $request) {
         $title = 'Edit Profile';
+        $menuName = 'profile';
         $user = Auth::user();
         // if there's an id means this request is coming from admin
         // else is coming from client.
-        if($id && $user->id !== $id){
-            $user = User::find($id);
+        if($request->id && $user->id !== $request->id){
+            $title = 'Edit Profile by Admin';
+            $user = User::find($request->id);
         }
-        $user->user_type = $user->roleDesc('super', 'staff', 'voluntier', 'campaigner', 'donor', 'guest');
-
-        if (!$user->gender){
-            $user->gender = 'Not Defined';
-        }
-
-        if(!$user->currentAddress()->phone){
-            $user->phone = 'Not Provided';
-        }else $user->phone = $user->currentAddress()->phone;
-        
         
         $countries = Country::all();
-
-        if($user->currentAddress()->country && $user->currentAddress()->country->nicename){
-            $user->countryNiceName = $user->currentAddress()->country->nicename;
-        }
-        else {
-            $user->countryNiceName = 'Not Provided';
-        }
-        // return view('dashboard.profile-edit')->with('user', $user);
-        return view('user.profile-edit')->with(compact('request', 'user', 'countries', 'title'));
+        return view('user.profile-edit', compact('user', 'countries', 'title', 'menuName'));
     }
     
     
-    public function update(Request $request, $id=0) {
+    public function update(Request $request) {
         $user = Auth::user();
         // if there's an id means this request is coming from admin
         // else is coming from client.
-        if($id){
-            $user = User::find($id);
-        }
-        //* $inputs = Arr::except($req->input(), ['_token', 'photo']);
+        if($request->id)
+            $user = User::find($request->id);
         
-        $rules = [
-            'name' => 'string:255',
-            'birth_date' => 'date',
-            'gender' => 'string:10',
-            'phone' => 'numeric',
-            'nid' => 'numeric',
-            'email' => 'email',
-            'facebook' => 'string:50',
-            'twitter' => 'string:50',
-            
-            'current_holding' => 'string:30',
-            'current_road' => 'string:30',
-            'current_post_code' => 'string:30',
-            'current_upazilla' => 'string:30',
-            'current_district' => 'string:30',
-            'current_country' => 'numeric',
-            
-            'permanent_holding' => 'string:30',
-            'permanent_road' => 'string:30',
-            'permanent_post_code' => 'string:30',
-            'permanent_upazilla' => 'string:30',
-            'permanent_district' => 'string:30',
-            'permanent_country' => 'numeric',
-            
-            'careof' => 'string:255',
-            'careof_phone' => 'numeric',
-        ];
-        $validated = $request->validate($rules);
-
-        
+        $validated = $this->UpdInfoValidn($request);
         if(isset($validated['name'])) $user->name = $validated['name'];
-        if(isset($validated['birth_date'])) $user->userExtra->birth_date = $validated['birth_date'];
         if(isset($validated['gender'])) $user->gender = $validated['gender'];
-        if(isset($validated['phone'])) $user->userExtra->phone = $validated['phone'];
-        if(isset($validated['nid'])) $user->userExtra->nid = $validated['nid'];
-        if(isset($validated['email'])) $user->email = $validated['email'];
-        if(isset($validated['facebook'])) $user->userExtra->facebook = $validated['facebook'];
-        if(isset($validated['twitter'])) $user->userExtra->twitter = $validated['twitter'];
+        if(isset($validated['about'])) $user->about = $validated['about'];
+        $userExtra = $this->isUserExtraData($validated, $user);
+        $currAddr = $this->isCurrAddrData($validated, $user);
+        $permAddr = $this->isPermAddrData($validated, $user);
         
-        if(isset($validated['current_holding'])) $user->currentAddress()->holding = $validated['current_holding'];
-        if(isset($validated['current_road'])) $user->currentAddress()->road = $validated['current_road'];
-        if(isset($validated['current_post_code'])) $user->currentAddress()->post_code = $validated['current_post_code'];
-        if(isset($validated['current_upazilla'])) $user->currentAddress()->upazilla = $validated['current_upazilla'];
-        if(isset($validated['current_district'])) $user->currentAddress()->district = $validated['current_district'];
-        if(isset($validated['current_country'])) $user->currentAddress()->country_id = $validated['current_country'];
+        $saved = false;
+        try {
+            DB::transaction(function () use ($user, $userExtra, $currAddr, $permAddr) {
+                $user->save();
+                if($userExtra)
+                    $userExtra->save();
+                if($currAddr)
+                    $currAddr->save();
+                if($permAddr)
+                    $permAddr->save();
+            }, 3);
+            $saved = true;
+        } catch (\Exception $e) {
+            $saved = false;
+        }
         
-        if(isset($validated['permanent_holding'])) $user->permanentAddress()->holding = $validated['permanent_holding'];
-        if(isset($validated['permanent_road'])) $user->permanentAddress()->road = $validated['permanent_road'];
-        if(isset($validated['permanent_post_code'])) $user->permanentAddress()->post_code = $validated['permanent_post_code'];
-        if(isset($validated['permanent_upazilla'])) $user->permanentAddress()->upazilla = $validated['permanent_upazilla'];
-        if(isset($validated['permanent_district'])) $user->permanentAddress()->district = $validated['permanent_district'];
-        if(isset($validated['permanent_country'])) $user->permanentAddress()->country_id = $validated['permanent_country'];
-        
-        if(isset($validated['careof'])) $user->userExtra->careof = $validated['careof'];
-        if(isset($validated['careof_phone'])) $user->userExtra->careof_phone = $validated['careof_phone'];
-
-        
-        $saved = $user->push();
         // $req->user_panel_fraction = 'alls';
         if($saved){
             // if there's an origUrl, then after making edition to profile app will go to
             // that origUrl.
             if($request->origUrl) return redirect($request->origUrl);
             
-            if(Auth::user()->id !== $id){
+            $isAdmin = (Auth::user()->is_admin === 1);
+            if( $isAdmin && $request->id ){
                 // returns to users table in admin panel from this 'if block'
                 // the 'user_panel_fraction' is uploaded from user-panel blade
                 // so that after updating user information the admin can go to 
                 // the appropriate original section of user-panel.
-                return redirect('/dashboard/admin/users-panel/' . $request->user_panel_fraction)->with('success', $request->profileItem . ' has been updated');
+                return redirect('/dashboard/admin/users-panel/'.$request->user_panel_fraction.'?menuName=users')->with('success', $request->profileItem.' has been updated');
             }
-            else {
+            else if( !$request->id ) {
                 // returns to client profile from this else block
-                return redirect(route('user.show'))->with('success', $request->profileItem . ' has been updated');
+                return redirect(route('user.show', ['menuName'=> 'profile']))->with('success', $request->profileItem.' has been updated');
             }
         }
         return back()->with('error', 'sorry the changes you are trying to make couldn\'t be possible');
+    }
+    
+    private function UpdInfoValidn($request) {
+        $rules = [
+            'name' => 'string:255',
+            'birth_date' => 'date',
+            'gender' => 'string:10',
+            'phone' => 'numeric',
+            'nid' => 'numeric',
+            //'email' => 'email',
+            'facebook' => 'string:50',
+            'twitter' => 'nullable|string:50',
+            'about' => 'string:500',
+            'current_holding' => 'string:30',
+            'current_road' => 'string:30',
+            'current_post_code' => 'string:30',
+            'current_upazilla' => 'string:30',
+            'current_district' => 'string:30',
+            'current_country' => 'numeric',
+            'permanent_holding' => 'string:30',
+            'permanent_road' => 'string:30',
+            'permanent_post_code' => 'string:30',
+            'permanent_upazilla' => 'string:30',
+            'permanent_district' => 'string:30',
+            'permanent_country' => 'numeric',
+            'careof' => 'string:255',
+            'careof_phone' => 'numeric',
+        ];
+        return $request->validate($rules);
+    }
+    
+    private function isUserExtraData($validated, $user) {
+        $isAvailable = isset($validated['birth_date']) ||
+        isset($validated['phone']) ||
+        isset($validated['nid']) ||
+        isset($validated['facebook']) ||
+        isset($validated['twitter']) ||
+        isset($validated['careof']) ||
+        isset($validated['careof_phone']);
+        
+        if($isAvailable){
+            $userExtra = UserExtra::firstOrNew(['user_id' => $user->id]);
+            if(isset($validated['birth_date'])) $userExtra->birth_date = $validated['birth_date'];
+            if(isset($validated['phone'])) $userExtra->phone = $validated['phone'];
+            if(isset($validated['nid'])) $userExtra->nid = $validated['nid'];
+            if(isset($validated['facebook'])) $userExtra->facebook = $validated['facebook'];
+            if(isset($validated['twitter'])) $userExtra->twitter = $validated['twitter'];
+            if(isset($validated['careof'])) $userExtra->careof = $validated['careof'];
+            if(isset($validated['careof_phone'])) $userExtra->careof_phone = $validated['careof_phone'];
+            // $userExtra->save();
+            return $userExtra;
+        }
+        return null;
+    }
+    
+    private function isCurrAddrData($validated, $user) {
+        $isAvailable = isset($validated['current_holding']) &&
+            isset($validated['current_road']) &&
+            isset($validated['current_post_code']) &&
+            isset($validated['current_upazilla']) &&
+            isset($validated['current_district']) &&
+            isset($validated['current_country']);
+        
+        if($isAvailable){
+            $currentAddress = Address::firstOrNew(['user_id' => $user->id, 'type' => 'current']);
+            if(isset($validated['current_holding'])) $currentAddress->holding = $validated['current_holding'];
+            if(isset($validated['current_road'])) $currentAddress->road = $validated['current_road'];
+            if(isset($validated['current_post_code'])) $currentAddress->post_code = $validated['current_post_code'];
+            if(isset($validated['current_upazilla'])) $currentAddress->upazilla = $validated['current_upazilla'];
+            if(isset($validated['current_district'])) $currentAddress->district = $validated['current_district'];
+            if(isset($validated['current_country'])) $currentAddress->country_id = $validated['current_country'];
+            // $currentAddress->save();
+            return $currentAddress;
+        }
+        return null;
+    }
+    
+    private function isPermAddrData($validated, $user) {
+        $isAvailable = isset($validated['permanent_holding']) &&
+            isset($validated['permanent_road']) &&
+            isset($validated['permanent_post_code']) &&
+            isset($validated['permanent_upazilla']) &&
+            isset($validated['permanent_district']) &&
+            isset($validated['permanent_country']);
+        
+        if($isAvailable){
+            $permanentAddress = Address::firstOrNew(['user_id' => $user->id, 'type' => 'permanent']);
+            if(isset($validated['permanent_holding'])) $permanentAddress->holding = $validated['permanent_holding'];
+            if(isset($validated['permanent_road'])) $permanentAddress->road = $validated['permanent_road'];
+            if(isset($validated['permanent_post_code'])) $permanentAddress->post_code = $validated['permanent_post_code'];
+            if(isset($validated['permanent_upazilla'])) $permanentAddress->upazilla = $validated['permanent_upazilla'];
+            if(isset($validated['permanent_district'])) $permanentAddress->district = $validated['permanent_district'];
+            if(isset($validated['permanent_country'])) $permanentAddress->country_id = $validated['permanent_country'];
+            // $permanentAddress->save();
+            return $permanentAddress;
+        }
+        return null;
     }
     
     public function updatePhoto(Request $req, $id=0) {
@@ -363,12 +504,13 @@ class UserController extends Controller {
 
         $user->refresh();
         if($req->hasFile('avatar')){
-            return redirect(route('user.show'))->with(['success' => $req->profileItem.' has been updated', 'user' => $user]);
+            return redirect(route('user.show', ['menuName'=>'profile']))->with(['success' => $req->profileItem.' has been updated', 'user' => $user]);
         }
         return back()->with('error', 'sorry the changes you are trying to make couldn\'t be possible');
     }
     
-    //------- client updates ------------------------------------
+    
+        //------- client updates ------------------------------------
     /*
      * 0:pending, 1:active, 2:malicous, 3:blocked, 4:left, 5:paused
      * active_status is set to 5. resuming means setting it back to 1
@@ -404,6 +546,7 @@ class UserController extends Controller {
     //------- client updates ends ------------------------------------
     
     
+    
     /*
      * ------- admin updates to volunteer ------------------------------------
      * an admin performs four actions with this method. admin can:
@@ -425,6 +568,8 @@ class UserController extends Controller {
         $updated = $user->update();
         
         if($updated){
+            $user->refresh();
+            Mail::to($user)->send(new VolunteerRequest($user));
             return redirect()->back();
         }
     }

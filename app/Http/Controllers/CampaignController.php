@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
 
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
 
-use App\Lib\Helper;
+use App\Library\Helper;
 use App\Models\Campaign;
 use App\Models\Country;
 use App\Models\Category;
@@ -21,38 +23,44 @@ use App\Models\View;
 use App\Models\Document;
 use App\Models\Album;
 use App\Models\Update;
+use App\Models\UserExtra;
+
+use App\Mail\CampaignCreation;
+
+
 
 class CampaignController extends Controller {
     
+    public function searchGuestCampaign() {
+        $rules = ['q' => 'string:500', 'searching' => 'integer:1'];
+        $validated = request()->validate($rules);
+        return $campaigns = Campaign::where('title', 'like', "%{$validated['q']}%")->
+            orWhere('slug', 'like', "%{$validated['q']}%")->
+            orWhere('short_description', 'like', "%{$validated['q']}%")->
+            orWhere('description', 'like', "%{$validated['q']}%")->paginate(15)->withQueryString();
+    }
     
+    public function indexFilteredCampaign() {}
     
-    public function indexGuestCampaign(Request $request, $categoryId='1'){
+    public function indexGuestCampaign(Request $request){
         $categories = Category::all();
+        $categoryId = $request->categoryId ? $request->categoryId : 0;
         $active = $categoryId;
-        $campaigns = Campaign::where('category_id', $categoryId)->where('status', 1)->paginate(4);
-        return view('face.campaign-master', compact('request', 'categories', 'active', 'campaigns'));
-    }
-    
-    public function indexSearchedCampaign(Request $request) {
-        $rules = [
-            'q' => 'string:500',
-            'category_id' => 'numeric',
-        ];
-        $validated = $this->validate($request, $rules);
         
-        $categories = Category::all();
-        $active = $request->category_id;
-        $campaigns = Campaign::where('category_id', $validated['category_id'])->orWhere('short_description', 'like', "%{$validated['q']}%")->orWhere('description', 'like', "%{$validated['q']}%")->paginate(4);
-        return view('face.campaign-master', compact('request', 'categories', 'active', 'campaigns'));
+        $campaigns = Campaign::where('category_id', $categoryId)->paginate(15);
+        if(request()->searching){
+            $campaigns = $this->searchGuestCampaign();
+        }
+        
+        $campsCollect = $campaigns->getCollection()->filter(function($aCamp) {
+            return $aCamp->isActive();
+        });
+        $campaigns->setCollection($campsCollect);
+
+        return view('face.camp-master', compact('categories', 'active', 'campaigns'));
     }
     
-    public function indexFilteredCampaign(Request $request) {
-        $categories = Category::all();
-        $active = $request->category_id;
-        $campaigns = Campaign::where('category_id', $request->category_id)->paginate(4);
-        return view('face.campaign-master', compact('request', 'categories', 'active', 'campaigns'));
-    }
-
+   
     /*
      * shows a campaign on the basis of it's id which is provided by the master page.
      * it records each show before showing.
@@ -63,7 +71,7 @@ class CampaignController extends Controller {
         if($campaign){
             // every show of any campaign is recoreded by this portion.
             // but recorded only if the visitor is logged in and not campaign creator himself.
-            if (Auth::check() && (Auth::user()->id !== $campaign->user_id)) {
+            if (Auth::check() && (Auth::user()->id !== $campaign->user_id && !$campaign->isCampPending())) {
                 $data = [
                     'user_id' => Auth::user()->id,
                     'campaign_id' => $campaign->id,
@@ -71,116 +79,107 @@ class CampaignController extends Controller {
                 View::create($data);
             }
             
-            return view('face.campaign-detail', compact('campaign'));
+            return view('face.camp-offerus', compact('campaign'));
         }
         else {
-            return view('face.campaign-not-found');
+            return view('face.camp-not-found');
         }
     }
-    
-    
-    
-    public function f($map) {
-        if($map->contains()->key()){
-            $map->value++;
-        }
-        else {
-            $map->add()->key;
-            $map->value = 1;
-        }
-    }
-    
-    
     
     /*
      * donor activities starts
      */
-    public function indexDonatedCampaign(Request $request){
+    public function indexDonatedCampaign(){
+        $title = 'Donated Campaign';
+        $menuName = 'donated-camp';
         if(Auth::check()){
             $userId = Auth::user()->id;
-            $donations = Donation::where('user_id', $userId)->get();
+            $donations = Donation::where('user_id', $userId)->paginate(15);
             // just converting donation to campaign
-            $campaigns = $donations->map(function($donation){
-                return $donation->campaign;
+            $camps = $donations->getCollection()->map(function($donation) {
+                        return $donation->campaign;
+                        // taking only one occurance of each campaign elininating
+                        // the duplicate occurance but counting the occurance number
+                    })->groupBy('id')->map(function ($aGroup) {
+                        // as we need only one of each group. this map iterates once
+                        // for each group
+                        $first = $aGroup[0];
+                        $first->count = $aGroup->count();
+                        return $first;
             });
-            
-            // taking only one occurance of each campaign elininating
-            // the duplicate occurance but counting the occurance number
-            $campaigns = $campaigns->groupBy('id')->map(function ($aGroup) {
-                // as we need only one of each group. this map iterates once
-                // for each group
-                $first = $aGroup[0];
-                $first->count = $aGroup->count();
-                return $first;
-            });
-            return view('campaign.campaigns-list', compact('request', 'campaigns'));
+            $campaigns = $donations->setCollection($camps);
+            return view('campaign.campaigns-list', compact('campaigns', 'title', 'menuName'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
     
-    public function indexSupportedCampaign(Request $request){
+    public function indexSupportedCampaign(){
+        $title = 'Supported Campaign';
+        $menuName = 'supported-camp';
         if(Auth::check()){
-            $user = Auth::user();
-            $likes = Like::where('user_id', $user->id)->get();
-            $campaigns = $likes->map(function($like, $key){
+            $likes = Like::where('user_id', Auth::user()->id)->paginate(15);
+            $camps = $likes->getCollection()->map(function($like, $key){
                 return $like->campaign;
             });
-            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns'));
+            $campaigns = $likes->setCollection($camps);
+            return view('campaign.campaigns-list', compact('campaigns', 'title', 'menuName'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
     
-    public function indexSharedCampaign(Request $request){
+    public function indexSharedCampaign(){
+        $title = 'Shared Campaign';
+        $menuName = 'shareed-camp';
         if(Auth::check()){
-            $user = Auth::user();
-            $shares = Share::where('user_id', $user->id)->get();
-            $campaigns = $shares->map(function($share, $key){
+            $shares = Share::where('user_id', Auth::user()->id)->paginate(5);
+            $camps = $shares->getCollection()->map(function($share, $key){
                 return $share->campaign;
             });
-            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns'));
+            $campaigns = $shares->setCollection($camps);
+            return view('campaign.campaigns-list', compact('campaigns', 'title', 'menuName'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
     
-    public function indexCommentedCampaign(Request $request){
+    public function indexCommentedCampaign(){
+        $title = 'Commented Campaign';
+        $menuName = 'commented-camp';
         if(Auth::check()){
-            $user = Auth::user();
-            $comments = Comment::where('user_id', $user->id)->distinct()->get(['campaign_id']);
-            $campaigns = $comments->map(function($comment, $key){
+            $comments = Comment::where('user_id', Auth::user()->id)->distinct()->paginate(15, ['campaign_id']);
+            $campsCollect = $comments->getCollection()->map(function($comment, $key){
                 return $comment->campaign;
             });
-            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns'));
+            $campaigns = $comments->setCollection($campsCollect);
+            return view('campaign.campaigns-list', compact('campaigns', 'title', 'menuName'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
     
     // views is counted by when user clicks on a tile to see it's detail.
-    public function indexViewedCampaign(Request $request){
+    public function indexViewedCampaign(){
+        $title = 'Viewed Campaign';
+        $menuName = 'viewed-camp';
         if(Auth::check()){
-            $userId = Auth::user()->id;
-            $views = View::where('user_id', $userId)->get();
+            $views = View::where('user_id', Auth::user()->id)->paginate(15);
             // just converting views to campaign
-            $campaigns = $views->map(function($view, $key){
-                return $view->campaign;
+            $campsCollect = $views->getCollection()->map(function($view, $key) {
+                    return $view->campaign;
+                // taking only one occurance of each campaign elininating
+                // the duplicate occurance but counting the occurance number
+                })->groupBy('id')->map(function ($aGroup) {
+                    // as we need only one of each group. this map iterates once
+                    // for each group
+                    $first = $aGroup[0];
+                    $first->count = $aGroup->count();
+                    return $first;
+                // rejects the campaigns which are create by the campaigner himself
+                })->reject(function ($value) {
+                    if ((Auth::user()->id === $value->user_id) || $value->isCampPending()) {
+                        return true;
+                    }
             });
-            
-            // taking only one occurance of each campaign elininating
-            // the duplicate occurance but counting the occurance number
-            $campaigns = $campaigns->groupBy('id')->map(function ($aGroup) {
-                // as we need only one of each group. this map iterates once
-                // for each group
-                $first = $aGroup[0];
-                $first->count = $aGroup->count();
-                return $first;
-            });
-            
-            // rejects the campaigns which are create by the campaigner himself
-            $campaigns = $campaigns->reject(function ($value){
-                if(Auth::user()->id === $value->user_id){
-                    return true;
-                }
-            });
-            return view('campaign.campaigns-list', compact('request', 'campaigns'));
+            $campaigns = $views->setCollection($campsCollect);
+            return view('campaign.campaigns-list', compact('campaigns', 'title', 'menuName'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
@@ -197,74 +196,152 @@ class CampaignController extends Controller {
      * campaigner activities starts
      */
     public function indexMyCampaignsPanel() {
-        return view('campaign.campaigns-panel-mine');
+        $title = 'My Campaigns Panel';
+        $menuName = 'myc-camp';
+        return view('campaign.campaigns-panel-mine', compact('title', 'menuName'));
     }
     
-    public function indexMyAllCampaign(Request $request){
+    public function searchMyCampaign($status) {
+        $rules = ['q' => 'string:500', 'searching' => 'integer:1'];
+        $validated = request()->validate($rules);
+        if( isset($status) ){
+            return $campaigns = Campaign::where(function($query) use ($validated) {
+                $query->where('title', 'like', "%{$validated['q']}%")->
+                orWhere('slug', 'like', "%{$validated['q']}%")->
+                orWhere('short_description', 'like', "%{$validated['q']}%")->
+                orWhere('description', 'like', "%{$validated['q']}%");
+            })->where('user_id', Auth::user()->id)->
+            where('status', $status)->paginate(15)->withQueryString();
+        }
+        else {
+            return $campaigns = Campaign::where(function($query) use ($validated) {
+                $query->where('title', 'like', "%{$validated['q']}%")->
+                orWhere('slug', 'like', "%{$validated['q']}%")->
+                orWhere('short_description', 'like', "%{$validated['q']}%")->
+                orWhere('description', 'like', "%{$validated['q']}%");
+            })->where('user_id', Auth::user()->id)->paginate(15)->withQueryString();
+        }
+    }
+    
+    public function indexMyAllCampaign(){
+        $title = 'All Campaigns';
+        $menuName = 'my-camp';
         if(Auth::check()){
             $title = 'My All Campaign';
-            $user = Auth::user();
-            $campaigns = Campaign::where('user_id', $user->id)->paginate(5);
-            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns', 'title'));
+            $menuName = 'my-camp';
+            $campaigns = Campaign::where('user_id', Auth::user()->id)->paginate(15);
+            if (request()->searching) {
+                $title = 'Searching All Campaigns';
+                $campaigns = $this->searchMyCampaign(null);
+            }
+            
+            return view('campaign.campaigns-list', compact('campaigns', 'title', 'menuName'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
     
-    public function indexMyActiveCampaign(Request $request){
+    public function indexMyActiveCampaign(){
+        $title = 'Active Campaigns';
+        $menuName = 'my-camp';
         if(Auth::check()){
             $user = Auth::user();
-            $campaigns = Campaign::where('user_id', $user->id)->get()->filter(function($value, $key){
+            $campaigns = Campaign::where('user_id', $user->id)->paginate(15);
+            if (request()->searching) {
+                $title = 'Searching Active Campaigns';
+                $campaigns = $this->searchMyCampaign(null);
+            }
+            
+            $campsCollect = $campaigns->getCollection()->filter(function($value, $key){
                 return $value->isActive();
             });
-            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns'));
+            $campaigns->setCollection($campsCollect);
+            return view('campaign.campaigns-list', compact('user', 'campaigns', 'title', 'menuName'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
     
-    public function indexMyCompletedCampaign(Request $request){
+    public function indexMyCompletedCampaign(){
+        $title = 'Completed Campaign';
+        $menuName = 'my-camp';
         if(Auth::check()){
             $user = Auth::user();
-            $campaigns = Campaign::where('user_id', $user->id)->get()->filter(function($value, $key){
+            $campaigns = Campaign::where('user_id', $user->id)->paginate(15);
+            if (request()->searching) {
+                $title = 'Searching Completed Campaigns';
+                $campaigns = $this->searchMyCampaign(null);
+            }
+            
+            $campsCollect = $campaigns->getCollection()->filter(function($value, $key){
                 return $value->isCompleted();
             });
-            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns'));
+            $campaigns->setCollection($campsCollect);
+            
+            return view('campaign.campaigns-list', compact('user', 'campaigns', 'title', 'menuName'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
     
-    public function indexMyPendingCampaign(Request $request){
+    public function indexMyPendingCampaign(){
+        $title = 'Pending Campaingn';
+        $menuName = 'my-camp';
         if(Auth::check()){
             $user = Auth::user();
-            $campaigns = Campaign::where('user_id', $user->id)->where('status', 0)->get();
-            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns'));
+            $campaigns = Campaign::where('user_id', $user->id)->where('status', 0)->paginate(15);
+            if (request()->searching) {
+                $title = 'Searching Pending Campaigns';
+                $campaigns = $this->searchMyCampaign(0);
+            }
+            
+            return view('campaign.campaigns-list', compact('user', 'campaigns', 'title', 'menuName'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
     
-    public function indexMyCancelledCampaign(Request $request){
+    public function indexMyCancelledCampaign(){
+        $title = 'Cancelled Campaign';
+        $menuName = 'my-camp';
         if(Auth::check()){
             $user = Auth::user();
             // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
-            $campaigns = Campaign::where('user_id', $user->id)->where('status', 2)->get();
-            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns'));
+            $campaigns = Campaign::where('user_id', $user->id)->where('status', 2)->paginate(15);
+            if (request()->searching) {
+                $title = 'Searching Cancelled Campaigns';
+                $campaigns = $this->searchMyCampaign(2);
+            }
+            
+            return view('campaign.campaigns-list', compact('user', 'campaigns', 'title', 'menuName'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
     
-    public function indexMyBlockedCampaign(Request $request){
+    public function indexMyBlockedCampaign(){
+        $title = 'Blocked Campaign';
+        $menuName = 'my-camp';
         if(Auth::check()){
             $user = Auth::user();
-            $campaigns = Campaign::where('user_id', $user->id)->where('status', 3)->get();
-            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns'));
+            $campaigns = Campaign::where('user_id', $user->id)->where('status', 3)->paginate(15);
+            if (request()->searching) {
+                $title = 'Searching Blocked Campaigns';
+                $campaigns = $this->searchMyCampaign(3);
+            }
+            
+            return view('campaign.campaigns-list', compact('user', 'campaigns', 'title', 'menuName'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
     
-    public function indexMyDeclinedCampaign(Request $request){
+    public function indexMyDeclinedCampaign(){
+        $title = 'Declined Campaign';
+        $menuName = 'my-camp';
         if(Auth::check()){
             $user = Auth::user();
-            $campaigns = Campaign::where('user_id', $user->id)->where('status', 4)->get();
-            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns'));
+            $campaigns = Campaign::where('user_id', $user->id)->where('status', 4)->paginate(15);
+            if (request()->searching) {
+                $title = 'Searching Declined Campaigns';
+                $campaigns = $this->searchMyCampaign(4);
+            }
+            
+            return view('campaign.campaigns-list', compact('user', 'campaigns', 'title', 'menuName'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
@@ -274,8 +351,9 @@ class CampaignController extends Controller {
     
     
     
+    // select all form table campaign where id is (select id from table userExtra where phone is 0187) 
     
-    
+    // Campaign::find();
     
     
     
@@ -283,58 +361,186 @@ class CampaignController extends Controller {
     /*
      * admin activities starts
      */
-    public function indexAdminCampaignPanel(Request $request){
-        return view('campaign.campaigns-panel-admin');
+    public function indexAdminCampaignPanel(){
+        $title = 'Campaign Information';
+        $menuName = 'campaign';
+        return view('campaign.campaigns-panel-admin', compact('title', 'menuName'));
     }
     
-    public function indexAdminAllCampaign(Request $request){
-        $allCampaigns = Campaign::paginate(15);
-        return view('campaign.campaigns')->with('campaigns', $allCampaigns);
+    public function adminCampaignSearchByTitle($status=false){
+        $rules = ['q' => 'string:500', 'searching' => 'integer:1'];
+        $validated = request()->validate($rules);
+        if( isset($status) ){
+            return $campaigns = Campaign::where(function($query) use ($validated) {
+                $query->where('title', 'like', "%{$validated['q']}%")->
+                orWhere('slug', 'like', "%{$validated['q']}%")->
+                orWhere('short_description', 'like', "%{$validated['q']}%")->
+                orWhere('description', 'like', "%{$validated['q']}%");
+            })->where('status', $status)->paginate(15)->withQueryString();
+        }
+        else {
+            return $campaigns = Campaign::where(function($query) use ($validated) {
+                $query->where('title', 'like', "%{$validated['q']}%")->
+                orWhere('slug', 'like', "%{$validated['q']}%")->
+                orWhere('short_description', 'like', "%{$validated['q']}%")->
+                orWhere('description', 'like', "%{$validated['q']}%");
+            })->paginate(15)->withQueryString();
+        }
+    }
+    
+    public function adminCampaignSearch($status=null){
+        $rules = ['q' => 'string:500', 'searching' => 'integer:1'];
+        $validated = request()->validate($rules);
+
+        /*
+        $campaigns = Campaign::join('user_extras', function($builder){
+            $builder->on('campaigns.user_id', '=', 'user_extras.user_id');
+        })->where('phone', 'like', '01873334000%')->get();
+        */
+
+
+        /*
+        $campaigns = DB::table('campaigns')
+                ->join('user_extras', function ($join) {
+                    $join->on('campaigns.user_id', '=', 'user_extras.user_id')
+                    ->where('phone', 'like', '01873334000%');
+                })
+                ->get();
+        */
+
+        if( is_numeric($validated['q']) ){
+            $c = new Collection();
+            $userExtra = UserExtra::where('phone', 'like', "%{$validated['q']}%")->paginate(5)->withQueryString();
+            if ($userExtra->getCollection()->count()) {
+                foreach ($userExtra->getCollection() as $ue) {
+                    $camps = null;
+                    if( isset($status) )
+                        $camps = Campaign::where('user_id', $ue->user_id)->whereStatus($status)->get();
+                    else
+                        $camps = Campaign::where('user_id', $ue->user_id)->get();
+                    $c = $c->merge($camps);
+                }
+            }
+            return $campaigns = $userExtra->setCollection($c);
+        }
+        else {
+            return $this->adminCampaignSearchByTitle($status);
+        }
+    }
+    
+    public function indexAdminAllCampaign(){
+        $title = 'All Campaign';
+        $menuName = 'campaign';
+        $campaigns = Campaign::paginate(15);
+        if (request()->searching) {
+            $title = 'Searching All Campaigns';
+            $campaigns = $this->adminCampaignSearch(null);
+        }
+        return view('campaign.campaigns', compact('campaigns', 'title', 'menuName'));
     }
 
-    public function indexAdminActiveCampaign(Request $request){
+    public function indexAdminActiveCampaign(){
+        $title = 'Active Campaign';
+        $menuName = 'campaign';
         // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
-        $activeCampaigns = Campaign::whereStatus(1)->get()->filter(function ($value, $key) {
+        $campaigns = Campaign::whereStatus(1)->paginate(15);
+        if (request()->searching) {
+            $title = 'Searching Active Campaigns';
+            $campaigns = $this->adminCampaignSearch(1);
+        }
+        
+        $campsCollect = $campaigns->getCollection()->filter(function ($value, $key) {
             return $value->isActive();
         });
+        $campaigns->setCollection($campsCollect);
         
-        return view('campaign.campaigns')->with('campaigns', $activeCampaigns);
+        return view('campaign.campaigns', compact('campaigns', 'title', 'menuName'));
     }
     
-    public function indexAdminCompletedCampaign(Request $request){
-        $completedCampaigns = Campaign::whereStatus(1)->get()->filter(function ($value, $key) {
+    public function indexAdminCompletedCampaign(){
+        $title = 'Completed Campaign';
+        $menuName = 'campaign';
+        $campaigns = Campaign::whereStatus(1)->paginate(15);
+        if (request()->searching) {
+            $title = 'Searching Completed Campaigns';
+            $campaigns = $this->adminCampaignSearch(1);
+        }
+        
+        $campsCollect = $campaigns->getCollection()->filter(function ($value, $key) {
             return $value->isCompleted();
         });
+        $campaigns->setCollection($campsCollect);
         
-        return view('campaign.campaigns')->with('campaigns', $completedCampaigns);
+        return view('campaign.campaigns', compact('title', 'menuName', 'campaigns'));
     }
     
-    public function indexAdminPendingCampaign(Request $request){
-        $pendingCampaigns = Campaign::whereStatus(0)->get();
-        return view('campaign.campaigns')->with('campaigns', $pendingCampaigns);
+    public function indexAdminPendingCampaign(){
+        $title = 'Pending Campaingn';
+        $menuName = 'campaign';
+        $campaigns = Campaign::whereStatus(0)->paginate(15);
+        if (request()->searching) {
+            $title = 'Searching Pending Campaigns';
+            $campaigns = $this->adminCampaignSearch(0);
+        }
+        
+        return view('campaign.campaigns', compact('campaigns', 'title', 'menuName'));
     }
     
-    public function indexAdminCancelledCampaign(Request $request){
+    public function indexAdminCancelledCampaign(){
+        $title = 'Cancelled Campaign';
+        $menuName = 'campaign';
         // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
-        $cancelledCampaigns = Campaign::whereStatus(2)->get();
-        return view('campaign.campaigns')->with('campaigns', $cancelledCampaigns);
+        $campaigns = Campaign::whereStatus(2)->paginate(15);
+        if (request()->searching) {
+            $title = 'Searching Canceled Campaigns';
+            $campaigns = $this->adminCampaignSearch(2);
+        }
+        
+        return view('campaign.campaigns', compact('title', 'menuName', 'campaigns'));
     }
     
-    public function indexAdminBlockedCampaign(Request $request){
+    public function indexAdminBlockedCampaign(){
+        $title = 'Blocked Campaign';
+        $menuName = 'campaign';
         // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
-        $blockedCampaigns = Campaign::whereStatus(3)->get();
-        return view('campaign.campaigns')->with('campaigns', $blockedCampaigns);
+        $campaigns = Campaign::whereStatus(3)->paginate(15);
+        if (request()->searching) {
+            $title = 'Searching Blocked Campaigns';
+            $campaigns = $this->adminCampaignSearch(3);
+        }
+        
+        return view('campaign.campaigns', compact('title', 'menuName', 'campaigns'));
     }
     
-    public function indexAdminDeclinedCampaign(Request $request){
+    public function indexAdminDeclinedCampaign(){
+        $title = 'Declined Campaign';
+        $menuName = 'campaign';
         // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
-        $declinedCampaigns = Campaign::whereStatus(4)->get();
-        return view('campaign.campaigns')->with('campaigns', $declinedCampaigns);
+        $campaigns = Campaign::whereStatus(4)->paginate(15);
+        if (request()->searching) {
+            $title = 'Searching Canceled Campaigns';
+            $campaigns = $this->adminCampaignSearch(4);
+        }
+        
+        return view('campaign.campaigns', compact('title', 'menuName', 'campaigns'));
     }
     
-    
-    public function indexAdminCampaign($category='pending'){
-        return view('campaign.campaigns')->with('category', $category);
+    public function indexAdminPickedCampaign(){
+        $title = 'Picked Campaign';
+        $menuName = 'campaign';
+        // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
+        $campaigns = Campaign::whereIsPicked(true)->paginate(15);
+        if (request()->searching) {
+            $title = 'Searching Picked Campaigns';
+            $campaigns = $this->adminCampaignSearch(4);
+        }
+        
+        $coll = $campaigns->getCollection()->filter(function($camp){
+            return $camp->is_picked;
+        });
+        $campaigns->setCollection($coll);
+        $option = 'picked';
+        return view('campaign.campaigns', compact('title', 'menuName', 'campaigns', 'option'));
     }
     /*
      * admin activities ends
@@ -349,21 +555,21 @@ class CampaignController extends Controller {
      */
     public function create(Request $request) {
         $title = 'Create New Campaign';
-        // fields are empty menas profile is complete. so no action needed.
-        // but if are not empty means, those fields are not filled up. so 
-        // redirect user to profile-edit page. and accociate a link to
-        // campaign-create page as origUrl so that after completing the profile
-        // user could go to campaign-create page.
+        $menuName = 'create-camp';
+        
+        // check first whether a user has completed her profile
         $fields = Auth::user()->isProfileComplete();
         $message = 'You didn\'t comple your profile.' .$fields. ' are not filled. To create any campaign you have to fillup those fields.';
         if($fields){
-            return view('campaign.incomplete-profile-msg', compact('message'));
+            $title = 'Incomplete Profile';
+            $request->request->add(['origUrl' => route('campaign.create')]);
+            return view('campaign.incomplete-profile-msg', compact('message', 'title', 'menuName'));
         }
         
         // actual campaign creation process.
         $countries = Country::all();
         $categories = Category::all();
-        return view('campaign.campaign-create', compact('countries', 'categories', 'request', 'title'));
+        return view('campaign.campaign-create', compact('countries', 'categories', 'request', 'title', 'menuName'));
     }
     
     public function preview(Request $request) {
@@ -375,6 +581,12 @@ class CampaignController extends Controller {
     public function store(Request $request, $preview=false) {
         // $previewedId = session('previewedId');
         // if($previewedId) $this->destroy ($previewedId);
+        
+        $isAnyCampPending = Auth::user()->campaign->contains(function($camp){
+            return $camp->isCampPending();
+        });
+        if($isAnyCampPending)
+            return back()->with('error', 'Sorry! you cannot create another campaign while you have a campaign already pending.');
         
         $rules = [
             'title' => 'required|string:255',
@@ -423,7 +635,6 @@ class CampaignController extends Controller {
             'amount_prefilled' => $request->amount_prefilled,
             
             'status' => $status,
-            'is_funded' => 0,
         ];
         $create = Campaign::create($data);
         // if any image for supplimenting feature image to this campaign
@@ -444,74 +655,6 @@ class CampaignController extends Controller {
         return back()->with('error', trans('app.something_went_wrong'))->withInput($request->input());
     }
     
-    /*
-     * this portion is actually a part of this->store() method. but is separated from that
-     * to facilate the use use of preview() so that we can avoid dry provess. (not used)
-     */
-    private function storeOnly($request) {
-        $rules = [
-            'title' => 'required|string:255',
-            'category' => 'required|numeric',
-            'short_description' => 'required|string:400',
-            'description' => 'required|string',
-            'feature_image' => 'required|file',
-            'album' => 'array',
-            'documents' => 'required|array',
-            // 'feature_video' => 'required|file',
-            'goal' => 'required|numeric',
-            'end_method' => 'required|numeric',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-            'min_amount' => 'numeric',
-            'max_amount' => 'numeric',
-            'recommended_amount' => 'numeric',
-            'amount_prefilled' => 'string:255',
-        ];
-        $this->validate($request, $rules);
-
-        $user_id = Auth::user()->id;
-        $slug = Helper::unique_slug($request->title);
-        
-        $data = [
-            'user_id' => $user_id,
-            'category_id' => $request->category,
-            
-            'slug' => $slug,
-            'title' => $request->title,
-            'short_description' => $request->short_description,
-            'description' => $request->description,
-            'feature_image' => $this->storeImage($request),
-            // 'feature_video' => $request->video,
-            
-            'goal' => $request->goal,
-            // 0:ends-by-date, 1:ends-by-goal
-            'end_method' => $request->end_method,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'min_amount' => $request->min_amount,
-            'max_amount' => $request->max_amount,
-            'recommended_amount' => $request->recommended_amount,
-            'amount_prefilled' => $request->amount_prefilled,
-            
-            'status' => 0,
-            'is_funded' => 0,
-        ];
-        $create = Campaign::create($data);
-        // if any image for supplimenting feature image to this campaign
-        // those are uploaded by this method
-        if ($request->hasFile('album')) {
-            $this->updateAlbum($request, $create);
-        }
-        // if any image, pdf for supporting documents of this campaign
-        // those are uploaded by this method
-        if ($request->hasFile('documents')) {
-            $this->updateDocuments($request, $create);
-        }
-        
-        return $create;
-    }
-
-
     private function storeImage($request) {
         if(!$request->hasFile('feature_image')){
             return '';
@@ -558,10 +701,12 @@ class CampaignController extends Controller {
     
     
     public function edit(Request $request, $campaignId) {
+        $title = 'Edit Campaign';
+        $menuName = $request->menuName? $request->menuName : 'my-camp';
         $campaign = Campaign::find($campaignId);
         $countries = Country::all();
         $categories = Category::all();
-        return view('campaign.campaign-edit')->with(compact('request', 'campaign', 'countries', 'categories'));
+        return view('campaign.campaign-edit', compact('campaign', 'countries', 'categories', 'title', 'menuName'));
     }
     
     public function update(Request $request, $campaignId) {
@@ -607,9 +752,6 @@ class CampaignController extends Controller {
         $campaign->max_amount = $request->max_amount;
         $campaign->recommended_amount = $request->recommended_amount;
         $campaign->amount_prefilled = $request->amount_prefilled;
-
-        $campaign->status = 0;
-        $campaign->is_funded = 0;
         
         $updated = $campaign->update();
         // if any image for supplimenting feature image to this campaign
@@ -624,10 +766,10 @@ class CampaignController extends Controller {
         }
         
         if ($updated) {
-            $req = [
-                'adminCampaignMenu' => $request->adminCampaignMenu,
-            ];
-            return redirect(route('campaign.showGuestCampaign', $campaignId))->with(['success' => trans('app.campaign_created'), 'request' => $req]);
+//            session(['approving' => 'true']);
+//            $request->request->add(['editing' => 'yes']);
+            return redirect(route('campaign.showGuestCampaign', ['campaignId' => $campaignId, 'editing' => 'true']));
+//            return redirect()->back()->with(['success' => trans('app.campaign_created'), 'editing' => 'yes']);
         }
         return back()->with('error', trans('app.something_went_wrong'))->withInput($request->input());
     }
@@ -780,13 +922,17 @@ class CampaignController extends Controller {
         }
     }
 
-
+    /*
+     * approves a campaign
+     */
     public function updateStatusToApproved($id) {
         $campaign = Campaign::find($id);
         // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
         $campaign->status = 1;
         $updated = $campaign->update();
         if($updated){
+            $campaign->refresh();
+            Mail::to($campaign->campaigner)->send(new CampaignCreation($campaign));
             return back()->with(['success' => 'The campaign has been approved', 'campaing' => $campaign]);
         }
         return back()->with(['error' => 'The action couldn\'t be performed', 'campaing' => $campaign]);
@@ -798,6 +944,7 @@ class CampaignController extends Controller {
         $campaign->status = 2;
         $updated = $campaign->update();
         if($updated){
+            Mail::to($campaign->campaigner)->send(new CampaignCreation($campaign));
             return back()->with(['success' => 'The campaign has been approved', 'campaing' => $campaign]);
         }
         return back()->with(['error' => 'The action couldn\'t be performed', 'campaing' => $campaign]);
@@ -809,6 +956,7 @@ class CampaignController extends Controller {
         $campaign->status = 3;
         $updated = $campaign->update();
         if($updated){
+            Mail::to($campaign->campaigner)->send(new CampaignCreation($campaign));
             return back()->with(['success' => 'The campaign has been approved', 'campaing' => $campaign]);
         }
         return back()->with(['error' => 'The action couldn\'t be performed', 'campaing' => $campaign]);
@@ -820,9 +968,20 @@ class CampaignController extends Controller {
         $campaign->status = 4;
         $updated = $campaign->update();
         if($updated){
-            return back()->with(['success' => 'The campaign has been approved', 'campaing' => $campaign]);
+            return back()->with(['success' => 'The campaign has been approved', 'campaign' => $campaign]);
         }
-        return back()->with(['error' => 'The action couldn\'t be performed', 'campaing' => $campaign]);
+        return back()->with(['error' => 'The action couldn\'t be performed', 'campaign' => $campaign]);
+    }
+    
+    public function updatePickedCampaign($id){
+//        dd('id is : '.$id);
+        $camp = Campaign::find($id);
+        if($camp->is_picked)
+            $camp->is_picked = false;
+        else $camp->is_picked = true;
+        $camp->save();
+        
+        return redirect()->back();
     }
     
     
@@ -838,6 +997,12 @@ class CampaignController extends Controller {
         // 4. album photos
         // 5. document photos
         // 6. update photos
+        // 7. like
+        // 8. view
+        // 9. comment
+        // 10. share
+        // 11. investigation
+        // to-do: decide whether everything relating to a campaign should be deleted
         $campaign = Campaign::find($id);
         $featureImage = $campaign->feature_image;
         $albumPhotos = Album::where('campaign_id', $id)->get();

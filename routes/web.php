@@ -4,16 +4,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SocialController;
 
 
-
-
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('guest-campaign-list/{categoryId?}', 'CampaignController@indexGuestCampaign')->name('campaign.indexGuestCampaign');
+Route::get('guest-campaign-list', 'CampaignController@indexGuestCampaign')->name('campaign.indexGuestCampaign');
 Route::get('guest-campaign-search', 'CampaignController@indexSearchedCampaign')->name('campaign.indexSearchedCampaign');
-Route::post('guest-campaign-filter', 'CampaignController@indexFilteredCampaign')->name('campaign.indexFilteredCampaign');
-Route::get('guest-campaign/{campaignId}', 'CampaignController@showGuestCampaign')->name('campaign.showGuestCampaign'); //return view('face.campaign-detail', compact('campaign'));
+Route::post('guest-campaign-filter', 'CampaignController@indexFilteredCampaign')->middleware('auth')->name('campaign.indexFilteredCampaign');
+Route::get('guest-campaign/{campaignId}', 'CampaignController@showGuestCampaign')->name('campaign.showGuestCampaign');
 // this route is for short link purpose
 Route::get('c/{campaignId}', 'CampaignController@showGuestCampaign')->name('campaign.shortLink');
+Route::get('searchCamp', 'HomeController@searchCamp')->name('campaign.search');
+
+//Route::get('blog/{pageName}', 'BlogController@showGuestCampaign');
 
 // Route::get('donation-create', 'DonationController@createModel')->name('donation.createModel');
 // Route::match(['get', 'post'], '/donation-create', [
@@ -28,14 +28,11 @@ Route::post('donation-store', 'DonationController@store')->name('donation.store'
 // SSLCOMMERZ Start
 Route::get('/example1', [App\Http\Controllers\SslCommerzPaymentController::class, 'exampleEasyCheckout']);
 Route::get('/example2', [App\Http\Controllers\SslCommerzPaymentController::class, 'exampleHostedCheckout']);
-
 Route::post('/pay', [App\Http\Controllers\SslCommerzPaymentController::class, 'index']);
 Route::post('/pay-via-ajax', [App\Http\Controllers\SslCommerzPaymentController::class, 'payViaAjax']);
-
 Route::post('/success', [App\Http\Controllers\SslCommerzPaymentController::class, 'success']);
 Route::post('/fail', [App\Http\Controllers\SslCommerzPaymentController::class, 'fail']);
 Route::post('/cancel', [App\Http\Controllers\SslCommerzPaymentController::class, 'cancel']);
-
 Route::post('/ipn', [App\Http\Controllers\SslCommerzPaymentController::class, 'ipn']);
 // SSLCOMMERZ END
 
@@ -45,7 +42,10 @@ Route::get('test', function(){
 
 // --------------------------------------------------------------------------------------------------
 // initiated by ajax request
+// updates likes for campaign
 Route::post('update-like/{campaignId}', 'LikeController@update')->name('like.update');
+// updates likes for comment
+Route::post('update-like-for-comment/{commentId}', 'LikeForCommentController@store')->name('comment.storeLikeForComment');
 // --------------------------------------------------------------------------------------------------
 Route::post('store-comment', 'CommentController@store')->name('comment.store');
 
@@ -59,19 +59,19 @@ Route::get('verify/resend', [App\Http\Controllers\Auth\TwoFactorController::clas
 Route::get('verify', [App\Http\Controllers\Auth\TwoFactorController::class, 'index'])->name('verify.index');
 Route::post('verify/store', [App\Http\Controllers\Auth\TwoFactorController::class, 'store'])->name('verify.store');
 
-//Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'twofactor']], function(){
-Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function(){
+Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'nullAuth', 'twofactor']], function(){
     // profile routes
     // this route serves two purpose. one is for admin user related operation
     // another is for client profile operation. id portion is used for admin.
-    Route::get('profile/show/{id?}', 'UserController@show')->name('user.show'); //return view('dashboard.profile')->with(['user' => $user]);
+    Route::get('profile/show', 'UserController@show')->name('user.show');
+    Route::get('profile/showMenu', 'UserController@showMenu')->name('user.showMenu'); 
     Route::get('profile/edit/{id?}', 'UserController@edit')->name('user.edit'); //return view('dashboard.profile-edit')->with(compact('user', 'countries'));
     Route::put('profile/update/{id?}', 'UserController@update')->name('user.update'); //return redirect(route('user.show', $user->id))->with('success', $req->profileItem.' has been updated');
     Route::put('profile/photo/{id?}', 'UserController@updatePhoto')->name('user.updatePhoto'); //return redirect(route('user.showProfile', $user->id))->with(['success' => $req->profileItem.' has been updated', 'user' => $user]);
     Route::patch('profile/active-status/delete', 'UserController@updateDeletion')->name('user.updateDeletion');
     // Route::patch('profile/active-status/retrieve', 'UserController@updateActivation')->name('user.updateRetrieval');
     Route::patch('profile/active-status/pause', 'UserController@updatePausing')->name('user.updatePausing');
-    Route::patch('profile/active-status/resume', 'UserController@updateActivation')->name('user.updateResuming');
+    Route::match(['get', 'patch'], 'profile/active-status/resume', 'UserController@updateActivation')->name('user.updateResuming');
 
     Route::get('campaign/donated', 'CampaignController@indexDonatedCampaign')->name('campaign.indexDonatedCampaign'); 
     Route::get('campaign/supported', 'CampaignController@indexSupportedCampaign')->name('campaign.indexSupportedCampaign'); 
@@ -81,6 +81,8 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function(){
     Route::get('campaign/viewed', 'CampaignController@indexViewedCampaign')->name('campaign.indexViewedCampaign');
     
     Route::get('preference', 'PreferenceController@index')->name('preference.index');
+    Route::get('preference/createPassReset', 'PreferenceController@createPassReset')->name('preference.createPassReset');
+    Route::patch('preference/updatePassReset', 'PreferenceController@updatePassReset')->name('preference.updatePassReset');
 
     
     Route::group(['prefix' => 'campaigner'], function(){
@@ -112,6 +114,8 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function(){
         Route::post('payment-method/store', 'PaymentMethodController@store')->name('paymentMethod.store');
         
         Route::get('campaigner-fund-panel', 'FundController@indexCampaignerFundPanel')->name('fund.indexCampaignerFundPanel');
+        Route::get('campaigner-fund-panel/fundableCamp', 'FundController@showFundableCampaigns')->name('fund.showFundableCampaigns');
+        Route::get('campaigner-fund-panel/pendedCamp', 'FundController@showFundingPendedCampaigns')->name('fund.showFundingPendedCampaigns');
         Route::get('campaigner-fund-panel/compCamp', 'FundController@showCompletelyFundedCampaigns')->name('fund.showCompletelyFundedCampaigns');
         Route::get('campaigner-fund-panel/partCamp', 'FundController@showPartlyFundedCampaigns')->name('fund.showPartlyFundedCampaigns');
         Route::get('campaigner-fund-panel/notCamp', 'FundController@showNotFundedCampaigns')->name('fund.showNotFundedCampaigns');
@@ -166,9 +170,13 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function(){
         Route::get('admin-campaign-panel/cancelled', 'CampaignController@indexAdminCancelledCampaign')->name('campaign.indexAdminCancelledCampaign');
         Route::get('admin-campaign-panel/blocked', 'CampaignController@indexAdminBlockedCampaign')->name('campaign.indexAdminBlockedCampaign');
         Route::get('admin-campaign-panel/declined', 'CampaignController@indexAdminDeclinedCampaign')->name('campaign.indexAdminDeclinedCampaign');
+        Route::get('admin-campaign-panel/index-picked', 'CampaignController@indexAdminPickedCampaign')->name('campaign.indexAdminPickedCampaign');
+        Route::patch('admin-campaign-panel/updatePicked/{id}', 'CampaignController@updatePickedCampaign')->name('campaign.updatePickedCampaign');
         Route::patch('admin-campaign-panel/approve/{id}', 'CampaignController@updateStatusToApproved')->name('campaign.updateStatusToApproved');
         Route::patch('admin-campaign-panel/cancel/{id}', 'CampaignController@updateStatusToCancel')->name('campaign.updateStatusToCancel');
         Route::patch('admin-campaign-panel/block/{id}', 'CampaignController@updateStatusToBlock')->name('campaign.updateStatusToBlock');
+        Route::patch('approve-inv-report/{invId}', 'InvestigationController@updateApproval')->name('investigation.updateApproval');
+        Route::patch('cancel-inv-report/{invId}', 'InvestigationController@updateCancel')->name('investigation.updateCancel');
 
         Route::get('admin-fund-panel', 'FundController@indexAdminFundPanel')->name('fund.indexAdminFundPanel');
         Route::get('admin-fund-panel/fundableCamp', 'FundController@indexFundableCampaigns')->name('fund.indexFundableCampaigns');
@@ -178,7 +186,9 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function(){
         Route::get('admin-fund-panel/notFundedCamp', 'FundController@indexNotFundedCampaigns')->name('fund.indexNotFundedCampaigns');
         Route::get('admin-fund-panel/fundingBlockedCamp', 'FundController@indexFundingBlockedCamps')->name('fund.indexFundingBlockedCamps');
         
-        Route::get('admin-fund-panel/withdrawRequest/{id}', 'withdrawRequestController@showToAdmin')->name('withdrawRequest.showToAdmin');
+        Route::get('admin-fund-panel/withdrawRequestPend/{id}', 'withdrawRequestController@showPendingToAdmin')->name('withdrawRequest.showPendingToAdmin');
+        Route::get('admin-fund-panel/withdrawRequestComp/{id}', 'withdrawRequestController@showCompletedToAdmin')->name('withdrawRequest.showCompletedToAdmin');
+        Route::get('admin-fund-panel/withdrawRequestCan/{id}', 'withdrawRequestController@showCancelledToAdmin')->name('withdrawRequest.showCancelledToAdmin');
         Route::post('admin-fund-panel/withdrawPayment/{id}', 'withdrawPaymentController@store')->name('withdrawPayment.store');
         
         Route::get('platform-panel', 'PlatformController@indexPlatformPanel')->name('platform.indexPlatformPanel');
@@ -187,6 +197,9 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function(){
         Route::post('platform-panel/category', 'CategoryController@store')->name('category.store');
         Route::put('platform-panel/category/{id}', 'CategoryController@update')->name('category.update');
         Route::delete('platform-panel/category/{id}', 'CategoryController@destroy')->name('category.destroy');
+        Route::get('platform-panel/comments', 'CommentController@index')->name('comment.index');
+        Route::patch('platform-panel/enableComment/{id}', 'CommentController@update')->name('comment.enable');
+        Route::delete('platform-panel/deleteComment/{id}', 'CommentController@destroy')->name('comment.delete');
         
         Route::group(['prefix' => 'super', 'middleware'=>'super'], function(){
             Route::get('permission', 'PermissionController@storePermission')->name('permission.store');

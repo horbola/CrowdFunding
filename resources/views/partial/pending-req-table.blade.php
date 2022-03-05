@@ -4,9 +4,9 @@
             <thead>
                 <tr>
                     <th>Serial</th>
-                    <th>Image</th>
                     <th>Title</th>
                     <th>Raised</th>
+                    <th>Paid</th>
                     <th>Requested</th>
                     <th>View Campaign</th>
                     <th>Payable Amount</th>
@@ -20,9 +20,9 @@
                     <tr>
                         @php $serial++ @endphp
                         <td>{{$serial}}</td>
-                        <td>$item->campaign->image</td>
                         <td>{{$item->campaign->title}}</td>
                         <td>{{$item->campaign->totalSuccessfulDonation()}}</td>
+                        <td>{{$item->campaign->totalPaidFund()}}</td>
                         <td class="req-amount">{{$item->requested_amount}}</td>
                         <td><a href="{{route('campaign.showGuestCampaign', ['campaignId' => $item->campaign->id, 'user_panel_fraction' => Request::segment(4)])}}">View</a></td>
                         <td><input type="number" name="payable_amount" class="form-control" style="min-width: 150px;" value="{{ old('payable_amount')? old('payable_amount') : $item->requested_amount }}" onkeyup="calcTotalPayable();"></td>
@@ -58,6 +58,7 @@
                     <th></th>
                     <th></th>
                     <th></th>
+                    <th></th>
                     <th>Total</th>
                     <th id="totalPayable">500000</th>
                     <script>
@@ -82,12 +83,17 @@
             <div class="row">
                 <div class="col">
                     <div class="mb-5">
-                        <h3 id="bank-info-title" class="d-inline">Bank Information</h3>
+                        @if($wRequest->user->currentPayMethType() === 'Bank')
+                        <h3 id="bank-info-title" class="d-inline border border-3 rounded-3 p-2 ml-3 text-info">Bank Info</h3>
+                        @elseif($wRequest->user->currentPayMethType() === 'MobileBank')
+                        <h3 id="bank-info-title" class="d-inline border border-3 rounded-3 p-2 ml-3 text-info">Mobile Bank Info</h3>
+                        @endif
+                        
                         <div class="dropdown float-right">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">Add New Bank</button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                 <li class="dropdown-item" id="bank-btn">Bank</li>
-                                <li class="dropdown-item" id="mobile-bank-btn">Mobile Bank</li>
+                                <li class="dropdown-item disabled" id="mobile-bank-btn">Mobile Bank</li>
                             </ul>
                         </div>
                     </div>
@@ -95,6 +101,7 @@
                     <!----------------- new form ------------------------->
                     <div class="new-form">
                         <div class="new-bank d-none">
+                            <h5 class="text-center pb-2">Enter New Bank Information</h5>
                             <div>
                                 <div class="form-group form-row {{ $errors->has('bank_name')? 'has-error' : '' }}">
                                     <label for="bank_name" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Bank Name<span class="text-danger">* </span> <span> :</span></label>
@@ -147,6 +154,7 @@
                             </div>
                         </div>
                         <div class="new-mobile-bank d-none">
+                            <h5 class="text-center pb-2">Enter New Mobile Bank Information</h5>
                             <div>
                                 <div class="form-group form-row {{ $errors->has('brand_name')? 'has-error' : '' }}">
                                     <label for="brand_name" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Brand Name<span class="text-danger">* </span> <span> :</span></label>
@@ -252,6 +260,14 @@
                     <!----------------- bank info ends------------------------->
                     <script>
                         $(function(){
+                            adaptBankInfoTitle();
+                            
+                            function adaptBankInfoTitle(){
+                                if( '{{$wRequest->user->currentPayMethType()}}' === 'Bank' )
+                                    $('.pay #bank-info-title').text('Bank Info');
+                                else if( '{{$wRequest->user->currentPayMethType()}}' === 'MobileBank' )
+                                    $('.pay #bank-info-title').text('Mobile Bank Info');
+                            }
                             function bootPay(){
                                 $('.pay .new-bank').addClass('d-none');
                                 $('.pay .new-mobile-bank').addClass('d-none');
@@ -261,15 +277,19 @@
                             function bootNewPayMeth(){
                                 $('.pay .bank-common-field').removeClass('d-none');
                                 $('.pay input[name=new_pay_meth]').val('true');
+                                $('.pay #bank-info-title').text('See Current Bank Info');
                             }
                             
+                            // Banking info title adaptation
                             $('.pay #bank-info-title').click(function(event){
                                 bootPay();
                                 $('.pay .bank-info').removeClass('d-none');
                                 $('.pay input[name=new_pay_meth]').val('false');
                                 $('.pay input[name=pay_meth_type]').val('');
+                                adaptBankInfoTitle();
                             });
                             
+                            // new banking info buttons
                             $('.pay #bank-btn').click(function(event){
                                 bootPay();
                                 $('.pay .new-bank').removeClass('d-none');

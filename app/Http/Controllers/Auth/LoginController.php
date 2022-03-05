@@ -5,11 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\Notifications\TwoFactorCode;
-use App\Http\Controllers\DonationController;
 
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 
 class LoginController extends Controller
@@ -46,10 +43,20 @@ class LoginController extends Controller
     
     
     
-    protected function authenticated(Request $request, $user){
-        // these two lines sometimes breaks laravel's default intended route redirection
-//        $user->generateTwoFactorCode();
-//        $user->notify(new TwoFactorCode());
+    
+    public function showLoginForm()
+    {
+        $title = 'Login- Oporajoy';
+        return view('auth.login', compact('title'));
+    }
+    
+    protected function authenticated($request, $user){
+        $release = !$user->hasCampaign() && (!$user->is_volunteer || !$user->is_admin || !$user->is_super);
+        if(!$release){
+            // these two lines sometimes breaks laravel's default intended route redirection
+            $user->generateTwoFactorCode();
+            $user->notify(new TwoFactorCode());
+        }
         
         // 0:pending, 1:active, 2:malicous, 3:blocked, 4:left, 5:paused
         if($user->active_status === 4){

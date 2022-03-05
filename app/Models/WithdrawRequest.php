@@ -44,4 +44,20 @@ class WithdrawRequest extends Model
     public function totalPaidAmount() {
         return $this->withdrawRequestItems()->sum('paid_amount');
     }
+    
+    
+    
+    // statuses -------------------------------------------------
+    public function isPending() {
+        return $this->withdrawRequestItems->contains(function($wReqItem, $key){
+            return $wReqItem->isPending();
+        });
+    }
+    
+    public function isComplete() {
+        return $this->withdrawRequestItems->contains(function($wReqItem, $key){
+            return $wReqItem->isFunded();
+        });
+    }
+    // statuses end -------------------------------------------------
 }

@@ -9,6 +9,9 @@
                     <th>Title</th>
                     <th>Raised</th>
                     <th>Paid</th>
+                    @if(isset($partly))
+                    <th>Residual</th>
+                    @endif
                     <th>View Campaign</th>
                     <th>Include to withdraw request</th>
                     <th>Request Amount</th>
@@ -24,6 +27,9 @@
                         <td>{{$item->title}}</td>
                         <td id="raised-fund">{{$item->totalSuccessfulDonation()}}</td>
                         <td>{{$item->totalPaidFund()}}</td>
+                        @if(isset($partly))
+                        <td id="residual-fund">{{$item->totalSuccessfulDonation() - $item->totalPaidFund()}}</td>
+                        @endif
                         <td><a href="{{route('campaign.showGuestCampaign', ['campaignId' => $item->id, 'user_panel_fraction' => Request::segment(4)])}}">View</a></td>
                         <td>
                             <div class="form-check">
@@ -42,9 +48,13 @@
                     <script>
                         function fillReqAmount(thiss){
                             var raisedFund = $(thiss).closest('tr').find('#raised-fund').text();
+                            var residualFund = $(thiss).closest('tr').find('#residual-fund').text();
                             var reqAmountElem = $(thiss).closest('tr').find('input[name=request_amount]');
-                            if( $(thiss).is(":checked") && ($(reqAmountElem).val() !== 0) )
-                                $(reqAmountElem).val(raisedFund);
+                            if( $(thiss).is(":checked") && ($(reqAmountElem).val() !== 0) ){
+                                if(residualFund)
+                                    $(reqAmountElem).val(residualFund);
+                                else $(reqAmountElem).val(raisedFund);
+                            }
                             else $(reqAmountElem).val(0);
                         }
                         
@@ -62,9 +72,12 @@
                     <th></th>
                     <th></th>
                     <th></th>
+                    @if(isset($partly))
+                    <th></th>
+                    @endif
                     <th></th>
                     <th></th>
-                    <th><button type="button" class="btn btn-primary" onclick="submitData(this);">Withdraw</button></th>
+                    <th><button type="button" class="btn btn-primary" onclick="submitData(this);" {{ !$not->count() ? 'disabled' : '' }}>Withdraw</button></th>
                     <script>
                         function submitData(thiss){
                             var tr = '#funded-camps-not-table tr';

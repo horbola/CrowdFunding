@@ -3,7 +3,6 @@
         <thead>
             <tr>
                 <th>Serial</th>
-                <th>Image</th>
                 <th>Title</th>
                 <th>Raised</th>
                 <th>Requested</th>
@@ -14,11 +13,10 @@
         </thead>
         <tbody>
             @php $serial = 0 @endphp
-            @foreach($wRequests->withdrawRequestItems()->get() as $item)
+            @foreach($wRequest->withdrawRequestItems()->get() as $item)
             <tr>
                 @php $serial++ @endphp
                 <td>{{$serial}}</td>
-                <td>$item->image</td>
                 <td>{{$item->campaign->title}}</td>
                 <td>{{$item->campaign->totalSuccessfulDonation()}}</td>
                 <td>{{$item->requested_amount}}</td>
@@ -32,6 +30,8 @@
         </tbody>
         <tfoot>
             <tr>
+                <th></th>
+                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>

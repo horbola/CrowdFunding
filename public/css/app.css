@@ -10033,6 +10033,10 @@ h3 {
   top: 70px;
 }
 
+.green-btn, .green-btn:hover {
+  background-color: #42ccae;
+}
+
 /*
 // two column information table starts
 .two-column-table {

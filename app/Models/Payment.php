@@ -24,6 +24,51 @@ class Payment extends Model
     
     
     
+    // statuses -----------------------------------------------------------------------------------
+    public function isPending() {
+        return $this->status === 'Pending';
+    }
+    
+    public function isProcessing() {
+        return $this->status === 'Processing';
+    }
+    
+    public function isComplete() {
+        return $this->status === 'Complete';
+    }
+    
+    public function isFailed() {
+        return $this->status === 'Fail';
+    }
+    
+    public function isCanceled() {
+        return $this->status === 'Canceled';
+    }
+    
+    // setters ----------------------------------
+    public function setPending() {
+        $this->status = 'Pending';
+    }
+    
+    public function setProcessing() {
+        $this->status = 'Processing';
+    }
+    
+    public function setComplete() {
+        $this->status = 'Complete';
+    }
+    
+    public function setFailed() {
+        $this->status = 'Fail';
+    }
+    
+    public function setCanceled() {
+        $this->status = 'Canceled';
+    }
+    // statuses end -----------------------------------------------------------------------------------
+    
+    
+    
     public function donation() {
         return $this->belongsTo(Donation::class);
     }  

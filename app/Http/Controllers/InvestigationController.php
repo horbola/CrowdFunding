@@ -4,18 +4,33 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 use App\Models\Investigation;
 use App\Models\Campaign;
-use App\Models\Category;
+
+use App\Mail\InvestigationReport;
 
 
 
 class InvestigationController extends Controller
 {
     // reners the licence agrement form
-    public function createVolunteer() {
-        return view('investigation.volunteer-create');
+    public function createVolunteer(Request $request) {
+        $title = 'Be a Volunteer';
+        $menuName = 'be-volunteer';
+        
+        // check first whether a user has completed her profile
+        $fields = Auth::user()->isProfileComplete();
+        $message = 'You didn\'t comple your profile.' .$fields. ' are not filled. To be a volunteer, you have to fillup those fields.';
+        if($fields){
+            $title = 'Incomplete Profile';
+            $request->request->add(['origUrl' => route('volunteer.create')]);
+            return view('campaign.incomplete-profile-msg', compact('message', 'title', 'menuName'));
+        }
+        
+        return view('investigation.volunteer-create', compact('title', 'menuName'));
     }
     
     // from the lincence agrement form user
@@ -42,13 +57,15 @@ class InvestigationController extends Controller
     
     // renders my investigations campaigns
     public function indexInvestigations(Request $request) {
+        $title = 'My Investigated Campaigns';
+        $menuName = 'investigation';
         if(Auth::check()){
             $user = Auth::user();
             $investigations = Investigation::where('user_id', $user->id)->get();
             $campaigns = $investigations->map(function($investigation, $key){
                 return $investigation->campaign;
             });
-            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns'));
+            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns', 'title', 'menuName'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
@@ -57,18 +74,23 @@ class InvestigationController extends Controller
     // campaign tile the detail page comes up. if clikcing on upload 
     // ivestigation info then 'createInvestigationForm()' method will be callded.
     public function createInvestigation(Request $request, $categoryId=1) {
-        $categories = Category::all();
-        $active = $categoryId;
-        $campaigns = Campaign::where('category_id', $categoryId)->get();
+        $title = 'Campaigns To Investigate';
+        $menuName = 'investigate';
+        $campaigns = Campaign::all()->reject(function($aCampaign){
+            return $aCampaign->isPostedToVerify() || $aCampaign->isVerified();
+        });
         // this variable is difined to detect that the campaign detali page has come from 'investigate' button.
         // this variable is passed to the 'campaign-detail' page through the 'campaign-master' page.
         $request->request->add(['indexInvestigation' => true]);
-        return view('face.campaign-master')->with(compact('request', 'categories', 'active', 'campaigns'));
+//        return view('face.camp-master', compact('categories', 'active', 'campaigns', 'title', 'menuName'));
+        return view('campaign.campaigns-list', compact('campaigns', 'title', 'menuName'));
     }
     
     // brings the form by which investigation description and images could be uploaded.
     public function createInvestigationForm() {
-        return view('investigation.investigation-create');
+        $title = 'Upload Investigation Info';
+        $menuName = 'investigate';
+        return view('investigation.investigation-create', compact('title', 'menuName'));
     }
     
     public function storeInvestigation(Request $request, $campaignId) {
@@ -78,10 +100,15 @@ class InvestigationController extends Controller
         $this->validate($request, $rules);
 
         $userId = Auth::user()->id;
-        $investigation = Investigation::whereUserId($userId)->whereCampaignId($campaignId)->get()->count();
-        if($investigation){
-            return back()->with('error', 'You already have investigated this campaign and provided report');
+        $invedByMe = Investigation::whereUserId($userId)->whereCampaignId($campaignId)->get()->count();
+        $invedByOther = Investigation::whereCampaignId($campaignId)->get()->count();
+        if($invedByMe){
+            return back()->with('error', 'You already have investigated this campaign');
         }
+        else if ($invedByOther){
+            return back()->with('error', 'This Campaign is already investigated by some one else');
+        }
+ 
         $data = [
             'user_id' => $userId,
             'campaign_id' => $campaignId,
@@ -97,9 +124,38 @@ class InvestigationController extends Controller
         return back()->with('error', 'Sorry, there\'s an error occured');
     }
     
+    public function updateApproval($invId) {
+        $inv = null;
+        if($invId){
+            $inv = Investigation::find($invId);
+        }
+        $updated = null;
+        if( $inv && $inv->count() ){
+            $inv->is_verified = 'yes';
+            $updated = $inv->save();
+        }
+        
+        session(['approving' => 'true']);
+//        $request->request->add(['approving' => 'yes']);
+        if($updated){
+            $inv->refresh();
+            Mail::to($inv->investigator)->send(new InvestigationReport($inv));
+            return back();
+        }
+    }
+    
+    public function updateCancel($invId) {
+        $inv = Investigation::find($invId);
+//        Mail::to($inv->investigator)->send(new InvestigationReport($inv));
+        $inv->delete();
+        return back();
+    }
+    
     // renders the form from wchich user can resign volunteer
     public function destroyVolunteer() {
-        return view('investigation.volunteer-resign');
+        $title = 'Delete Volunteer';
+        $menuName = 'resign-volunteer';
+        return view('investigation.volunteer-resign', compact('title', 'menuName'));
     }
     
     // ultimately resigns from volunteer

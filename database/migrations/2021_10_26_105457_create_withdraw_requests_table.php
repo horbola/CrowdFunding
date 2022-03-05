@@ -16,8 +16,7 @@ class CreateWithdrawRequestsTable extends Migration
         Schema::create('withdraw_requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            // 1.pending, 2.processing, 3.complete
-            $table->tinyInteger('status');
+            $table->boolean('is_cancelled')->default(false);
             $table->timestamps();
         });
     }

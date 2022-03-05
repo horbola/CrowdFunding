@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-use App\Lib\Helper;
+use App\Library\Helper;
 
 
 
@@ -36,9 +36,61 @@ class Campaign extends Model
         'recommended_amount',
         'amount_prefilled',
         'status',
-        'is_funded',
     ];
     protected $guarded = [];
+    
+    
+    // statuses -----------------------------------------------------
+    public function isCampPreviewing() {
+        return $this->status === -1;
+    }
+    
+    public function isCampPending() {
+        return $this->status === 0;
+    }
+    
+    public function isCampApproved() {
+        return $this->status === 1;
+    }
+    
+    public function isCampCancelled() {
+        return $this->status === 2;
+    }
+    
+    public function isCampBlocked() {
+        return $this->status === 3;
+    }
+    
+    public function isCampDeclined() {
+        return $this->status === 4;
+    }
+    
+    // setters -------------------------------
+    public function setsCampPreviewing() {
+        $this->status = 4;
+    }
+    
+    public function setCampPending() {
+        $this->status = 4;
+    }
+    
+    public function setCampApproved() {
+        $this->status = 4;
+    }
+    
+    public function setCampCancelled() {
+        $this->status = 4;
+    }
+    
+    public function setCampBlocked() {
+        $this->status = 4;
+    }
+    
+    public function setCampDeclined() {
+        $this->status = 4;
+    }
+    // statuses -----------------------------------------------------
+    
     
     public function campaigner() {
         return $this->belongsTo(User::class, 'user_id');
@@ -61,11 +113,38 @@ class Campaign extends Model
     public function updates() {
         return $this->hasMany(Update::class);
     }
+
+
+
+
+
+
+
     
     public function investigation() {
         // Investigation::find($this->campaign_id);
         return $this->hasOne(Investigation::class);
     }
+    
+    public function isVerified() {
+        // count() is used to detect whether any investigation is just posted or not.
+        if( $this->investigation && $this->investigation->count() && $this->investigation->is_verified === 'yes' ){
+            return true;
+        }
+        else return false;
+    }
+    
+    // detects whether a any investigation report has been posted. if any investigation entry is present in investigation table but is_verified is no
+    // then this means that some investigation report has been just posted but that's not verified yet.
+    public function isPostedToVerify() {
+        return $this->investigation;
+    }
+    
+    
+    
+
+
+    
     
     public function views() {
         return $this->hasMany(View::class);
@@ -80,7 +159,15 @@ class Campaign extends Model
      */
     public function comments() {
         // return $this->hasMany(Comment::class)->whereNull('parent_id')->orWhere('parent_id', 0)->orderBy('created_at', 'desc');
-        return $this->hasMany(Comment::class, 'campaign_id')->whereNull('parent_id')->orWhere('parent_id', 0)->latest();
+        return $this->hasMany(Comment::class)
+                ->where('parent_id', 0)
+                ->orderBy('created_at','DESC')
+                ->skip(0)
+                ->take(5);
+    }
+    
+    public function commentsTotal() {
+        return $this->hasMany(Comment::class)->where('parent_id', 0)->get()->count();
     }
     
     /*
@@ -116,11 +203,12 @@ class Campaign extends Model
      * produces related campaign on the basis of category
      */
     public function related() {
-        $collection = Campaign::where('category_id', $this->category->id)->paginate(27)->collect();
-        $filtered = $collection->reject(function ($value, $key) {
-            return $value->id === $this->id;
+        $related = Campaign::where('category_id', $this->category->id)->paginate(27);
+        $filtered = $related->getCollection()->reject(function ($value, $key) {
+            return ($value->id === $this->id) || !$value->isActive();
         });
-        return $filtered;
+        $related->setCollection($filtered);
+        return $related;
     }
  
     public function viewsCount() {
@@ -196,13 +284,13 @@ class Campaign extends Model
      * total Successful Donation..
      */
     public function isFundable() {
-        return ($this->totalPaidFund() < $this->totalSuccessfulDonation()) && !($this->isBlocked()) && !$this->isPending();
+        return ($this->totalPaidFund() < $this->totalSuccessfulDonation()) && !$this->isPending() && !$this->isFundingBlocked();
     }
     
     public function isPending() {
-        return $this->withdrawRequestItems()->get()->collect()->filter(function($aWRequestItem) {
-            return $aWRequestItem->withdrawRequest->status === 1;
-        })->count();
+        return $this->withdrawRequestItems->contains(function($aWRequestItem, $key) {
+            return $aWRequestItem->isPending();
+        });
     }
     
     public function isCompletelyFunded() {
@@ -211,21 +299,30 @@ class Campaign extends Model
     
     public function isPartlyFunded() {
 //        $partly = ($this->totalPaidFund() !== 0.00) && ($this->totalPaidFund() < $this->totalSuccessfulDonation());
-        $partly = $this->totalPaidFund() && ($this->totalPaidFund() < $this->totalSuccessfulDonation()) && !$this->isPending();
+        $partly = $this->totalPaidFund() && ($this->totalPaidFund() < $this->totalSuccessfulDonation()) && !$this->isPending() && !$this->isFundingBlocked();
         return $partly;
     }
     
     public function isNotFunded() {
 //        return $this->totalPaidFund() === 0.00;
-        return !$this->totalPaidFund() && !$this->isPending();
+        return !$this->totalPaidFund() && !$this->isFundingBlocked() && !$this->isPending();
     }
     
+    
+    public function isFundingBlocked() {
+        return $this->withdrawRequestItems->contains(function($wReqItem, $key){
+            return $wReqItem->isCurrentlyBlocked();
+        });
+    }
+    
+    /* previous
     public function isBlocked() {
         $lastRecord = WithdrawRequestItem::where('campaign_id', $this->id)->latest()->first();
 //        $lastRecord = WithdrawRequestItem::where('campaign_id', $this->id)->sortByDesc('created_at')->take(1)->toArray();;
 //        $lastRecord = $this->wRequestItems()->latest()->first();
         return isset($lastRecord->status)? $lastRecord->status === 2 : false;
     }
+    */
     
     /*
      * calculates total funds requested by all campaigns of this campaigner
@@ -336,6 +433,10 @@ class Campaign extends Model
     public function parseAmountPrefilled() {
         $amounts = explode(',', $this->amount_prefilled);
         return $amounts;
+    }
+    
+    public function getCampHeadingDateFormat() {
+        return Helper::formattedDate($this->created_at);
     }
 }   
 

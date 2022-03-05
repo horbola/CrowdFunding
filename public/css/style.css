@@ -2869,7 +2869,7 @@ p {
 
 #navmenu-nav li.account-menu.active .navbar-link, #navmenu-nav li.account-menu:hover .navbar-link {
   color: #ffffff !important;
-  background-color: #2f55d4 !important;
+  background-color: #42ccae !important;
 }
 
 .bg-home {
@@ -5003,7 +5003,7 @@ p {
 
 .form-icon .icons {
   position: absolute;
-  top: 13px;
+  top: 10px;
   left: 18px;
 }
 

@@ -29,7 +29,7 @@
                 <style>
                     .title-text {
                         position: absolute;
-                        top: -50px;
+                        top: -30px;
                         left: 50%;
                         transform: translate(-50%, -50%);
                         font-weight: 600;

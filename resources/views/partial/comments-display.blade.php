@@ -1,42 +1,44 @@
 <div class="comments-display">
     @foreach($comments as $comment)
-    <li class="mt-4 @if ($comment->parent_id) ml-5 @endif">
-        <div class="d-flex align-items-center">
-            <a class="pe-3" href="#">
-                <img src="{{$comment->commentor->avatar()}}" class="img-fluid avatar avatar-md-sm rounded-circle shadow" alt="img">
-            </a>
-            <div class="flex-1 commentor-detail">
-                <h6 class="mb-0"><a href="javascript:void(0)" class="text-dark media-heading">{{$comment->commentor->name}}</a></h6>
-                <small class="text-muted">{{Helper::formattedTime($comment->created_at)}}</small>
+        @if($comment->is_enabled || (Auth::check() && Auth::user()->id === $comment->commentor->id))
+        <li class="mt-4 {{ $comment->parent_id ? 'ml-5' : '' }}">
+            <div class="d-flex align-items-center">
+                <a class="pe-3" href="#">
+                    <img src="{{$comment->commentor->avatar()}}" class="img-fluid avatar avatar-md-sm rounded-circle shadow" alt="img">
+                </a>
+                <div class="flex-1 commentor-detail">
+                    <h6 class="mb-0"><a href="javascript:void(0)" class="text-dark media-heading">{{$comment->commentor->name}}</a></h6>
+                    <small class="text-muted">{{App\Library\Helper::formattedTime($comment->created_at)}}</small>
+                </div>
+                <!--if it's parent-->
+                @if(!$comment->parent_id)
+                <div>
+                    <input type="button" value="Reply" class="btn btn-primary btn-sm" onclick="replyFunc(this)" {{ !$campaign->isActive() || !Auth::check() ? 'disabled' : '' }}>
+                </div>
+                @endif
             </div>
             <!--if it's parent-->
             @if(!$comment->parent_id)
-            <div>
-                <input type="button" value="Reply" class="btn btn-primary btn-sm" onclick="replyFunc(this)">
+            <div class="reply-form mt-3" style="display: none;">
+                <form action="{{route('comment.store')}}" method="post">
+                    @csrf
+                    <div class="input-group">
+                        <textarea name="body" rows="1" class="form-control" placeholder="Write your reply here" required></textarea>
+                        <input type="hidden" name="campaign_id" value="{{$campaign->id}}">
+                        <input type="hidden" name="parent_id" value="{{$comment->id}}">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" onclick="canReplyFunc(this)">Cancel</button>
+                            <button class="btn btn-outline-secondary" type="submit">Submit</button>
+                        </div>
+                    </div>
+                </form>
             </div>
             @endif
-        </div>
-        <!--if it's parent-->
-        @if(!$comment->parent_id)
-        <div class="reply-form mt-3" style="display: none;">
-            <form action="{{route('comment.store')}}" method="post">
-                @csrf
-                <div class="input-group">
-                    <textarea name="body" rows="1" class="form-control" placeholder="Write your reply here" required></textarea>
-                    <input type="hidden" name="campaign_id" value="{{$campaign->id}}">
-                    <input type="hidden" name="parent_id" value="{{$comment->id}}">
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" onclick="canReplyFunc(this)">Cancel</button>
-                        <button class="btn btn-outline-secondary" type="submit">Submit</button>
-                    </div>
-                </div>
-            </form>
-        </div>
+            <div class="mt-3">
+                <p id="comment-body" class="text-muted fst-italic pb-3 rounded">{{$comment->body}}</p>
+            </div>
+        </li>
         @endif
-        <div class="mt-3">
-            <p id="comment-body" class="text-muted fst-italic pb-3 rounded">{{$comment->body}}</p>
-        </div>
-    </li>
     @include('partial.comments-display', ['comments' => $comment->replies])
     @endforeach
 </div>

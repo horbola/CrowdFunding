@@ -15,9 +15,60 @@ use App\Models\WithdrawPayment;
 class WithdrawPaymentController extends Controller
 {
     public function store(Request $request) {
+        if(!$request->trans_id){
+            return back()->with('error', 'You didn\'t provide any transaction key. Provide a random number or string or mix of both to mark this transaction as unique');
+        }
         $withdraw_request = json_decode($request->withdraw_request);
         $withReq = WithdrawRequest::find($request->withdraw_request_id);
         
+        $this->createPayMeth($request, $withReq);
+        
+        $totalPayable = 0;
+        // if this variable is true then it means at least one campaign is valid to complete the request.
+        $isAnyWReqItem = null;
+        foreach ($withdraw_request as $wReqItemRaw) {
+            $wReqItemModel = WithdrawRequestItem::whereWithdrawRequestId( $withReq->id )->whereCampaignId( $wReqItemRaw->campaign_id )->get()->first();
+            if( $wReqItemModel->campaign->isFundingBlocked() )
+                continue;
+            
+            if($wReqItemRaw->is_blocked){
+                $wReqItemModel->setBlocked();
+                $wReqItemModel->setCurrentlyBlocked();
+                $wReqItemModel->block_msg = $wReqItemRaw->block_msg;
+            }
+            else {
+                $wReqItemModel->paid_amount = $wReqItemRaw->payable_amount;
+                $wReqItemModel->setFunded();
+                $totalPayable += $wReqItemModel->paid_amount;
+            }
+            $wReqItemModel->save();
+            $isAnyWReqItem = true;
+        }
+
+        $payCreated = null;
+        if($isAnyWReqItem){
+            $payCreated = WithdrawPayment::create([
+                        'withdraw_request_id' => $withReq->id,
+                        'payment_meth_type' => $withReq->user->currentPayMethType(),
+                        'payment_meth_id' => $withReq->user->currentPayMeth()->id,
+                        'amount' => $totalPayable,
+                        'currency' => 'bdt',
+                        'trans_id' => $request->trans_id,
+            ]);
+        }
+        else {
+            $withReq->is_cancelled = true;
+            $withReq->save();
+            return back()->with('error', 'This request couldn\'t be completed. The campaign or Campaigns it includes may be blocked before or now by authority');
+        }
+        
+        if($payCreated){
+            return redirect(route('fund.indexAdminFundPanel'));
+        }
+        else return back();
+    }
+
+    private function createPayMeth($request, $withReq) {
         if($request->new_pay_meth === 'true'){
             $withReq->user->makeAllPayMethPast();
             if($request->pay_meth_type && strtolower($request->pay_meth_type) === 'bank'){
@@ -42,56 +93,6 @@ class WithdrawPaymentController extends Controller
                     'owner_nid' => $request->owner_nid,
                     'status' => '1',
                 ]);
-            }
-        }
-        
-        $totalPayable = 0;
-        Log::debug($withdraw_request);
-        Log::debug('withdraw request  '.$withReq);
-        foreach ($withdraw_request as $wReqItemRaw) {
-            $wReqItemModel = WithdrawRequestItem::whereWithdrawRequestId( $withReq->id )->whereCampaignId( $wReqItemRaw->campaign_id )->get()->first();
-            Log::debug('withdraw request item  '.$wReqItemModel);
-//            dump($wReqItemModel);
-            Log::debug('campaign-id:  '.$wReqItemRaw->campaign_id);
-            Log::debug('model-id:  '.$wReqItemModel->requested_amount);
-            if($wReqItemRaw->is_blocked){
-                $wReqItemModel->status = 2;
-                $wReqItemModel->block_msg = $wReqItemRaw->block_msg;
-            }
-            else {
-                $wReqItemModel->paid_amount = $wReqItemRaw->payable_amount;
-                $totalPayable += $wReqItemModel->paid_amount;
-                $wReqItemModel->status = 1;
-            }
-            $wReqItemModel->save();
-        }
-        Log::debug($totalPayable);
-        $withReq->status = 2;
-        $withReq->save();
-        
-        Log::debug($request->new_pay_meth);
-        Log::debug('mobile_number'.$request->mobile_number);
-        
-        $created = WithdrawPayment::create([
-            'withdraw_request_id' => $withReq->id,
-            'payment_meth_type' => $withReq->user->currentPayMethType(),
-            'payment_meth_id' => $withReq->user->currentPayMeth()->id,
-            'amount' => $totalPayable,
-            'currency' => 'bdt',
-            'trans_id' => $request->trans_id,
-        ]);
-        
-        $created = true;
-        if($created){
-            return redirect(route('fund.indexAdminFundPanel'));
-        }
-        else return back();
-    }
-    
-    private function hasBlocked($wReq) {
-        foreach ($wReq as $wReqItem) {
-            if($wReqItem->is_blocked){
-                return true;
             }
         }
     }

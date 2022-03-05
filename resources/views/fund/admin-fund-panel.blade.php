@@ -3,13 +3,15 @@
 
 @section('dashboard-content')
 @php
-use App\Models\User;
-use App\Models\Donation;
-use App\Models\Campaign;
+    use App\Models\User;
+    use App\Models\Donation;
+    use App\Models\Campaign;
+    use App\Library\Helper;
 @endphp
 <div id="admin-fund-panel">
     <div class="row">
         <div class="col">
+            <!--
             <div class="two-column-table position-relative mx-auto border border-1 shadow bg-white">
                 <div class="legend bg-white position-absolute">User Type</div>
                 <a href="{{ route('fund.indexFundableCampaigns') }}">
@@ -31,7 +33,7 @@ use App\Models\Campaign;
                     <div class="row">
                         <div class="col align-self-center">
                             <div class="one h5 text-right text-muted">
-                                Total Pending Campaigns <span class="ps-4">:</span>
+                                Total Funding-Pended Campaigns <span class="ps-4">:</span>
                             </div>
                         </div>
                         <div class="col">
@@ -91,7 +93,7 @@ use App\Models\Campaign;
                     <div class="row">
                         <div class="col align-self-center">
                             <div class="one h5 text-right text-muted">
-                                Funding Blocked <span class="ps-4">:</span>
+                                Funding Blocked Campaigns <span class="ps-4">:</span>
                             </div>
                         </div>
                         <div class="col">
@@ -102,81 +104,96 @@ use App\Models\Campaign;
                     </div>
                 </a>
             </div>
-            
-            
-            <div class="two-column-table position-relative mx-auto border border-1 shadow bg-white mt-5">
-                <div class="legend bg-white position-absolute">User Weight</div>
-                <a href="{{ route('user.indexDonors') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Total Fund Raised <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ $totalFund }}
-                            </div>
-                        </div>
+            -->
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="javascript:void(0)">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexDonors') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Total Requested Fund <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ $totalReqFund }}
-                            </div>
-                        </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Total Raised Fund</h4>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexCampaigners') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Total Withdraw <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ $totalPaidFund }}
-                            </div>
-                        </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ Helper::formatMoneyFigure($totalFund) }}</h4>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexVolunteerRequests') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Residual Fund <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ $totalResFund }}
-                            </div>
-                        </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="javascript:void(0)">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
                     </div>
-                </a>
-            </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Total Requested Fund</h4>
+                    </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ Helper::formatMoneyFigure($totalReqFund) }}</h4>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="javascript:void(0)">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Total Withdrawn Fund</h4>
+                    </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ Helper::formatMoneyFigure($totalPaidFund) }}</h4>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="javascript:void(0)">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Residual Fund</h4>
+                    </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ Helper::formatMoneyFigure($totalResFund) }}</h4>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
     
+    <hr />
+    
     <div class="row mt-5">
         <div class="col-12">
-            <h3 class="text-muted">Pending Request</h3>
+            @if($wRequestsPend->count())
+            <h3 class="text-muted">Pending Withdraw Request</h3>
             @include('partial.withdraw-request-table', ['wRequests' => $wRequestsPend, 'adminPending' => 'true'])
+            @endif
         </div>
         <div class="col-12 mt-5">
-            <h3 class="text-muted">Completed Request</h3>
-            @include('partial.withdraw-request-table', ['wRequests'=>$wRequestsComp])
+            @if($wRequestsComp->count())
+            <h3 class="text-muted">Completed Withdraw Request</h3>
+            @include('partial.withdraw-request-table', ['wRequests'=>$wRequestsComp, 'adminComp' => 'true'])
+            @endif
+        </div>
+        <div class="col-12 mt-5">
+            @if($wRequestsCan->count())
+            <h3 class="text-muted">Cancelled Withdraw Request</h3>
+            @include('partial.withdraw-request-table', ['wRequests' => $wRequestsCan, 'adminCan' => 'true'])
+            @endif
         </div>
     </div>
 </div>

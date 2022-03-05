@@ -11,7 +11,9 @@ use App\Models\MobileBank;
 class PaymentMethodController extends Controller{
     
     public function create() {
-        return view('fund.add-pay-meth');
+        $title = 'Add Payment Method';
+        $menuName = 'withdraw-fund';
+        return view('fund.add-pay-meth', compact('title', 'menuName'));
     }
     
     public function store(Request $request) {

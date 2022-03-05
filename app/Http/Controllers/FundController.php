@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Collection;
 
 use App\Models\User;
@@ -13,38 +12,66 @@ class FundController extends Controller
 {
     
     public function indexCampaignerFundPanel() {
-        $wRequestsPend = Auth::user()->wRequests()->whereStatus('1')->get();
-        $wRequestsComp = Auth::user()->wRequests()->whereStatus('2')->get();
-        return view('fund.campaigner-fund-panel', compact('wRequestsPend', 'wRequestsComp'));
+        $title = 'Fund Panel';
+        $menuName = 'withdraw-fund';
+//        $wRequestsPend = Auth::user()->wRequests()->whereStatus('1')->get();
+        $wRequestsPend = Auth::user()->wRequests->filter(function($wRequest){
+            return $wRequest->isPending();
+        });
+        
+//        dd(Auth::user()->wRequests);
+//        dd(Auth::user()->wRequests->count());
+//        dd($wRequestsPend );
+//        $wRequestsComp = Auth::user()->wRequests()->whereStatus('2')->get();
+        $wRequestsComp = Auth::user()->wRequests->filter(function($wRequest ,$key){
+            return $wRequest->isComplete();
+        });
+        $wRequestsCan = Auth::user()->wRequests()->whereIsCancelled(true)->get();
+        
+        return view('fund.campaigner-fund-panel', compact('wRequestsPend', 'wRequestsComp', 'wRequestsCan', 'title', 'menuName'));
     }
     
+    public function showFundableCampaigns() {
+        $title = 'All Fundable Campaigns';
+        $menuName = 'withdraw-fund';
+        $fundable = Auth::user()->totalUserFundableCampaigns();
+//        dd($fundable);
+        return view('fund.funded-camps-fundable', compact('fundable', 'title', 'menuName'));
+    }
     
-    
-    
-    
+    public function showFundingPendedCampaigns() {
+        $title = 'Funding-Pended Campaigns';
+        $menuName = 'withdraw-fund';
+        $pended = Auth::user()->totalUserPendingCampaigns();
+        return view('fund.funded-camps-pended', compact('pended', 'title', 'menuName'));
+    }
     
     public function showCompletelyFundedCampaigns() {
+        $title = 'Completely Funded Campaigns';
+        $menuName = 'withdraw-fund';
         $completely = Auth::user()->totalUserCompletelyFundedCampaigns();
-        return view('fund.funded-camps-completely', compact('completely'));
+        return view('fund.funded-camps-completely', compact('completely', 'title', 'menuName'));
     }
     
-    public function totalAllCompletelyFundedCampaigns() {
-        
-    }
-
     public function showPartlyFundedCampaigns() {
+        $title = 'Partly Funded Campaigns';
+        $menuName = 'withdraw-fund';
         $partly = Auth::user()->totalUserPartlyFundedCampaigns();
-        return view('fund.funded-camps-partly', compact('partly'));
+        return view('fund.funded-camps-partly', compact('partly', 'title', 'menuName'));
     }
     
     public function showNotFundedCampaigns() {
+        $title = 'Not Funded Campaigns';
+        $menuName = 'withdraw-fund';
         $not = Auth::user()->totalUserNotFundedCampaigns();
-        return view('fund.funded-camps-not', compact('not'));
+        return view('fund.funded-camps-not', compact('not', 'title', 'menuName'));
     }
     
     public function showFundingBlockedCampaigns() {
+        $title = 'Funding-Blocked Campaigns';
+        $menuName = 'withdraw-fund';
         $blocked = Auth::user()->totalUserFundingBlockedCampaigns();
-        return view('fund.funded-camps-blocked', compact('blocked'));
+        return view('fund.funded-camps-blocked', compact('blocked', 'title', 'menuName'));
     }
     
     
@@ -54,6 +81,8 @@ class FundController extends Controller
     
     
     public function indexAdminFundPanel() {
+        $title = 'Fund Panel';
+        $menuName = 'fund';
         $fundableCamps = $this->totalFundableCampaigns();
         $pendingCamps = $this->totalPendingCampaigns();
         $compCamps = $this->totalCompFundedCampaigns();
@@ -66,8 +95,14 @@ class FundController extends Controller
         $totalPaidFund = $this->totalPaidFund();
         $totalResFund = $this->totalResidualFund();
         
-        $wRequestsPend = WithdrawRequest::where('status', '1')->get();
-        $wRequestsComp = WithdrawRequest::where('status', '2')->get();
+        $wRequestsPend = WithdrawRequest::all()->filter(function($wRequest ,$key){
+            return $wRequest->isPending();
+        });
+        $wRequestsComp = WithdrawRequest::all()->filter(function($wRequest ,$key){
+            return $wRequest->isComplete();
+        });
+        $wRequestsCan = WithdrawRequest::whereIsCancelled(true)->get();
+        
         return view('fund.admin-fund-panel', compact(
                 'fundableCamps',
                 'pendingCamps',
@@ -83,37 +118,53 @@ class FundController extends Controller
                 
                 'wRequestsPend',
                 'wRequestsComp',
+                'wRequestsCan',
+                
+                'title',
+                'menuName',
             ));
     }
     
     public function indexFundableCampaigns(){
+        $title = 'Fundable Campaigns';
+        $menuName = 'fund';
         $fundableCamps = $this->totalFundableCampaigns();
-        return view('fund.funded-camps-fundable-admin', compact('fundableCamps'));
+        return view('fund.funded-camps-fundable-admin', compact('fundableCamps', 'title', 'menuName'));
     }
     
     public function indexPendingCampaigns(){
+        $title = 'Funding-Pended Campaigns';
+        $menuName = 'fund';
         $pendingCamps = $this->totalPendingCampaigns();
-        return view('fund.funded-camps-pending-admin', compact('pendingCamps'));
+        return view('fund.funded-camps-pending-admin', compact('pendingCamps', 'title', 'menuName'));
     }
     
     public function indexCompFundedCampaigns(){
+        $title = 'Completely Funded Campaigns';
+        $menuName = 'fund';
         $compFundedCamps = $this->totalCompFundedCampaigns();
-        return view('fund.funded-camps-comp-admin', compact('compFundedCamps'));
+        return view('fund.funded-camps-comp-admin', compact('compFundedCamps', 'title', 'menuName'));
     }
     
     public function indexPartlyFundedCampaigns(){
+        $title = 'Partly Campaigns';
+        $menuName = 'fund';
         $partlyFundedCamps = $this->totalPartlyFundedCampaigns();
-        return view('fund.funded-camps-partly-admin', compact('partlyFundedCamps'));
+        return view('fund.funded-camps-partly-admin', compact('partlyFundedCamps', 'title', 'menuName'));
     }
     
     public function indexNotFundedCampaigns(){
+        $title = 'Not Funded Campaigns';
+        $menuName = 'fund';
         $notFundedCamps = $this->totalNotFundedCampaigns();
-        return view('fund.funded-camps-not-admin', compact('notFundedCamps'));
+        return view('fund.funded-camps-not-admin', compact('notFundedCamps', 'title', 'menuName'));
     }
     
     public function indexFundingBlockedCamps(){
+        $title = 'Funding-Blocked Campaigns';
+        $menuName = 'fund';
         $blockedFundedCamps = $this->totalFundingBlockedCampaigns();
-        return view('fund.funded-camps-blocked-admin', compact('blockedFundedCamps'));
+        return view('fund.funded-camps-blocked-admin', compact('blockedFundedCamps', 'title', 'menuName'));
     }
     
     

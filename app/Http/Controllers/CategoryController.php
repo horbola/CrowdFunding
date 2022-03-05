@@ -12,7 +12,8 @@ class CategoryController extends Controller {
     public function index(Request $request) {
         $categories = Category::all();
         $title = 'Category';
-        return view('campaign.campaigns-category', compact('categories', 'title', 'request'));
+        $menuName = 'platform';
+        return view('campaign.campaigns-category', compact('categories', 'request', 'title', 'menuName'));
     }
     
     public function store(Request $request) {

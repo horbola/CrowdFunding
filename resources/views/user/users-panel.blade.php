@@ -3,230 +3,246 @@
 
 @section('dashboard-content')
 @php
-use App\Models\User;
-use App\Models\Donation;
-use App\Models\Campaign;
+    use App\Models\User;
+    use App\Models\Donation;
+    use App\Models\Campaign;
 @endphp
 <div id="users-panel">
     <div class="row">
-        <div class="col">
-            <div class="two-column-table position-relative mx-auto border border-1 shadow bg-white">
-                <div class="legend bg-white position-absolute">User Type</div>
-                <a href="{{ route('user.indexAllUsers') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                All Users <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ User::all()->count() }}
-                            </div>
-                        </div>
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="{{ route('user.indexAllUsers', ['menuName'=>$request->menuName]) }}">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexActiveUsers') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Active Users <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ User::whereActiveStatus(1)->count() }}
-                            </div>
-                        </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">All Users</h4>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexMalicousUsers') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Malicious Users <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ User::whereActiveStatus(2)->count() }}
-                            </div>
-                        </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ User::all()->count() }}</h4>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexBlockedUsers') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Blocked Users <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ User::whereActiveStatus(3)->count() }}
-                            </div>
-                        </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="{{ route('user.indexActiveUsers', ['menuName'=>$request->menuName]) }}">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexLeftUsers') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Left Users <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ User::whereActiveStatus(4)->count() }}
-                            </div>
-                        </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Active Users</h4>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexPausedUsers') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Paused Users <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ User::whereActiveStatus(5)->count() }}
-                            </div>
-                        </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ User::whereActiveStatus(1)->count() }}</h4>
                     </div>
-                </a>
-            </div>
-            
-            
-            <div class="two-column-table position-relative mx-auto border border-1 shadow bg-white mt-5">
-                <div class="legend bg-white position-absolute">User Weight</div>
-                <a href="{{ route('user.indexGuests') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Guests <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                @php
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="{{ route('user.indexMalicousUsers', ['menuName'=>$request->menuName]) }}">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Malicious Users</h4>
+                    </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ User::whereActiveStatus(2)->count() }}</h4>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="{{ route('user.indexBlockedUsers', ['menuName'=>$request->menuName]) }}">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Blocked Users</h4>
+                    </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ User::whereActiveStatus(3)->count() }}</h4>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="{{ route('user.indexLeftUsers', ['menuName'=>$request->menuName]) }}">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Left Users</h4>
+                    </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ User::whereActiveStatus(4)->count() }}</h4>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="{{ route('user.indexPausedUsers', ['menuName'=>$request->menuName]) }}">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Paused Users</h4>
+                    </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ User::whereActiveStatus(5)->count() }}</h4>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <hr />
+
+    <div class="row">
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="{{ route('user.indexGuests', ['menuName'=>$request->menuName]) }}">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Guests</h4>
+                    </div>
+                    <div class="">
+                        <h4 class="title mb-0">
+                            @php
                                 $users = User::all()->filter(function($user, $key){
                                     return $user->hasRole('guest');
                                 });
                                 echo $users->count();
-                                @endphp
-                            </div>
-                        </div>
+                            @endphp
+                        </h4>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexDonors') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Donors <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                @php
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="{{ route('user.indexDonors', ['menuName'=>$request->menuName]) }}">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Donors</h4>
+                    </div>
+                    <div class="">
+                        <h4 class="title mb-0">
+                            @php
                                 echo Donation::all()->unique('user_id')->count();
-                                @endphp
-                            </div>
-                        </div>
+                            @endphp
+                        </h4>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexCampaigners') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Campaigners <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ Campaign::all()->unique('user_id')->count() }}
-                            </div>
-                        </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="{{ route('user.indexCampaigners', ['menuName'=>$request->menuName]) }}">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexVolunteerRequests') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Volunteer Requests <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ User::whereIsVolunteer(1)->count() }}
-                            </div>
-                        </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Campaigners</h4>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexVolunteers') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Volunteers <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ User::whereIsVolunteer(2)->count() }}
-                            </div>
-                        </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ Campaign::all()->unique('user_id')->count() }}</h4>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexStaffs') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Staffs <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ User::whereIsAdmin(1)->count() }}
-                            </div>
-                        </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="{{ route('user.indexVolunteerRequests', ['menuName'=>$request->menuName]) }}">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
                     </div>
-                </a>
-                
-                <a href="{{ route('user.indexSuper') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Super Admin <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                {{ User::whereIsSuper(1)->count() }}
-                            </div>
-                        </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Volunteer Requests</h4>
                     </div>
-                </a>
-            </div>
-            
-            
+                    <div class="">
+                        <h4 class="title mb-0">{{ User::whereIsVolunteer(1)->count() }}</h4>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="{{ route('user.indexVolunteers', ['menuName'=>$request->menuName]) }}">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Volunteers</h4>
+                    </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ User::whereIsVolunteer(2)->count() }}</h4>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="{{ route('user.indexStaffs', ['menuName'=>$request->menuName]) }}">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Staffs</h4>
+                    </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ User::whereIsAdmin(1)->count() }}</h4>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-6 col-md-12 mt-4 pt-2">
+            <a href="{{ route('user.indexSuper', ['menuName'=>$request->menuName]) }}">
+                <div class="d-flex key-feature align-items-center p-3 rounded shadow">
+                    <div class="icon text-center rounded-circle me-3">
+                        <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="title mb-0">Super Admin</h4>
+                    </div>
+                    <div class="">
+                        <h4 class="title mb-0">{{ User::whereIsSuper(1)->count() }}</h4>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col">
+            <!--
             <div class="two-column-table position-relative mx-auto border border-1 shadow bg-white mt-5">
                 <div class="legend bg-white position-absolute">Donor Value</div>
-                <a href="{{ route('user.indexTopDonors') }}">
+                <a href="{{ route('user.indexTopDonors', ['menuName'=>$request->menuName]) }}">
                     <div class="row">
                         <div class="col align-self-center">
                             <div class="one h5 text-right text-muted">
-                                <!--who donated most that others are top donors-->
+                                who donated most that others are top donors
                                 Top Donors <span class="ps-4">:</span>
                             </div>
                         </div>
@@ -238,11 +254,11 @@ use App\Models\Campaign;
                     </div>
                 </a>
                 
-                <a href="{{ route('user.indexTopActives') }}">
+                <a href="{{ route('user.indexTopActives', ['menuName'=>$request->menuName]) }}">
                     <div class="row">
                         <div class="col align-self-center">
                             <div class="one h5 text-right text-muted">
-                                <!--who comments much are active donors-->
+                                who comments much are active donors
                                 Top Active <span class="ps-4">:</span>
                             </div>
                         </div>
@@ -254,11 +270,11 @@ use App\Models\Campaign;
                     </div>
                 </a>
                 
-                <a href="{{ route('user.indexTopSupporters') }}">
+                <a href="{{ route('user.indexTopSupporters', ['menuName'=>$request->menuName]) }}">
                     <div class="row">
                         <div class="col align-self-center">
                             <div class="one h5 text-right text-muted">
-                                <!--who likes most that others are top supporters-->
+                                who likes most that others are top supporters
                                 Top Supporters <span class="ps-4">:</span>
                             </div>
                         </div>
@@ -270,11 +286,11 @@ use App\Models\Campaign;
                     </div>
                 </a>
                 
-                <a href="{{ route('user.indexTopVisiters') }}">
+                <a href="{{ route('user.indexTopVisiters', ['menuName'=>$request->menuName]) }}">
                     <div class="row">
                         <div class="col align-self-center">
                             <div class="one h5 text-right text-muted">
-                                <!--who are viewing most are top visiting-->
+                                who are viewing most are top visiting
                                 Top Visiting <span class="ps-4">:</span>
                             </div>
                         </div>
@@ -286,6 +302,7 @@ use App\Models\Campaign;
                     </div>
                 </a>
             </div>
+            -->
         </div>
     </div>
 </div>

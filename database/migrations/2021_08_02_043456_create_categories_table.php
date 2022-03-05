@@ -18,6 +18,7 @@ class CreateCategoriesTable extends Migration
             $table->string('category_name');
             $table->string('category_slug');
             $table->string('category_image');
+            $table->string('category_icon');
             $table->boolean('show_in_home');
             $table->timestamps();
         });

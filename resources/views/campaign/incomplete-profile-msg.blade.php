@@ -4,7 +4,7 @@
 @section('dashboard-content')
 <div id="incomplete-profile-msg">
     {{ $message }}
-    <a href="{{ route('user.edit', ['origUrl' => route('campaign.create')]) }}">Complete Profile</a>
+    <a href="{{ route('user.edit', ['origUrl' => request()->origUrl]) }}">Complete Profile</a>
 </div>
 @endsection
 

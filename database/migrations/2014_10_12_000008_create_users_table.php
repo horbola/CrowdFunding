@@ -28,13 +28,16 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('active_status')->default('1');
             // 0:not, 1:requested, 2:volunteer, 3:removed, 4:resigned
             $table->tinyInteger('is_volunteer')->default('0');
+            // 1:true, 2:false
+            $table->boolean('is_special')->default(false);
             // 0:not, 1:admin, 2:rejected, 3:resigned
             $table->tinyInteger('is_admin')->default('0');
-            // 0:not, 1:super
-            $table->tinyInteger('is_super')->default('0');
+            // 0:true, 1:false
+            $table->boolean('is_super')->default(false);
             
             $table->string('photo')->nullable();
             $table->enum('gender', ['male', 'female', 'others'])->nullable();
+            $table->longText('about')->default('No Information about the fundraiser is provided');
             $table->rememberToken();
             $table->timestamps();
         });

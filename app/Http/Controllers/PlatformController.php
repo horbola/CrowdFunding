@@ -17,11 +17,15 @@ class PlatformController extends Controller {
     
     
     public function indexPlatformPanel(){
-        return view('platform.platform-panel');
+        $title = 'Platform Panel';
+        $menuName = 'platform';
+        return view('platform.platform-panel', compact('title', 'menuName'));
     }
     
     public function indexPlatformSettings(){
-        return view('platform.platform-settings');
+        $title = 'Platform Panel';
+        $menuName = 'platform';
+        return view('platform.platform-settings', compact('title', 'menuName'));
     }
     
     

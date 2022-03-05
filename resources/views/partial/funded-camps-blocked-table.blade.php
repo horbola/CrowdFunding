@@ -21,7 +21,7 @@
                 <td>{{$item->totalSuccessfulDonation()}}</td>
                 <td>{{$item->totalPaidFund()}}</td>
                 <td>
-                    <a href="{{route('campaign.showGuestCampaign', ['campaignId' => $item->id, 'user_panel_fraction' => Request::segment(4)])}}">View</a>
+                    <a href="{{route('campaign.showGuestCampaign', ['campaignId' => $item->id])}}">View</a>
                 </td>
             </tr>
             @endforeach

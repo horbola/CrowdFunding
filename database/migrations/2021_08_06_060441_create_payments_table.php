@@ -19,7 +19,7 @@ class CreatePaymentsTable extends Migration
             $table->double('amount');
             $table->string('currency');
             $table->string('trans_id');
-            // statuses: Pending, Processing, Complete
+            // statuses: Pending, Processing, Complete, Failed, Canceled
             $table->string('status');
             $table->timestamps();
         });

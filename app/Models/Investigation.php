@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Investigation extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['user_id', 'campaign_id', 'text_report', 'image_report', 'video_report'];
+    protected $fillable = ['user_id', 'campaign_id', 'text_report', 'image_report', 'video_report', 'is_verified'];
 
 
     protected $gaurded = [];
@@ -31,4 +32,18 @@ class Investigation extends Model
     public function investigator() {
         return $this->belongsTo(User::class, 'user_id');
     }
+    
+    public function postedInvReport() {
+        return $this->campaign_id;
+    }
+    
+    public function isInvestigated() {
+        return $this->postedInvReport() && $this->is_verified === 'yes';
+    }
+    
+    /* not used */
+    public function investigatedByMe() {
+        return $this->user_id === Auth::user()->id;
+    }
+    
 }

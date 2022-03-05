@@ -7,6 +7,8 @@ use DateTime;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+
 
 class Helper {
     /**
@@ -33,10 +35,22 @@ class Helper {
         return $newSlug;
     }
     
+    /*
+     * returns fromatted date and time both.
+     */
     static function formattedTime($rawTime) {
         $date = date_parse($rawTime);
         $monthName = Helper::convertMonthNumToName($date['month']);
         return $dateString = $date['day'].' '.$monthName.', '.$date['year'].' at '.$date['hour'].':'.$date['minute'];
+    }
+    
+    /*
+     * returns fromatted date only.
+     */
+    static function formattedDate($rawDate) {
+        $date = date_parse($rawDate);
+        $monthName = Helper::convertMonthNumToName($date['month']);
+        return $dateString = $monthName.' '.$date['day'].', '.$date['year'];
     }
     
     static function convertMonthNumToName($monthNum) {
@@ -44,6 +58,11 @@ class Helper {
         $monthName = $dateObj->format('F'); // March
         return $monthName;
     }
+    
+    static function formatMoneyFigure($figure) {
+        return number_format($figure, 2).'tk';
+    }
+    
     
     static function decodeStatus($status) {
         switch ($status) {
@@ -71,6 +90,7 @@ class Helper {
             return $e->getMessage();
         }
     }
+    
     
 
 }

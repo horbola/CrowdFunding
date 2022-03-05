@@ -4,7 +4,11 @@
         $uri_path = parse_url(url()->previous(), PHP_URL_PATH);
         $uri_segments = explode('/', $uri_path);
     @endphp
-    @if(Auth::check() && (Request::segment(1) ?? '') === 'dashboard')
+    <!--this portion is actually only for client, not for admin. conceptually a client can only delete or pause her account-->
+    <!--it's temporarily blocked for admin. but when an admin watches his own profile he should be able to perform these operation. so write login for this.-->
+    @php $switchOff = true @endphp
+    @if(!Auth::user()->is_admin)
+    @if(Auth::check() && (Request::segment(1) ?? '') === 'dashboard' && !$switchOff)
     <div class="row mb-3 text-right">
         <div class="col">
             <span>
@@ -24,8 +28,14 @@
         </div>
     </div>
     @endif
-
-
+    @endif
+    
+    @php
+        $actStat = $user->active_status;
+        $panelFrac = request()->user_panel_fraction;
+    @endphp
+    
+    
     <!--buttons for admin actions-->
     @if(Auth::check() && Auth::user()->is_admin && (($uri_segments[2] ?? '') === 'admin'))
     <div class="row mb-5 text-right">
@@ -35,7 +45,7 @@
                 if route condition is not set then volunteer and volunteer requests are shown every type of
                 user pages where there are any volunteer or volunteer requests
                 -->
-                @if( ($request->user_panel_fraction === 'volunteer-request') && ($user->is_volunteer === 1) )
+                @if( ($panelFrac === 'volunteer-request') && ($user->is_volunteer === 1) )
                 <span>
                     <form class="d-inline" action="{{ route('user.updateVolunteer') }}" method="post">
                         @csrf
@@ -54,7 +64,7 @@
                         <button type="submit" class="btn btn-primary">Cancel Volunteer Reqeust</button>
                     </form>
                 </span>
-                @elseif( ($request->user_panel_fraction === 'volunteer') && ($user->is_volunteer === 2) )
+                @elseif( ($panelFrac === 'volunteer') && ($user->is_volunteer === 2) )
                 <span>
                     <form class="d-inline" action="{{ route('user.updateVolunteer') }}" method="post">
                         @csrf
@@ -69,7 +79,7 @@
             
             <!--buttons for active status-->
             <div class="mt-1">
-                @if( $user->active_status === 3 && ($request->user_panel_fraction === 'blocked') )
+                @if( $actStat === 3 && ($panelFrac === 'blocked' && (!($panelFrac === 'volunteer-request'))) )
                 <span>
                     <form class="d-inline" action="{{ route('user.updateActiveStatus') }}" method="post">
                         @csrf
@@ -92,7 +102,7 @@
                 @endif
                 
                 
-                @if( $user->active_status === 2 && ($request->user_panel_fraction === 'malicous') )
+                @if( $actStat === 2 && ($panelFrac === 'malicous') )
                 <span>
                     <form class="d-inline" action="{{ route('user.updateActiveStatus') }}" method="post">
                         @csrf

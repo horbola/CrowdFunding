@@ -91,6 +91,28 @@
                                         </div>
                                     </div>
                                 </div><!--end col-->
+                                
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Your Phone <span class="text-danger">*</span></label>
+                                        <div class="form-icon position-relative">
+                                            <i data-feather="mail" class="fea icon-sm icons"></i>
+                                            <input id="phone"
+                                                   name="phone"
+                                                   type="text"
+                                                   class="form-control ps-5 @error('phone') is-invalid @enderror"
+                                                   placeholder="Phone"
+                                                   required
+                                                   autocomplete="phone"
+                                                   value="">
+                                            @error('phone')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div><!--end col-->
 
                                 <div class="col-md-12">
                                     <div class="mb-3">
@@ -137,16 +159,27 @@
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <div class="form-check">
-                                            <input  id="terms" type="checkbox" class="form-check-input" value="">
-                                            <label for="terms" class="form-check-label">I Accept <a href="#" class="text-primary">Terms And Condition</a></label>
+                                            <input class="form-check-input" type="checkbox" value="agreed" id="licenseCheckBox" name="licenseCheckBox">
+                                            <label class="form-check-label" for="licenseCheckBox">I Accept Terms And Condition</label>
                                         </div>
                                     </div>
                                 </div><!--end col-->
 
                                 <div class="col-md-12">
                                     <div class="d-grid">
-                                        <button type="submit" class="btn btn-primary">Register</button>
+                                        <button id="licenseCheckBtn" type="submit" class="btn btn-primary" disabled>Request</button>
                                     </div>
+                                    <script>
+                                        $(document).ready(function() {
+                                            $("#licenseCheckBox").click(function() {
+                                                if ($(this).is(":checked")) {
+                                                    $("#licenseCheckBtn").prop('disabled', false);
+                                                } else {
+                                                      $("#licenseCheckBtn").prop('disabled', true);
+                                                }
+                                            });
+                                        });
+                                    </script>
                                 </div><!--end col-->
 
                                 <div class="col-lg-12 mt-4 text-center">

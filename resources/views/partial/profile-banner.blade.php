@@ -9,7 +9,7 @@
                         <!--callihng showUpload() on label gets invoked two times-->
                         <label for="avatar" data-toggle="tooltip" data-placement="top" title="Change Photo" class="position-relative">
                             <input type="file" id="avatar" accept="image/png,image/jpeg" name="avatar" style="display: none">
-                            <img src="{{ Auth::user()->photo }}" class="avatar avatar-large rounded-circle shadow d-block mx-auto" alt="" onclick="showUpload();">
+                            <img src="{{ Auth::user()->avatar() }}" class="avatar avatar-small rounded-circle shadow d-block mx-auto" alt="" onclick="showUpload();">
                             <input type="submit" id="avatar-up" value="Upload" style="position: absolute;bottom: -10px;left: 35px;display: none" onclick="hideUpload();">
                         </label>
                     </form>
@@ -28,10 +28,10 @@
                 <div class="row align-items-end">
                     <div class="col-md-7 text-md-start text-center mt-4 mt-sm-0">
                         <h3 class="title mb-0">{{ Auth::user()->name }}</h3>
-                        <small class="text-muted h6 me-2">{{ Auth::user()->user_type }}</small>
+                        <small class="text-muted h6 me-2">{{ Auth::user()->userIndex() }}</small>
                         <ul class="list-inline mb-0 mt-3">
-                            <li class="list-inline-item me-2"><a href="javascript:void(0)" class="text-muted" title="Instagram"><i data-feather="instagram" class="fea icon-sm me-2"></i>krista_joseph</a></li>
-                            <li class="list-inline-item"><a href="javascript:void(0)" class="text-muted" title="Linkedin"><i data-feather="linkedin" class="fea icon-sm me-2"></i>Krista Joseph</a></li>
+                            <li class="list-inline-item me-2">Donated: {{ App\Library\Helper::formatMoneyFigure(Auth::user()->totalDonation()) }}</li>
+                            <li class="list-inline-item">Raised: {{ App\Library\Helper::formatMoneyFigure(Auth::user()->totalFund()) }}</li>
                         </ul>
                     </div><!--end col-->
                     <div class="col-md-5 text-md-end text-center">
