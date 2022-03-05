@@ -62,9 +62,6 @@
 <meta property="og:type" content="website" />
 <meta property="og:description" content="{{ $campaign->short_description }}" />
 <meta property="og:image" content="{{ $campaign->feature_image }}" class="image-uri"/>
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="{{ $campaign->title }}" />
 <meta property="og:site_name" content="Oporajoy Crowd Funding" />
 <meta property="og:url" content="{{ URL::current() }}" />
 <!--<meta property="fb:app_id" content="">-->
@@ -128,7 +125,7 @@
 <!--share script-->
 <script>
     let postUrl = encodeURI(document.location.href);
-    let imageUrl = encodeURI('https://' + document.location.host + '{{ $campaign->feature_image }}');
+    let imageUrl = encodeURI(document.location.host + '{{ $campaign->feature_image }}');
     let postTitle = encodeURI('{{ $campaign->title }}');
     let postTitleRaw = '{{ $campaign->title }}';
     

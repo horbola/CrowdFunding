@@ -402,7 +402,7 @@ class Campaign extends Model
         // seconds/minute*minutes/hour*hours/day)
         $days = floor($diff/(60*60*24));
         
-        if( (int)$this->status === 1 ){
+        if($this->status === 1){
             if($days >= 0) {
                 switch ($days) {
                     case 0:
@@ -435,7 +435,7 @@ class Campaign extends Model
         if ($this->isActive()){
             return $this->daysLeft();
         }
-        else if ( (int)$this->status === 1 ){
+        else if ($this->status === 1){
             return 'Completed';
         }
         else return Helper::decodeStatus($this->status);
@@ -443,17 +443,17 @@ class Campaign extends Model
     
     public function isActive() {
         // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
-        if( (int)$this->status !== 1 ){
+        if($this->status !== 1){
             return false;
         }
             
         // 0:ends-by-date, 1:ends-by-goal
-        if ( (int)$this->end_method == 0 ){
+        if ($this->end_method == 0){
             $raised = $this->totalSuccessfulDonation();
             if ($raised <= $this->goal){
                 return true;
             }
-        }elseif ( (int)$this->end_method == 1 ){
+        }elseif ($this->end_method == 1){
             if (Carbon::today()->toDateString() < $this->end_date){
                 return true;
             }
@@ -464,16 +464,16 @@ class Campaign extends Model
     
     public function isCompleted() {
         // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
-        if( (int)$this->status !== 1 ){
+        if($this->status !== 1){
             return false;
         }
         
         // 0:ends-by-date, 1:ends-by-goal
-        if ( (int)$this->end_method == 0 ){
+        if ($this->end_method == 0){
             if (Carbon::today()->toDateString() > $this->end_date){
                 return true;
             }
-        }elseif ( (int)$this->end_method == 1 ){
+        }elseif ($this->end_method == 1){
             $raised = $this->totalSuccessfulDonation();
             if ($raised > $this->goal){
                 return true;

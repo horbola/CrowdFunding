@@ -100,7 +100,7 @@
             || Route::currentRouteName() === 'volunteer.store'
             || Route::currentRouteName() === 'volunteer.destroy' ? true : false);
         @endphp
-        @if((int)Auth::user()->is_volunteer === 0 || (int)Auth::user()->is_volunteer === 3 || (int)Auth::user()->is_volunteer === 4)
+        @if(Auth::user()->is_volunteer === '0' || Auth::user()->is_volunteer === '3' || Auth::user()->is_volunteer === '4')
         <!--<li class="navbar-item account-menu px-0 mt-2 {{ $volunteer ? 'active' : '' }}">-->
         <li class="navbar-item account-menu px-0 mt-2 {{ $menuName === 'be-volunteer'? 'active' : '' }}">
             <a href="{{ route('volunteer.create')}}" class="navbar-link d-flex rounded shadow align-items-center py-2 px-4">
@@ -110,7 +110,7 @@
         </li>
         @endif
         
-        @if((int)Auth::user()->is_volunteer === 1 || (int)Auth::user()->is_volunteer === 2)
+        @if(Auth::user()->is_volunteer === '1' || Auth::user()->is_volunteer === '2')
         <!--<li class="navbar-item account-menu px-0 mt-2 {{ $volunteer ? 'active' : '' }}">-->
         <li class="navbar-item account-menu px-0 mt-2 {{ $menuName === 'resign-volunteer'? 'active' : '' }}">
             <a href="{{ route('volunteer.destroy')}}" class="navbar-link d-flex rounded shadow align-items-center py-2 px-4">
@@ -149,7 +149,7 @@
         
         
         <!---------- admin menus ---------------------------------------------------------------------------------->
-        @if( ((int)Auth::user()->is_admin === 1) || ((int)Auth::user()->is_super === 1) )
+        @if( (Auth::user()->is_admin === '1') || (Auth::user()->is_super === '1') )
         @php $adminUsersPanel = (Request::segment(3) === 'users-panel' ||
                                 (isset($request)? $request->user_panel_fraction : false));
         @endphp

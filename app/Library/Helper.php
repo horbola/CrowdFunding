@@ -65,7 +65,7 @@ class Helper {
     
     
     static function decodeStatus($status) {
-        switch ( (int)$status ) {
+        switch ($status) {
             case 0: return 'Pending';   break;
             case 2: return 'Cancelled'; break;
             case 3: return 'Blocked';   break;
