@@ -1,0 +1,14 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// bootstrap library: functions, variables, mixins
+@import "_lib.scss";
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+// custom
+@import "_util.scss";
+@import "_components.scss";

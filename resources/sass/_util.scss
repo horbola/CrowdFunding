@@ -1,0 +1,22 @@
+// custom utilites sass starts
+.s-box-up-md {
+    @media (min-width: 767px) {
+        box-shadow: $box-shadow-lg;
+        transition: all 0.3s ease;
+        border-color: $border-color;
+        border-radius: $border-radius-lg;
+        padding: 20px;
+    }
+}
+
+.sticky-status {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 70px;
+}
+
+.green-btn, .green-btn:hover {
+    background-color: #42ccae;
+}
+
+// custom utilites sass ends

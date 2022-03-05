@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <link href="owl.carousel.css" rel="stylesheet" />
+        <link href="owl.theme.default.css" rel="stylesheet" />
+        <style>
+            .ss {
+                
+            }
+        </style>
+    </head>
+    <body>
+        <div class="" style="border: 1px solid red; width: 600px; height: 500px;">
+            <div class="owl-carousel owl-theme">
+                <div class="" style="border: 1px solid red; width: 500px; height: 400px">this is an owl item one</div>
+                <div class="" style="border: 1px solid red; width: 500px; height: 400px">this is an owl item two</div>
+                <div class="" style="border: 1px solid red; width: 500px; height: 400px">this is an owl item three</div>
+                <div class="" style="border: 1px solid red; width: 500px; height: 400px">this is an owl item four</div>
+                <div class="" style="border: 1px solid red; width: 500px; height: 400px">this is an owl item four</div>
+            </div>
+        </div>
+        <script src="jquery.js"></script>
+        <script src="owl.carousel.js"></script>
+        <script>
+            $(document).ready(function(){
+                $(".owl-carousel").owlCarousel({
+                    margin: 10,
+                    dots: true,
+                    loop: true,
+                    autoplay: false,
+                    nav: true,
+//                    pagination : true,
+//                    autoplayTimeout: 500,
+//                    responsiveClass: true,
+                    items: 2,
+                    center: true,
+//                    mouseDrag: false,
+//                    touchDrag: false,
+//                    pullDrag: false,
+//                    freeDrag: true,
+//                    stagePadding: 10,
+//                    merge: true,
+//                    maergeFit: false,
+//                    autoWidth: true,
+//                    startPosition: 10,
+//                    URLhashListener: true,
+                    navText: [
+                        '<span class="ss" style="border: 1px solid green; background-color: red;">pr</span>',
+                        '<span class="ss" style="border: 1px solid green; background-color: red;">pr</span>'
+                    ],
+//                    navElement: 'span',
+//                    slideBy: 1,
+//                    slideTransition: linear,
+                    dontsEach: false
+                });
+            });
+        </script>
+    </body>
+</html>
+
+<!--
+<div class="owl-carousel owl-theme owl-loaded">
+                <div class="owl-stage-outer">
+                    <div class="owl-stage">
+                        <div class="owl-item" style="border: 1px solid red; width: 600px;">this is an owl item one</div>
+                        <div class="owl-item" style="border: 1px solid red; width: 600px;">this is an owl item two</div>
+                        <div class="owl-item" style="border: 1px solid red; width: 600px;">this is an owl item three</div>
+                        <div class="owl-item" style="border: 1px solid red; width: 600px;">this is an owl item four</div>
+                    </div>
+                </div>
+                <div class="owl-nav">
+                    <div class="owl-prev">prev</div>
+                    <div class="owl-next">next</div>
+                </div>
+                <div class="owl-dots">
+                    <div class="owl-dot"><span></span></div>
+                    <div class="owl-dot active"><span></span></div>
+                    <div class="owl-dot"><span></span></div>
+                </div>
+            </div>-->
