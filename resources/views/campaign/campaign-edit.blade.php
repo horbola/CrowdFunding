@@ -30,21 +30,22 @@
                         </div>
                         -->
                         
-                        <div class="form-group form-row {{ $errors->has('address')? 'has-error':'' }}">
-                            <label for="address" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.address')</label>
+                        <div class="form-group form-row {{ $errors->has('title')? 'has-error':'' }}">
+                            <label for="title" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.title')<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
-                                <input type="text" class="form-control ps-5" id="address" value="{{$campaign->address}}" name="address" placeholder="@lang('app.address')" maxlength="255">
-                                {!! $errors->has('address')? '<p class="help-block">'.$errors->first('address').'</p>':'' !!}
+                                <input type="text" class="form-control ps-5" id="title" value="{{$campaign->title}}" name="title" placeholder="@lang('app.title')" maxlength="255">
+                                {!! $errors->has('title')? '<p class="help-block">'.$errors->first('title').'</p>':'' !!}
+                                <p class="text-info"> @lang('app.great_title_info')</p>
                             </div>
                         </div>
-
+                        
                         <div class="form-group form-row {{ $errors->has('category')? 'has-error':'' }}">
-                            <label for="category" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.category') <span class="text-danger">*</span></label>
+                            <label for="category" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.category')<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <select class="form-select form-control ps-5" name="category">
-                                    <option value="{{isset($campaign->category) ? $campaign->category->category_id : 1}}" selected>{{isset($campaign->category) ? $campaign->category->category_name : 'Medical'}}</option>
+                                    <option value="{{isset($campaign->category) ? $campaign->category->id : 1}}" selected>{{isset($campaign->category) ? $campaign->category->category_name : 'Medical'}}</option>
                                     @foreach ($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->category_name }}</option>
                                     @endforeach
@@ -53,18 +54,8 @@
                             </div>
                         </div>
 
-                        <div class="form-group form-row {{ $errors->has('title')? 'has-error':'' }}">
-                            <label for="title" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.title') <span class="text-danger">*</span></label>
-                            <div class="col-sm-12 col-md-9 form-icon position-relative">
-                                <i data-feather="user" class="fea icon-sm icons"></i>
-                                <input type="text" class="form-control ps-5" id="title" value="{{$campaign->title}}" name="title" placeholder="@lang('app.title')" maxlength="255">
-                                {!! $errors->has('title')? '<p class="help-block">'.$errors->first('title').'</p>':'' !!}
-                                <p class="text-info"> @lang('app.great_title_info')</p>
-                            </div>
-                        </div>
-
                         <div class="form-group form-row {{ $errors->has('short_description')? 'has-error':'' }}">
-                            <label for="short_description" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.short_description')</label>
+                            <label for="short_description" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.short_description')<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <textarea name="short_description" class="form-control ps-5" rows="3" cols="50" maxlength="300">{{$campaign->short_description}}</textarea>
@@ -73,7 +64,7 @@
                         </div>
 
                         <div class="form-group form-row {{ $errors->has('description')? 'has-error':'' }}">
-                            <label for="description" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.description') <span class="text-danger">*</span></label>
+                            <label for="description" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.description')<span> :</span></label>
                             <div class="col-sm-12 col-md-9">
                                 <!--<div class="alert alert-info"> @lang('app.image_insert_limitation') </div>-->
                                 <div class=" form-icon position-relative">
@@ -87,7 +78,7 @@
                         </div>
 
                         <div class="form-group form-row {{ $errors->has('feature_image')? 'has-error':'' }}">
-                            <label for="feature_image" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.feature_image')</label>
+                            <label for="feature_image" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.feature_image')<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="file" class="form-control ps-5" id="feature_image" value="{{$campaign->feature_image}}" name="feature_image" placeholder="@lang('app.feature_image')">
@@ -97,7 +88,7 @@
                         </div>
                         
                         <div class="form-group form-row {{ $errors->has('album')? 'has-error':'' }}">
-                            <label for="album" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Album</label>
+                            <label for="album" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Album<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="file" class="form-control ps-5" id="album" value="" name="album[]" multiple placeholder="Album">
@@ -119,7 +110,7 @@
                         -->
                         
                         <div class="form-group form-row {{ $errors->has('documents')? 'has-error':'' }}">
-                            <label for="documents" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Documents</label>
+                            <label for="documents" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Documents<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="file" class="form-control ps-5" id="documents" value="" name="documents[]" multiple placeholder="Documents">
@@ -129,7 +120,7 @@
                         </div>
 
                         <div class="form-group form-row {{ $errors->has('goal')? 'has-error':'' }}">
-                            <label for="goal" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.goal') <span class="text-danger">*</span></label>
+                            <label for="goal" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.goal')<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <div class=" form-icon position-relative">
                                     <i data-feather="user" class="fea icon-sm icons"></i>
@@ -143,7 +134,7 @@
                         </div>
 
                         <div class="form-group form-row {{ $errors->has('end_method')? 'has-error':'' }}">
-                            <label for="end_method" class="col-sm-12 col-md-3 form-label text-left text-md-right">@lang('app.campaign_end_method')</label>
+                            <label for="end_method" class="col-sm-12 col-md-3 form-label text-left text-md-right">@lang('app.campaign_end_method')<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <label>
                                     <input type="radio" name="end_method" value="0"  @if(old('end_method') == 0) checked="checked" @endif > @lang('app.after_end_date')
@@ -165,7 +156,7 @@
                         </div>
 
                         <div class="form-group form-row {{ $errors->has('start_date')? 'has-error':'' }}">
-                            <label for="start_date" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.start_date')</label>
+                            <label for="start_date" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.start_date')<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="text" class="form-control ps-5" id="start_date" value="{{$campaign->start_date}}" name="start_date" placeholder="@lang('app.start_date')">
@@ -173,7 +164,7 @@
                             </div>
                         </div>
                         <div class="form-group form-row {{ $errors->has('end_date')? 'has-error':'' }}">
-                            <label for="end_date" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.end_date')</label>
+                            <label for="end_date" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.end_date')<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="text" class="form-control ps-5" id="end_date" value="{{$campaign->end_date}}" name="end_date" placeholder="@lang('app.end_date')">
@@ -182,7 +173,7 @@
                         </div>
 
                         <div class="form-group form-row {{ $errors->has('min_amount')? 'has-error':'' }}">
-                            <label for="min_amount" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.min_amount')</label>
+                            <label for="min_amount" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.min_amount')<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="text" class="form-control ps-5" id="min_amount" value="{{$campaign->min_amount}}" name="min_amount" placeholder="@lang('app.min_amount')">
@@ -191,7 +182,7 @@
                         </div>
 
                         <div class="form-group form-row {{ $errors->has('max_amount')? 'has-error':'' }}">
-                            <label for="max_amount" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.max_amount')</label>
+                            <label for="max_amount" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.max_amount')<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="text" class="form-control ps-5" id="max_amount" value="{{$campaign->max_amount}}" name="max_amount" placeholder="@lang('app.max_amount')">
@@ -200,7 +191,7 @@
                         </div>
 
                         <div class="form-group form-row {{ $errors->has('recommended_amount')? 'has-error':'' }}">
-                            <label for="recommended_amount" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.recommended_amount')</label>
+                            <label for="recommended_amount" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.recommended_amount')<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="number" class="form-control ps-5" id="recommended_amount" value="{{$campaign->recommended_amount}}" name="recommended_amount" placeholder="@lang('app.recommended_amount')">
@@ -209,7 +200,7 @@
                         </div>
 
                         <div class="form-group form-row {{ $errors->has('amount_prefilled')? 'has-error':'' }}">
-                            <label for="amount_prefilled" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.amount_prefilled')</label>
+                            <label for="amount_prefilled" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.amount_prefilled')<span> :</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
                                 <i data-feather="user" class="fea icon-sm icons"></i>
                                 <input type="text" class="form-control ps-5" id="amount_prefilled" value="{{$campaign->amount_prefilled}}" name="amount_prefilled" placeholder="@lang('app.amount_prefilled')">
@@ -219,6 +210,7 @@
                             </div>
                         </div>
 
+                        <input type="hidden" name="adminCampaignMenu" value="{{ $request->adminCampaignMenu }}">
                         <div class="form-group form-row">
                             <div class="col-sm-12 col-md-3 offset-md-3 d-grid d-md-block">
                                 <button type="submit" class="btn btn-primary">Complete Edition</button>

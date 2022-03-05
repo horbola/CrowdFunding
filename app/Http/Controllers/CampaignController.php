@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
@@ -19,6 +20,7 @@ use App\Models\Share;
 use App\Models\View;
 use App\Models\Document;
 use App\Models\Album;
+use App\Models\Update;
 
 class CampaignController extends Controller {
     
@@ -27,7 +29,7 @@ class CampaignController extends Controller {
     public function indexGuestCampaign(Request $request, $categoryId='1'){
         $categories = Category::all();
         $active = $categoryId;
-        $campaigns = Campaign::where('category_id', $categoryId)->paginate(4);
+        $campaigns = Campaign::where('category_id', $categoryId)->where('status', 1)->paginate(4);
         return view('face.campaign-master', compact('request', 'categories', 'active', 'campaigns'));
     }
     
@@ -51,18 +53,29 @@ class CampaignController extends Controller {
         return view('face.campaign-master', compact('request', 'categories', 'active', 'campaigns'));
     }
 
+    /*
+     * shows a campaign on the basis of it's id which is provided by the master page.
+     * it records each show before showing.
+     */
     public function showGuestCampaign($campaignId){
+        session(['adminCampaignsUrl' => URL::previous()]);
         $campaign = Campaign::find($campaignId);
-        // image, pdf etc for supporting this campaign
-        if(Auth::check() && (Auth::user()->id !== $campaign->user_id)){
-            $data = [
-                'user_id' => Auth::user()->id,
-                'campaign_id' => $campaign->id,
-            ];
-            View::create($data);
+        if($campaign){
+            // every show of any campaign is recoreded by this portion.
+            // but recorded only if the visitor is logged in and not campaign creator himself.
+            if (Auth::check() && (Auth::user()->id !== $campaign->user_id)) {
+                $data = [
+                    'user_id' => Auth::user()->id,
+                    'campaign_id' => $campaign->id,
+                ];
+                View::create($data);
+            }
+            
+            return view('face.campaign-detail', compact('campaign'));
         }
-        
-        return view('face.campaign-detail', compact('campaign'));
+        else {
+            return view('face.campaign-not-found');
+        }
     }
     
     
@@ -189,9 +202,10 @@ class CampaignController extends Controller {
     
     public function indexMyAllCampaign(Request $request){
         if(Auth::check()){
+            $title = 'My All Campaign';
             $user = Auth::user();
             $campaigns = Campaign::where('user_id', $user->id)->paginate(5);
-            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns'));
+            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns', 'title'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
@@ -277,26 +291,6 @@ class CampaignController extends Controller {
         $allCampaigns = Campaign::paginate(15);
         return view('campaign.campaigns')->with('campaigns', $allCampaigns);
     }
-    private function paginatorTest($allCampaigns){
-//        dd($allCampaigns->count());
-//        dd($allCampaigns->firstItem());
-//        dd($allCampaigns->getOptions());
-//        dd($allCampaigns->getUrlRange(0, 5));
-//        dd($allCampaigns->hasPages());
-//        dd($allCampaigns->hasMorePages());
-//        dd($allCampaigns->items());
-//        dd($allCampaigns->lastItem());
-//        dd($allCampaigns->lastPage());
-//        dd($allCampaigns->nextPageUrl());
-//        dd($allCampaigns->onFirstPage());
-//        dd($allCampaigns->perPage());
-//        dd($allCampaigns->previousPageUrl());
-//        dd($allCampaigns->total());
-//        dd($allCampaigns->url());
-//        dd($allCampaigns->getPageName());
-//        dd($allCampaigns->setPageName());
-    }
-
 
     public function indexAdminActiveCampaign(Request $request){
         // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
@@ -354,30 +348,124 @@ class CampaignController extends Controller {
      * seller can create a product
      */
     public function create(Request $request) {
+        $title = 'Create New Campaign';
+        // fields are empty menas profile is complete. so no action needed.
+        // but if are not empty means, those fields are not filled up. so 
+        // redirect user to profile-edit page. and accociate a link to
+        // campaign-create page as origUrl so that after completing the profile
+        // user could go to campaign-create page.
+        $fields = Auth::user()->isProfileComplete();
+        $message = 'You didn\'t comple your profile.' .$fields. ' are not filled. To create any campaign you have to fillup those fields.';
+        if($fields){
+            return view('campaign.incomplete-profile-msg', compact('message'));
+        }
+        
+        // actual campaign creation process.
         $countries = Country::all();
         $categories = Category::all();
-        return view('campaign.campaign-create', compact('countries', 'categories', 'request'));
+        return view('campaign.campaign-create', compact('countries', 'categories', 'request', 'title'));
     }
     
-    public function store(Request $request) {
+    public function preview(Request $request) {
+        $previewedId = session('previewedId');
+        if($previewedId) $this->destroy ($previewedId);
+        $this->store($request, true);
+    }
+    
+    public function store(Request $request, $preview=false) {
+        // $previewedId = session('previewedId');
+        // if($previewedId) $this->destroy ($previewedId);
+        
         $rules = [
-            'address' => 'required|string',
+            'title' => 'required|string:255',
             'category' => 'required|numeric',
-            'title' => 'required|string',
-            'short_description' => 'required|string',
+            'short_description' => 'required|string:400',
             'description' => 'required|string',
             'feature_image' => 'required|file',
-            'album' => 'required|array',
+            'album' => 'array',
             'documents' => 'required|array',
             // 'feature_video' => 'required|file',
             'goal' => 'required|numeric',
             'end_method' => 'required|numeric',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'min_amount' => 'required|numeric',
-            'max_amount' => 'required|numeric',
-            'recommended_amount' => 'required|numeric',
-            'amount_prefilled' => 'required|string',
+            'min_amount' => 'numeric',
+            'max_amount' => 'numeric',
+            'recommended_amount' => 'numeric',
+            'amount_prefilled' => 'string:255',
+        ];
+        $this->validate($request, $rules);
+
+        $user_id = Auth::user()->id;
+        $slug = Helper::unique_slug($request->title);
+        
+        if($preview) $status = -1;
+        else $status = 0;
+        $data = [
+            'user_id' => $user_id,
+            'category_id' => $request->category,
+            
+            'slug' => $slug,
+            'title' => $request->title,
+            'short_description' => $request->short_description,
+            'description' => $request->description,
+            'feature_image' => $this->storeImage($request),
+            // 'feature_video' => $request->video,
+            
+            'goal' => $request->goal,
+            // 0:ends-by-date, 1:ends-by-goal
+            'end_method' => $request->end_method,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'min_amount' => $request->min_amount,
+            'max_amount' => $request->max_amount,
+            'recommended_amount' => $request->recommended_amount,
+            'amount_prefilled' => $request->amount_prefilled,
+            
+            'status' => $status,
+            'is_funded' => 0,
+        ];
+        $create = Campaign::create($data);
+        // if any image for supplimenting feature image to this campaign
+        // those are uploaded by this method
+        if ($request->hasFile('album')) {
+            $this->updateAlbum($request, $create);
+        }
+        // if any image, pdf for supporting documents of this campaign
+        // those are uploaded by this method
+        if ($request->hasFile('documents')) {
+            $this->updateDocuments($request, $create);
+        }
+
+        if ($create) {
+            // if($preview) session (['previewedId' => $created->id]);
+            return redirect(route('campaign.showGuestCampaign', $create->id));
+        }
+        return back()->with('error', trans('app.something_went_wrong'))->withInput($request->input());
+    }
+    
+    /*
+     * this portion is actually a part of this->store() method. but is separated from that
+     * to facilate the use use of preview() so that we can avoid dry provess. (not used)
+     */
+    private function storeOnly($request) {
+        $rules = [
+            'title' => 'required|string:255',
+            'category' => 'required|numeric',
+            'short_description' => 'required|string:400',
+            'description' => 'required|string',
+            'feature_image' => 'required|file',
+            'album' => 'array',
+            'documents' => 'required|array',
+            // 'feature_video' => 'required|file',
+            'goal' => 'required|numeric',
+            'end_method' => 'required|numeric',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'min_amount' => 'numeric',
+            'max_amount' => 'numeric',
+            'recommended_amount' => 'numeric',
+            'amount_prefilled' => 'string:255',
         ];
         $this->validate($request, $rules);
 
@@ -387,15 +475,13 @@ class CampaignController extends Controller {
         $data = [
             'user_id' => $user_id,
             'category_id' => $request->category,
-            'country_id' => 18,
-            'address' => $request->address,
             
             'slug' => $slug,
             'title' => $request->title,
             'short_description' => $request->short_description,
             'description' => $request->description,
             'feature_image' => $this->storeImage($request),
-            'feature_video' => $request->video,
+            // 'feature_video' => $request->video,
             
             'goal' => $request->goal,
             // 0:ends-by-date, 1:ends-by-goal
@@ -421,13 +507,11 @@ class CampaignController extends Controller {
         if ($request->hasFile('documents')) {
             $this->updateDocuments($request, $create);
         }
-
-        if ($create) {
-             return back()->with('success', trans('app.campaign_created'));
-        }
-        return back()->with('error', trans('app.something_went_wrong'))->withInput($request->input());
+        
+        return $create;
     }
-    
+
+
     private function storeImage($request) {
         if(!$request->hasFile('feature_image')){
             return '';
@@ -469,23 +553,21 @@ class CampaignController extends Controller {
     
     
     
-    public function showAdminCampaign($campaignID){}
     
     
     
     
-    public function edit($campaignId) {
+    public function edit(Request $request, $campaignId) {
         $campaign = Campaign::find($campaignId);
         $countries = Country::all();
         $categories = Category::all();
-        return view('campaign.campaign-edit')->with(compact('campaign', 'countries', 'categories'));
+        return view('campaign.campaign-edit')->with(compact('request', 'campaign', 'countries', 'categories'));
     }
     
     public function update(Request $request, $campaignId) {
         $rules = [
-            'address' => 'string',
-            'category' => 'numeric',
             'title' => 'string',
+            'category' => 'numeric',
             'short_description' => 'string',
             'description' => 'string',
             'feature_image' => 'file',
@@ -509,10 +591,9 @@ class CampaignController extends Controller {
         
         $campaign->category_id = $request->category;
         // $campaign->country_id = $request->country_id;
-        $campaign->address = $request->address;
         
-        $campaign->slug = $slug;
         $campaign->title = $request->title;
+        $campaign->slug = $slug;
         $campaign->short_description = $request->short_description;
         $campaign->description = $request->description;
         $campaign->feature_image = $this->updateImage($request, $campaign);
@@ -543,7 +624,10 @@ class CampaignController extends Controller {
         }
         
         if ($updated) {
-            return redirect(route('campaign.showGuestCampaign', $campaignId))->with('success', trans('app.campaign_created'));
+            $req = [
+                'adminCampaignMenu' => $request->adminCampaignMenu,
+            ];
+            return redirect(route('campaign.showGuestCampaign', $campaignId))->with(['success' => trans('app.campaign_created'), 'request' => $req]);
         }
         return back()->with('error', trans('app.something_went_wrong'))->withInput($request->input());
     }
@@ -746,8 +830,67 @@ class CampaignController extends Controller {
     /**
      * only admin can destroy a product but not seller
      */
-    public function destroy() {
+    public function destroy($id) {
+        // a campaign may have these resources to delete:
+        // 1. database record
+        // 2. feature image
+        // 3. feature video
+        // 4. album photos
+        // 5. document photos
+        // 6. update photos
+        $campaign = Campaign::find($id);
+        $featureImage = $campaign->feature_image;
+        $albumPhotos = Album::where('campaign_id', $id)->get();
+        $documentPhotos = Document::where('campaign_id', $id)->get();
+        $updatePhotos = Update::where('campaign_id', $id)->get();
         
+        // deletes feature image
+        if($featureImage) {
+            // replaces the word 'full' with 'thumb'
+            $featureThumbImage = str_replace('full', 'thumb', $featureImage);
+            $this->deleteImage($featureImage, $featureThumbImage);
+            $campaign->delete();
+        }
+        
+        if($albumPhotos) {
+            foreach ($albumPhotos as $anImage) {
+                $albumThumbImage = str_replace('full', 'thumb', $anImage->image_path);
+                $this->deleteImage($anImage->image_path, $albumThumbImage);
+                $anImage->delete();
+            }
+        }
+        
+        if($documentPhotos) {
+            foreach ($documentPhotos as $anImage) {
+                $this->deleteImage($anImage->image_path);
+                $anImage->delete();
+            }
+        }
+        
+        if($updatePhotos) {
+            foreach ($updatePhotos as $anImage) {
+                $this->deleteImage($anImage->image_path);
+                $anImage->delete();
+            }
+        }
+        return redirect(session('adminCampaignsUrl'));
+    }
+    
+    /*
+     * deletes an image and it's thumb image
+     */
+    public function deleteImage($image, $thumbImage='') {
+        try {
+            if (file_exists(public_path().$image)) {
+                unlink(public_path().$image);
+            }
+            
+            if (file_exists(public_path().$thumbImage)) {
+                unlink(public_path().$thumbImage);
+            }
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
     
 

@@ -12,7 +12,7 @@
             <a class="nav-link py-2 px-5 rounded border border-1" id="document-info" data-bs-toggle="pill" href="#document" role="tab" aria-controls="additional" aria-selected="false">
                 <div class="text-center">
                     <!--<h6 class="mb-0">Documents</h6>-->
-                    <h6 id="cus-font2" class="mb-0">ডকুমেন্ট</h6>
+                    <h6 id="cus-font2" class="mb-0">Documents</h6>
                 </div>
             </a><!--end nav link-->
         </li><!--end nav item-->
@@ -21,7 +21,7 @@
             <a class="nav-link py-2 px-5 rounded border border-1" id="update-number" data-bs-toggle="pill" href="#update" role="tab" aria-controls="review" aria-selected="false">
                 <div class="text-center">
                     <!--<h6 class="mb-0">Updates</h6>-->
-                    <h6 class="mb-0">ডকুমেন্ট</h6>
+                    <h6 class="mb-0">Updates</h6>
                 </div>
             </a><!--end nav link-->
         </li><!--end nav item-->
@@ -146,11 +146,13 @@
                 @if($campaign->documents->count())
                     @foreach($campaign->documents as $doc)
                     <div class="" style="width: 100%; height: 400px">
-                        <img src="{{$doc->image_path}}"/>
+                        <!--<img src="{{$doc->image_path}}" onclick="deleteImage(this, '{{ route('document.delete', $doc->id) }}');"/>-->
+                        <!--<img src="{{$doc->image_path}}" data-route="{{ route('document.delete', $doc->id) }}" data-for="document" data-bs-toggle="modal" data-bs-target="#img-del-conf-model"/>-->
+                        <img src="{{$doc->image_path}}" data-route="{{ route('document.delete', $doc->id) }}" data-for="document" ondblclick="openImgDelModal(this)"/>
                     </div>
                     @endforeach
                 @else
-                <p class="text-center">There document have been attached to this campaign</p>
+                <p class="text-center">There no document have been attached to this campaign</p>
                 @endif
             </div>
         </div>
@@ -217,6 +219,50 @@
         <!-- donor tab ends -->
 <!------------------------------------------------------------------------------------------------------------------------------------------------->        
     </div><!-- info tabs content ends -->
+    
+    <div title="model-component-wrapper">
+        <form action="" method="post">
+            <input type="hidden" name="_token" value="">
+            <div class="modal fade" id="img-del-conf-model" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete Iamge?</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete this image?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                            <button type="submit" class="btn btn-primary">Yes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <script>
+            $(document).ready(function(){
+                var imgDelModel = document.getElementById('img-del-conf-model');
+                imgDelModel.addEventListener('show.bs.modal', function (event) {
+                    var csrfToken = $('meta[name=csrf-token]').attr('content');
+                    var route = $(event.relatedTarget).attr('data-route');
+                    var imageType = $(event.relatedTarget).attr('data-for');
+                    var title = `Delete ${imageType} Image?`;
+                    $(imgDelModel).closest('form').attr('action', route);
+                    $(imgDelModel).siblings('input[name=_token]').val(csrfToken);
+                    $(imgDelModel).find('.modal-title').text(title);
+                });
+            });
+            
+            // called on double call
+            function openImgDelModal(thiss){
+                var imgDelModel = document.getElementById('img-del-conf-model');
+                var modal = new bootstrap.Modal( imgDelModel, {});
+                modal.show(thiss);
+            }
+        </script>
+    </div>
 </div>
 
 
@@ -262,30 +308,6 @@
 </style>
 <style>
     #campaign-tabs li.nav-item:hover {}
-    
-    
-</style>
-<style>
-    @font-face {
-        font-family: 'officialregular';
-        src: url('{{ asset('fonts/official-webfont.woff2') }}') format('woff2'),
-             url('{{ asset('fonts/official-webfont.woff') }}') format('woff');
-    }
-    @font-face {
-        font-family: 'bengali';
-        src: url('{{ asset('fonts/SolaimanLipi.ttf') }}') format('truetype'),
-    }
-    #cus-font {
-        font-family: 'officialregular';
-        font-weight: normal;
-        font-style: normal;
-    }
-    #cus-font2 {
-        font-family: 'bengali';
-        font-weight: normal;
-        font-style: normal;
-        unicode-range: U+0980-09FF;
-    }
 </style>
 @endsection
 
@@ -438,4 +460,13 @@
     }
 </script>
 <script onload="initOwlCarousel()" src="{{ asset('js/owl.carousel.min.js') }}"></script>
+<!-- not used -->
+<script>
+    // called and deletes image on single call
+    function deleteImage(thiss, route){
+        var form = new Form(route, 'post');
+        form.append('_token', $('meta[name=csrf-token]').attr('content'));
+        form.submit();
+    }
+</script>
 @endsection

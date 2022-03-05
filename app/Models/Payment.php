@@ -14,9 +14,19 @@ class Payment extends Model
         'payment_meth_type',
         'payment_meth_id',
         'amount',
+        'currency',
         'trans_id',
+        'status',
     ];
     protected $guarded = [];
     
     public $am = 100;
+    
+    
+    
+    public function donation() {
+        return $this->belongsTo(Donation::class);
+    }  
+  
+    
 }

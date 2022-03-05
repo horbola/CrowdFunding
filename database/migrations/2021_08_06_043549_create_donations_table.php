@@ -16,7 +16,7 @@ class CreateDonationsTable extends Migration
         Schema::create('donations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable();
-            $table->tinyInteger('anonymous')->nullable();
+            $table->boolean('anonymous')->nullable();
             $table->foreignId('campaign_id');
             $table->timestamps();
         });

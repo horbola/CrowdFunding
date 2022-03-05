@@ -30,12 +30,21 @@
                 <span class="d-block">{{$parcent}}%</span>
             </div>
             <div class="progress">
-                <div class="progress-bar position-relative bg-primary" style="width:0%;">
+                <div class="progress-bar-landrick position-relative bg-primary" style="width:0%;">
                     <div class="progress-value d-block text-muted h6"></div>
                 </div>
-                <!--<script>$('.progress-bar').css('width', '{{ $parcent }}%')</script>-->
             </div>
-        </div> 
+        </div>
+        <style>
+            /*this style is actually landrick style. but brought here becaue of collition with bootsrap progress-bar.*/
+            .progress-bar-landrick {
+                border-radius: 6px;
+                -webkit-animation: animate-positive 3s;
+                animation: animate-positive 3s;
+                overflow: visible !important;
+            }
+        </style>
+        <script>$('.progress-bar-landrick').css('width', '{{ $parcent }}%')</script>
         <ul class="list-unstyled d-flex justify-content-between mt-2 mb-0">
             <li class="text-bold small d-flex align-items-center"><i data-feather="book" class="fea icon-sm text-info me-1"></i> {{$campaign->daysLeft()}}</li>
             <li class="text-bold small d-flex align-items-center"><i data-feather="clock" class="fea icon-sm text-warning me-1"></i>{{$campaign->donorsCount()}} Donors</li>
@@ -45,7 +54,7 @@
     <div class="col-12">
         <!--this is quick amount component. the style and script for this component is below-->
         <div class="donation-amount">
-            <form action="{{route('donation.createDialogues')}}" method="post">
+            <form action="{{route('donation.createDialogues')}}" method="get">
                 @csrf
                 <div class="row">
                     <div class="col-12 mt-5">

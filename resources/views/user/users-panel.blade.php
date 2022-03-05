@@ -2,6 +2,11 @@
 
 
 @section('dashboard-content')
+@php
+use App\Models\User;
+use App\Models\Donation;
+use App\Models\Campaign;
+@endphp
 <div id="users-panel">
     <div class="row">
         <div class="col">
@@ -16,7 +21,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                1050
+                                {{ User::all()->count() }}
                             </div>
                         </div>
                     </div>
@@ -31,22 +36,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                50
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                
-                <a href="{{ route('user.indexBlockedUsers') }}">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <div class="one h5 text-right text-muted">
-                                Blocked Users <span class="ps-4">:</span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="two h3 ps-2  text-muted">
-                                50
+                                {{ User::whereActiveStatus(1)->count() }}
                             </div>
                         </div>
                     </div>
@@ -61,7 +51,22 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                {{ User::whereActiveStatus(2)->count() }}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="{{ route('user.indexBlockedUsers') }}">
+                    <div class="row">
+                        <div class="col align-self-center">
+                            <div class="one h5 text-right text-muted">
+                                Blocked Users <span class="ps-4">:</span>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="two h3 ps-2  text-muted">
+                                {{ User::whereActiveStatus(3)->count() }}
                             </div>
                         </div>
                     </div>
@@ -76,7 +81,22 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                50
+                                {{ User::whereActiveStatus(4)->count() }}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="{{ route('user.indexPausedUsers') }}">
+                    <div class="row">
+                        <div class="col align-self-center">
+                            <div class="one h5 text-right text-muted">
+                                Paused Users <span class="ps-4">:</span>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="two h3 ps-2  text-muted">
+                                {{ User::whereActiveStatus(5)->count() }}
                             </div>
                         </div>
                     </div>
@@ -95,7 +115,12 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                1050
+                                @php
+                                $users = User::all()->filter(function($user, $key){
+                                    return $user->hasRole('guest');
+                                });
+                                echo $users->count();
+                                @endphp
                             </div>
                         </div>
                     </div>
@@ -110,7 +135,9 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                1050
+                                @php
+                                echo Donation::all()->unique('user_id')->count();
+                                @endphp
                             </div>
                         </div>
                     </div>
@@ -125,7 +152,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                50
+                                {{ Campaign::all()->unique('user_id')->count() }}
                             </div>
                         </div>
                     </div>
@@ -140,7 +167,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                1050
+                                {{ User::whereIsVolunteer(1)->count() }}
                             </div>
                         </div>
                     </div>
@@ -155,7 +182,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                1050
+                                {{ User::whereIsVolunteer(2)->count() }}
                             </div>
                         </div>
                     </div>
@@ -170,7 +197,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                {{ User::whereIsAdmin(1)->count() }}
                             </div>
                         </div>
                     </div>
@@ -185,7 +212,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                {{ User::whereIsSuper(1)->count() }}
                             </div>
                         </div>
                     </div>
@@ -205,7 +232,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                1050
+                                
                             </div>
                         </div>
                     </div>
@@ -221,7 +248,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                
                             </div>
                         </div>
                     </div>
@@ -237,7 +264,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                
                             </div>
                         </div>
                     </div>
@@ -253,7 +280,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                50
+                                
                             </div>
                         </div>
                     </div>

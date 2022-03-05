@@ -6,12 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-
-use App\Models\User;
-use App\Models\Country;
-use App\Models\View;
-use App\Models\Category;
-use App\Models\Comment;
+use Illuminate\Support\Facades\Log;
 
 use App\Lib\Helper;
 
@@ -21,15 +16,32 @@ use App\Lib\Helper;
 class Campaign extends Model
 {
     use HasFactory;
-    
+
+    protected $fillable = [
+        'user_id',
+        'category_id',
+        'is_staff_picks',
+        'title',
+        'slug',
+        'short_description',
+        'description',
+        'feature_image',
+        'feature_video',
+        'goal',
+        'end_method',
+        'start_date',
+        'end_date',
+        'min_amount',
+        'max_amount',
+        'recommended_amount',
+        'amount_prefilled',
+        'status',
+        'is_funded',
+    ];
     protected $guarded = [];
     
     public function campaigner() {
         return $this->belongsTo(User::class, 'user_id');
-    }
-    
-    public function country() {
-         return $this->belongsTo(Country::class);
     }
     
     public function category() {
@@ -38,12 +50,37 @@ class Campaign extends Model
         return $this->belongsTo(Category::class);
     }
     
-    public function related() {
-        $collection = Campaign::where('category_id', $this->category->id)->paginate(27)->collect();
-        $filtered = $collection->reject(function ($value, $key) {
-            return $value->id === $this->id;
-        });
-        return $filtered;
+    public function album() {
+        return $this->hasMany(Album::class);
+    }
+    
+    public function documents() {
+        return $this->hasMany(Document::class);
+    }
+    
+    public function updates() {
+        return $this->hasMany(Update::class);
+    }
+    
+    public function investigation() {
+        // Investigation::find($this->campaign_id);
+        return $this->hasOne(Investigation::class);
+    }
+    
+    public function views() {
+        return $this->hasMany(View::class);
+    }
+    
+    public function likes() {
+        return $this->hasMany(Like::class);
+    }
+    
+    /*
+     * gets only the main (parent) comments. replies are retrieved from comment model by 'replies' method.
+     */
+    public function comments() {
+        // return $this->hasMany(Comment::class)->whereNull('parent_id')->orWhere('parent_id', 0)->orderBy('created_at', 'desc');
+        return $this->hasMany(Comment::class, 'campaign_id')->whereNull('parent_id')->orWhere('parent_id', 0)->latest();
     }
     
     /*
@@ -60,10 +97,32 @@ class Campaign extends Model
         return $this->hasMany(Donation::class)->where('user_id', $donorId);
     }
     
-    public function views() {
-        return $this->hasMany(View::class);
+    /*
+     * acmapaign may have many request item because many withdrew requests could be made
+     * for a campaign as long as total raised money not withdrawn completely.
+     */
+    public function withdrawRequestItems() {
+        return $this->hasMany(WithdrawRequestItem::class);
     }
     
+    
+    
+    
+    
+    
+    
+
+    /*
+     * produces related campaign on the basis of category
+     */
+    public function related() {
+        $collection = Campaign::where('category_id', $this->category->id)->paginate(27)->collect();
+        $filtered = $collection->reject(function ($value, $key) {
+            return $value->id === $this->id;
+        });
+        return $filtered;
+    }
+ 
     public function viewsCount() {
         $views = $this->views->count();
         if($views === 0 || $views === 1){
@@ -73,10 +132,6 @@ class Campaign extends Model
             $views = $views.' Views';
         }
         return $views;
-    }
-    
-    public function likes() {
-        return $this->hasMany(Like::class);
     }
     
     public function likesCount() {
@@ -97,28 +152,9 @@ class Campaign extends Model
         else return 0;
         
     }
-    
-    /*
-     * gets only the main (parent) comments. replies are retrieved from comment model by 'replies' method.
-     */
-    public function comments() {
-        // return $this->hasMany(Comment::class)->whereNull('parent_id')->orWhere('parent_id', 0)->orderBy('created_at', 'desc');
-        return $this->hasMany(Comment::class)->whereNull('parent_id')->orWhere('parent_id', 0)->latest();
-    }
-    
-    public function album() {
-        return $this->hasMany(Album::class);
-    }
-    
-    public function documents() {
-        return $this->hasMany(Document::class);
-    }
-    
-    public function updates() {
-        return $this->hasMany(Update::class);
-    }
-    
+  
     public function thumbImagePath() {
+        // replaces the word 'full' with 'thumb'
         $thumbImagePath = str_replace('full', 'thumb', $this->feature_image);
         return $thumbImagePath;
     }
@@ -128,22 +164,14 @@ class Campaign extends Model
         $count = $donations->unique()->count();
         return $count;
     }
-
-    
-    
-    
-    public function investigation() {
-        // Investigation::find($this->campaign_id);
-        return $this->hasOne(Investigation::class);
-    }
-    
+   
     /*
      * a campaigner may have created multiple campaigns. and
      * for a campaign there may have multiple donations. and
      * within a donation there may be multiple payments.
      * 
      * this method counts total succesful payment of all donations
-     * for a campaign.
+     * for a campaign. that means total raised money for a campaign.
      */
     public function totalSuccessfulDonation() {
         return $this->donations->sum(function($aDonation){
@@ -160,6 +188,80 @@ class Campaign extends Model
             return $aDonation->totalPayableAmount();
         });
     }
+    
+    
+    /*
+     * if full fund of any campaign is paid that that campaign is not fundable and
+     * a campaign is funded fully if total paid amount of that campaign is less than
+     * total Successful Donation..
+     */
+    public function isFundable() {
+        return ($this->totalPaidFund() < $this->totalSuccessfulDonation()) && !($this->isBlocked()) && !$this->isPending();
+    }
+    
+    public function isPending() {
+        return $this->withdrawRequestItems()->get()->collect()->filter(function($aWRequestItem) {
+            return $aWRequestItem->withdrawRequest->status === 1;
+        })->count();
+    }
+    
+    public function isCompletelyFunded() {
+        return !($this->totalPaidFund() < $this->totalSuccessfulDonation()) && !$this->isPending();
+    }
+    
+    public function isPartlyFunded() {
+//        $partly = ($this->totalPaidFund() !== 0.00) && ($this->totalPaidFund() < $this->totalSuccessfulDonation());
+        $partly = $this->totalPaidFund() && ($this->totalPaidFund() < $this->totalSuccessfulDonation()) && !$this->isPending();
+        return $partly;
+    }
+    
+    public function isNotFunded() {
+//        return $this->totalPaidFund() === 0.00;
+        return !$this->totalPaidFund() && !$this->isPending();
+    }
+    
+    public function isBlocked() {
+        $lastRecord = WithdrawRequestItem::where('campaign_id', $this->id)->latest()->first();
+//        $lastRecord = WithdrawRequestItem::where('campaign_id', $this->id)->sortByDesc('created_at')->take(1)->toArray();;
+//        $lastRecord = $this->wRequestItems()->latest()->first();
+        return isset($lastRecord->status)? $lastRecord->status === 2 : false;
+    }
+    
+    /*
+     * calculates total funds requested by all campaigns of this campaigner
+     */
+    public function totalRequestedFund() {
+//        return $this->wRequestItems()->sum('requested_amount');
+        return $this->withdrawRequestItems()->get()->collect()->sum(function($aWRequestItem) {
+//            if($aWRequestItem->withdrawRequest->user->id !== Auth::user()->id){
+//                return 0;
+//            }
+            return $aWRequestItem->requested_amount;
+        });
+    }
+    
+    /*
+     * calculates total funds paid by all campaigns of this campaigner
+     */
+    public function totalPaidFund() {
+        return $this->withdrawRequestItems()->get()->collect()->sum(function($aWRequestItem) {
+//            if($aWRequestItem->withdrawRequest->user->id !== Auth::user()->id){
+//                return 0;
+//            }
+            return $aWRequestItem->paid_amount;
+        });
+    }
+    
+    /*
+     * calculates total funds paid by all campaigns of this campaigner
+     */
+    public function totalResidualFund() {
+        return $this->totalSuccessfulDonation() - $this->totalPaidFund();
+    }
+    
+    
+    
+    
     
     public function daysLeft(){
         // time returns current time in seconds

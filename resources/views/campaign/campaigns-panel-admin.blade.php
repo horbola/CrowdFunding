@@ -2,6 +2,9 @@
 
 
 @section('dashboard-content')
+@php
+use App\Models\Campaign;
+@endphp
 <div id="campaigns-panel-admin">
     <div class="row">
         <div class="col">
@@ -16,7 +19,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                {{ Campaign::All()->count() }}
                             </div>
                         </div>
                     </div>
@@ -31,7 +34,12 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                @php
+                                $campaign = Campaign::whereStatus(1)->get()->filter(function ($value, $key) {
+                                    return $value->isActive();
+                                });
+                                echo $campaign->count();
+                                @endphp
                             </div>
                         </div>
                     </div>
@@ -46,7 +54,12 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                @php
+                                $campaign = Campaign::whereStatus(1)->get()->filter(function ($value, $key) {
+                                    return $value->isCompleted();
+                                });
+                                echo $campaign->count();
+                                @endphp
                             </div>
                         </div>
                     </div>
@@ -61,7 +74,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                {{ Campaign::whereStatus(0)->count() }}
                             </div>
                         </div>
                     </div>
@@ -76,7 +89,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                1050
+                                {{ Campaign::whereStatus(2)->count() }}
                             </div>
                         </div>
                     </div>
@@ -91,7 +104,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                50
+                                {{ Campaign::whereStatus(3)->count() }}
                             </div>
                         </div>
                     </div>
@@ -106,7 +119,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                50
+                                {{ Campaign::whereStatus(4)->count() }}
                             </div>
                         </div>
                     </div>
@@ -125,7 +138,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                1050
+                                
                             </div>
                         </div>
                     </div>
@@ -140,7 +153,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                50
+                                
                             </div>
                         </div>
                     </div>
@@ -155,7 +168,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                
                             </div>
                         </div>
                     </div>

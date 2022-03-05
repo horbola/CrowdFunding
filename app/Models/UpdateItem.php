@@ -10,4 +10,10 @@ class UpdateItem extends Model
     use HasFactory;
     
     protected $fillable = ['update_id', 'image_path', 'video_path'];
+    
+    
+    
+    public function updates() {
+        return $this->belongsTo(Update::class, 'update_id');
+    }
 }

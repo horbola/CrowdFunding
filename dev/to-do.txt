@@ -1,0 +1,78 @@
+
+
+
+1. pop up information notification for account existence in 'donation-create' page
+2. implement the checkbox in donation-create page
+5. make a way to preview the creating campaign
+6. make a way to edit a campaign from admin panel
+10. implement middleware to protect volunteer route and admin route
+12. correct progress bar
+15. implement short link generation mechanism
+16. put a way to delete album and update photo and edit update text
+17. put a barrier if user profile is not complete at the time of creating campaign -done
+19. make form input field box red on error
+20. attach date picker at form date input field
+26. remove some fields from profile-edit page for client
+28. delete a campaign
+29. notification system
+32. menu appearance condition in menu-dashboard
+33. two step verification
+34. put title and breadcrumb for every pages
+36. no campaign found page
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7. implement load more comments and load more reply
+8. implement pagination for donor activities
+11. implement seo mechanism
+18. fix client side 'required attribute' bug
+23. implement chatting system
+24. manage history navigation
+27. search and filter
+30. transaction (put multiple database action in traction: such as- createPaymentInfo method in DonationController)
+25. feature video
+35. if user himself logs in to any page then redirect her to that page after successful login.
+38. loading page
+
+
+
+
+
+
+
+
+3. put money sign after amounts---------
+4. put relevant icons
+9. complete social login and social share
+13. implement actual payment gateway
+14. implement withdraw system
+21. deploy the application
+22. cache the application
+31. auto scroll pages-------------
+37. upload to github
+
+
+
+
+*. take these information for withdraw money:
+bank information for payment gateway:
+bank name,
+bank account name,
+bank account number,
+account type,
+branch name,
+routing number,
+
+mension these info to withdrawer:
+date, acc name, bank name, checque id, withdraw amout, transaction id

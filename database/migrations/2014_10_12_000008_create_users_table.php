@@ -26,8 +26,12 @@ class CreateUsersTable extends Migration
             
             // 0:pending, 1:active, 2:malicous, 3:blocked, 4:left, 5:paused
             $table->tinyInteger('active_status')->default('1');
-            // 0:not, 1:requested, 2:volunteer, 3:removed, 4:resigned,
+            // 0:not, 1:requested, 2:volunteer, 3:removed, 4:resigned
             $table->tinyInteger('is_volunteer')->default('0');
+            // 0:not, 1:admin, 2:rejected, 3:resigned
+            $table->tinyInteger('is_admin')->default('0');
+            // 0:not, 1:super
+            $table->tinyInteger('is_super')->default('0');
             
             $table->string('photo')->nullable();
             $table->enum('gender', ['male', 'female', 'others'])->nullable();

@@ -1,14 +1,12 @@
 <div id="users-table" class="table-responsive bg-white shadow rounded">
-    <table id="users-table" class="display table mb-0 table-center" style="width:100%">
+    <table class="display table mb-0 table-center" style="width:100%">
         <thead>
             <tr>
                 <th>Serial</th>
                 <th>Name</th>
-                <th>Role</th>
                 <th>Phone</th>
                 <th>Email</th>
                 <th>Facebook</th>
-                <th>Address</th>
                 <th>NID</th>
                 <th>Is Active</th>
                 <th>Is Volunteer</th>
@@ -22,16 +20,17 @@
                 @php $serial++ @endphp
                 <td>{{$serial}}</td>
                 <td>{{$user->name}}</td>
+                {{--
                 <td>
                     @foreach($user->roles as $role)
                         {{$role->name}}, 
                     @endforeach
                 </td>
-                <td>{{$user->address->phone}}</td>
+                --}}
+                <td>{{$user->userExtra->phone}}</td>
                 <td>{{$user->email}}</td>
-                <td>{{$user->facebook}}</td>
-                <td>{{$user->address->toString()}}</td>
-                <td>{{$user->address->nid}}</td>
+                <td>{{$user->userExtra->facebook}}</td>
+                <td>{{$user->userExtra->nid}}</td>
                 @switch($user->active_status)
                     @case(0)
                         <td>{{'Pending'}}</td>

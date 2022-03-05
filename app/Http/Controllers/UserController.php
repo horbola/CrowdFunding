@@ -6,12 +6,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\Facades\Image;
 
 use App\Models\User;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\Country;
+use App\Models\Donation;
+use App\Models\Campaign;
 
 
 
@@ -34,23 +37,28 @@ class UserController extends Controller {
     
     public function indexBlockedUsers() {
         // 0:pending, 1:active, 2:malicous, 3:blocked, 4:left
-        $users = User::whereActiveStatus(3)->get();
+        $users = User::whereActiveStatus(3)->paginate(4);
         return view('user.users', compact('users'));
     }
     
     public function indexActiveUsers() {
         // 0:pending, 1:active, 2:malicous, 3:blocked, 4:left
-        $users = User::whereActiveStatus(1)->get();
+        $users = User::whereActiveStatus(1)->paginate(4);
         return view('user.users', compact('users'));
     }
     
     public function indexMalicousUsers() {
-        $users = User::whereActiveStatus(2)->get();
+        $users = User::whereActiveStatus(2)->paginate(4);
         return view('user.users', compact('users'));
     }
     
     public function indexLeftUsers() {
-        $users = User::whereActiveStatus(4)->get();
+        $users = User::whereActiveStatus(4)->paginate(4);
+        return view('user.users', compact('users'));
+    }
+    
+    public function indexPausedUsers() {
+        $users = User::whereActiveStatus(5)->paginate(4);
         return view('user.users', compact('users'));
     }
     
@@ -67,42 +75,45 @@ class UserController extends Controller {
     }
     
     public function indexDonors() {
-        $users = User::all()->filter(function($user, $key){
-            return $user->hasRole('donor');
+        $donations = Donation::all()->unique('user_id');
+        $users = $donations->map(function($donation, $key){
+            return $donation->donor;
         });
         return view('user.users', compact('users'));
     }
     
     public function indexCampaigners() {
-        $users = User::all()->filter(function($user, $key){
-            return $user->hasRole('campaigner');
+        $campaigns = Campaign::all()->unique('user_id');
+        $users = $campaigns->map(function($campaign, $key){
+            return $campaign->campaigner;
         });
         return view('user.users', compact('users'));
     }
     
+//    public function indexCampaigners() {
+//        $users = User::all()->filter(function($user, $key){
+//            return $user->hasRole('campaigner');
+//        });
+//        return view('user.users', compact('users'));
+//    }
+//    
     public function indexVolunteerRequests() {
         $users = User::whereIsVolunteer(1)->get();
         return view('user.users', compact('users'));
     }
     
     public function indexVolunteers() {
-        $users = User::all()->filter(function($user, $key){
-            return $user->hasRole('volunteer');
-        });
+        $users = User::whereIsVolunteer(2)->get();
         return view('user.users', compact('users'));
     }
     
     public function indexStaffs() {
-        $users = User::all()->filter(function($user, $key){
-            return $user->hasRole('staff');
-        });
+        $users = User::whereIsAdmin(1)->get();
         return view('user.users', compact('users'));
     }
     
     public function indexSuper() {
-        $users = User::all()->filter(function($user, $key){
-            return $user->hasRole('super');
-        });
+        $users = User::whereIsSuper(1)->get();
         return view('user.users', compact('users'));
     }
     
@@ -137,6 +148,7 @@ class UserController extends Controller {
      * shows a single user's details
      */
     public function show(Request $request, $id=0) {
+        $title = 'Dashboard';
         $user = Auth::user();
         // if there's an id means this request is coming from admin
         // else is coming from client.
@@ -150,22 +162,19 @@ class UserController extends Controller {
             $user->gender = 'Not Defined';
         }
         
-        if(!$user->address->phone){
+        if(!$user->userExtra->phone){
             $user->phone = 'Not Provided';
-        }else $user->phone = $user->address->phone;
+        }else $user->phone = $user->userExtra->phone;
         
-        if(!$user->address->website){
-            $user->website = 'Not Provided';
-        }else $user->website = $user->address->website;
         
-        if($user->address->country && $user->address->country->nicename){
-            $user->countryNiceName = $user->address->country->nicename;
+        if($user->currentAddress()->country && $user->currentAddress()->country->nicename){
+            $user->countryNiceName = $user->currentAddress()->country->nicename;
         }
         else {
             $user->countryNiceName = 'Not Provided';
         }
         
-        return view('user.profile')->with(compact('request', 'user'));
+        return view('user.profile')->with(compact('request', 'user', 'title'));
     }
     
     public function showAdmin() {
@@ -190,6 +199,7 @@ class UserController extends Controller {
      * admin gets edit user form
      */
     public function edit(Request $request, $id=0) {
+        $title = 'Edit Profile';
         $user = Auth::user();
         // if there's an id means this request is coming from admin
         // else is coming from client.
@@ -202,28 +212,25 @@ class UserController extends Controller {
             $user->gender = 'Not Defined';
         }
 
-        if(!$user->address->phone){
+        if(!$user->currentAddress()->phone){
             $user->phone = 'Not Provided';
-        }else $user->phone = $user->address->phone;
+        }else $user->phone = $user->currentAddress()->phone;
         
-        if(!$user->address->website){
-            $user->website = 'Not Provided';
-        }else $user->website = $user->address->website;
-        //dd($user);
+        
         $countries = Country::all();
 
-        if($user->address->country && $user->address->country->nicename){
-            $user->countryNiceName = $user->address->country->nicename;
+        if($user->currentAddress()->country && $user->currentAddress()->country->nicename){
+            $user->countryNiceName = $user->currentAddress()->country->nicename;
         }
         else {
             $user->countryNiceName = 'Not Provided';
         }
         // return view('dashboard.profile-edit')->with('user', $user);
-        return view('user.profile-edit')->with(compact('request', 'user', 'countries'));
+        return view('user.profile-edit')->with(compact('request', 'user', 'countries', 'title'));
     }
     
     
-    public function update(Request $req, $id=0) {
+    public function update(Request $request, $id=0) {
         $user = Auth::user();
         // if there's an id means this request is coming from admin
         // else is coming from client.
@@ -234,32 +241,78 @@ class UserController extends Controller {
         
         $rules = [
             'name' => 'string:255',
-            'gender' => 'String:10',
+            'birth_date' => 'date',
+            'gender' => 'string:10',
             'phone' => 'numeric',
-            'website' => 'string:255',
-            'country_id' => 'numeric',
+            'nid' => 'numeric',
+            'email' => 'email',
+            'facebook' => 'string:50',
+            'twitter' => 'string:50',
+            
+            'current_holding' => 'string:30',
+            'current_road' => 'string:30',
+            'current_post_code' => 'string:30',
+            'current_upazilla' => 'string:30',
+            'current_district' => 'string:30',
+            'current_country' => 'numeric',
+            
+            'permanent_holding' => 'string:30',
+            'permanent_road' => 'string:30',
+            'permanent_post_code' => 'string:30',
+            'permanent_upazilla' => 'string:30',
+            'permanent_district' => 'string:30',
+            'permanent_country' => 'numeric',
+            
+            'careof' => 'string:255',
+            'careof_phone' => 'numeric',
         ];
-        $validated = $req->validate($rules);
-        
-        $user->name = $validated['name'];
-        $user->gender = $validated['gender'];
-        $user->address->phone = $validated['phone'];
-        $user->address->website = $validated['website'];
-        $user->address->country_id = $validated['country_id'];
-        $saved = $user->push();
+        $validated = $request->validate($rules);
 
+        
+        if(isset($validated['name'])) $user->name = $validated['name'];
+        if(isset($validated['birth_date'])) $user->userExtra->birth_date = $validated['birth_date'];
+        if(isset($validated['gender'])) $user->gender = $validated['gender'];
+        if(isset($validated['phone'])) $user->userExtra->phone = $validated['phone'];
+        if(isset($validated['nid'])) $user->userExtra->nid = $validated['nid'];
+        if(isset($validated['email'])) $user->email = $validated['email'];
+        if(isset($validated['facebook'])) $user->userExtra->facebook = $validated['facebook'];
+        if(isset($validated['twitter'])) $user->userExtra->twitter = $validated['twitter'];
+        
+        if(isset($validated['current_holding'])) $user->currentAddress()->holding = $validated['current_holding'];
+        if(isset($validated['current_road'])) $user->currentAddress()->road = $validated['current_road'];
+        if(isset($validated['current_post_code'])) $user->currentAddress()->post_code = $validated['current_post_code'];
+        if(isset($validated['current_upazilla'])) $user->currentAddress()->upazilla = $validated['current_upazilla'];
+        if(isset($validated['current_district'])) $user->currentAddress()->district = $validated['current_district'];
+        if(isset($validated['current_country'])) $user->currentAddress()->country_id = $validated['current_country'];
+        
+        if(isset($validated['permanent_holding'])) $user->permanentAddress()->holding = $validated['permanent_holding'];
+        if(isset($validated['permanent_road'])) $user->permanentAddress()->road = $validated['permanent_road'];
+        if(isset($validated['permanent_post_code'])) $user->permanentAddress()->post_code = $validated['permanent_post_code'];
+        if(isset($validated['permanent_upazilla'])) $user->permanentAddress()->upazilla = $validated['permanent_upazilla'];
+        if(isset($validated['permanent_district'])) $user->permanentAddress()->district = $validated['permanent_district'];
+        if(isset($validated['permanent_country'])) $user->permanentAddress()->country_id = $validated['permanent_country'];
+        
+        if(isset($validated['careof'])) $user->userExtra->careof = $validated['careof'];
+        if(isset($validated['careof_phone'])) $user->userExtra->careof_phone = $validated['careof_phone'];
+
+        
+        $saved = $user->push();
         // $req->user_panel_fraction = 'alls';
         if($saved){
+            // if there's an origUrl, then after making edition to profile app will go to
+            // that origUrl.
+            if($request->origUrl) return redirect($request->origUrl);
+            
             if(Auth::user()->id !== $id){
                 // returns to users table in admin panel from this 'if block'
                 // the 'user_panel_fraction' is uploaded from user-panel blade
                 // so that after updating user information the admin can go to 
                 // the appropriate original section of user-panel.
-                return redirect('/dashboard/admin/users-panel/' . $req->user_panel_fraction)->with('success', $req->profileItem . ' has been updated');
+                return redirect('/dashboard/admin/users-panel/' . $request->user_panel_fraction)->with('success', $request->profileItem . ' has been updated');
             }
             else {
                 // returns to client profile from this else block
-                return redirect(route('user.show'))->with('success', $req->profileItem . ' has been updated');
+                return redirect(route('user.show'))->with('success', $request->profileItem . ' has been updated');
             }
         }
         return back()->with('error', 'sorry the changes you are trying to make couldn\'t be possible');
@@ -315,7 +368,7 @@ class UserController extends Controller {
         return back()->with('error', 'sorry the changes you are trying to make couldn\'t be possible');
     }
     
-    
+    //------- client updates ------------------------------------
     /*
      * 0:pending, 1:active, 2:malicous, 3:blocked, 4:left, 5:paused
      * active_status is set to 5. resuming means setting it back to 1
@@ -347,6 +400,57 @@ class UserController extends Controller {
         $user->update();
         Auth::logout();
         return redirect('/');
+    }
+    //------- client updates ends ------------------------------------
+    
+    
+    /*
+     * ------- admin updates to volunteer ------------------------------------
+     * an admin performs four actions with this method. admin can:
+     * 1. approve a volunteer request (setting is_volunteer to 2 from volunteer request)
+     * 2. cancel a volunteer request (setting is_volunteer to 0 from volunteer request)
+     * 3. remove a volunteer (setting is_volunteer to 3 from volunteer)
+     * 4. remake a volunteer (setting is_volunteer to 2 from any status)
+     * this value caome via update_volunteer parameter
+     */
+    public function updateVolunteer(Request $request) {
+        $rules = [
+            'user_id' => 'numeric',
+            'update_volunteer' => 'numeric',
+        ];
+        $validated = $this->validate($request, $rules);
+
+        $user = User::find($validated['user_id']);
+        $user->is_volunteer = $validated['update_volunteer'];
+        $updated = $user->update();
+        
+        if($updated){
+            return redirect()->back();
+        }
+    }
+    
+    /*
+     * ------- admin updates active status ------------------------------------
+     * an admin performs three actions with this method. admin can:
+     * 1. block an user (setting active_status to 3 from active)
+     * 2. mark an user as malicous (setting active_status to 2 from active)
+     * 3. make an user alive (setting active_status to 1 from block)
+     * this value caome via update_active_status parameter
+     */
+    public function updateActiveStatus(Request $request) {
+        $rules = [
+            'user_id' => 'numeric',
+            'update_active_status' => 'numeric',
+        ];
+        $validated = $this->validate($request, $rules);
+
+        $user = User::find($validated['user_id']);
+        $user->active_status = $validated['update_active_status'];
+        $updated = $user->update();
+        
+        if($updated){
+            return redirect()->back();
+        }
     }
     
 

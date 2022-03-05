@@ -16,11 +16,9 @@ class CreateCampaignsTable extends Migration
         Schema::create('campaigns', function (Blueprint $table) {
             $table->id();
             
-            $table->integer('user_id');
-            $table->mediumInteger('country_id');
-            $table->string('address');
-            $table->integer('category_id');
-            $table->tinyInteger('is_staff_picks')->nullable(); //1:staff Picks
+            $table->foreignId('user_id');
+            $table->foreignId('category_id');
+            $table->boolean('is_staff_picks')->nullable()->default(false);
                 
             $table->string('title');
             $table->string('slug');
@@ -30,7 +28,8 @@ class CreateCampaignsTable extends Migration
             $table->string('feature_video')->nullable();
             
             $table->decimal('goal');
-            $table->tinyInteger('end_method')->default(1); // 0:ends-by-date, 1:ends-by-goal                                                                                                                                                                                                                                                        
+            // 0:ends-by-date, 1:ends-by-goal
+            $table->tinyInteger('end_method')->default(1);
             $table->date('start_date');
             $table->date('end_date');
             $table->decimal('min_amount')->nullable();
@@ -38,8 +37,13 @@ class CreateCampaignsTable extends Migration
             $table->decimal('recommended_amount')->nullable();
             $table->string('amount_prefilled')->nullable();
             
-            $table->tinyInteger('status')->nullable()->default(0); // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
-            $table->tinyInteger('is_funded')->nullable(); //0:pending,1:approve,2:blocked
+            // -1:preview, 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
+            $table->tinyInteger('status')->nullable()->default(0);
+            // if a campaign is investigated and satisfied as valid then it's verified
+            $table->boolean('isVerified')->nullable()->default(false);
+            // status of withdraw request
+            // 0:not requested, 1:requested 2:funded, 3:blocked
+            $table->tinyInteger('is_funded')->nullable();
                                                                                                                                                                                                         
             $table->timestamps();
         });

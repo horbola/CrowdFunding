@@ -4,7 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Oporajoy Crowd Funding') }}</title>
+    @php use Illuminate\Support\Facades\URL; @endphp
+    <meta name="idlePage" content="{{ URL::current() }}">
+    {{ session(['idlePage' => URL::current()]) }}
+    <!--<title>{{ config('app.name', 'Oporajoy Crowd Funding') }}</title>-->
+    <title>{{ $title?? '' }}</title>
     
     <!-- icons -->
     <link href="{{ asset('images/favicon.ico') }}" rel="shortcut icon">
@@ -27,6 +31,9 @@
     @yield('campaign-detail-image-style')
     @yield('campaign-detail-sticky-style')
     @yield('campaign-detail-tabs-style')
+    @yield('comments-display-style')
+    @yield('profile-style')
+    @yield('profile-edit-style')
     
     <!-- Scripts -->
     <script src="{{ asset('js/jquery.js') }}"></script>
@@ -36,6 +43,7 @@
     <script src="{{ asset('js/app_landrick.js') }}" defer></script><!--landrick provided-->
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}" defer></script>
     <script src="{{ asset('js/plugins.init.js') }}" defer></script><!--landrick provided-->
+    <script src="{{ asset('js/library.js') }}" defer></script><!-- utility functions and classes -->
     <script></script>
     <!-- native page scripts -->
     @yield('page-script')
@@ -55,6 +63,8 @@
 @yield('campaign-detail-image-script-bottom')
 @yield('campaign-detail-sticky-script-bottom')
 @yield('campaign-detail-tabs-script-bottom')
+@yield('comments-display-script')
+@yield('profile-script')
 </body>
 </html>
 

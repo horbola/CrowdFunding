@@ -12,19 +12,19 @@ class Address extends Model
     use HasFactory;
     
     protected $fillable = [
+        'type',
         'user_id',
+        'phone',
         'careof',
+        'careof_phone',
         'holding',
         'road',
-        'city',
-        'division',
-        'subdivision',
+        'upazilla',
+        'district',
         'country_id',
-        'phone',
-        'email',
+        'post_code',
         'facebook',
         'twitter',
-        'website',
         'nid',
     ];
     protected $guarded = [];
@@ -43,8 +43,8 @@ class Address extends Model
     public function toString() {
         return 'Holding: ' . ($this->holding.'/ ' ?? '- / ')
               .'Road: ' . ($this->road.'/ ' ?? '- / ')
-              .'City: ' . ($this->city.'/ ' ?? '- / ')
-              .'Division: ' . ($this->division.'/ ' ?? '- / ')
+              .'Upazilla: ' . ($this->upazilla.'/ ' ?? '- / ')
+              .'District: ' . ($this->district.'/ ' ?? '- / ')
               .'Country: ' . ($this->country->nicename ?? '');
     }
 }

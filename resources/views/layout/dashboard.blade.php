@@ -20,6 +20,25 @@
 <!-- dashboard menu and content -->
 <section class="section mt-60">
     <div class="container mt-lg-3">
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title position-relative">
+                    <div class="title-text">{{ $title?? '' }}</div>
+                </div>
+                <style>
+                    .title-text {
+                        position: absolute;
+                        top: -50px;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        font-weight: 600;
+                        font-size: 30px;
+                    }
+                </style>
+            </div>
+        </div>
+        
         <div class="row">
             <div class="col-lg-3 col-md-6 col-12 d-lg-block d-none">
                 <div class="sidebar sticky-bar p-2 rounded shadow">

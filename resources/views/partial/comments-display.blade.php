@@ -1,4 +1,4 @@
-<div id="comments-display" class="">
+<div class="comments-display">
     @foreach($comments as $comment)
     <li class="mt-4 @if ($comment->parent_id) ml-5 @endif">
         <div class="d-flex align-items-center">
@@ -9,12 +9,14 @@
                 <h6 class="mb-0"><a href="javascript:void(0)" class="text-dark media-heading">{{$comment->commentor->name}}</a></h6>
                 <small class="text-muted">{{Helper::formattedTime($comment->created_at)}}</small>
             </div>
+            <!--if it's parent-->
             @if(!$comment->parent_id)
             <div>
                 <input type="button" value="Reply" class="btn btn-primary btn-sm" onclick="replyFunc(this)">
             </div>
             @endif
         </div>
+        <!--if it's parent-->
         @if(!$comment->parent_id)
         <div class="reply-form mt-3" style="display: none;">
             <form action="{{route('comment.store')}}" method="post">
@@ -32,21 +34,36 @@
         </div>
         @endif
         <div class="mt-3">
-            <p class="text-muted fst-italic pb-3 rounded">{{$comment->body}}</p>
+            <p id="comment-body" class="text-muted fst-italic pb-3 rounded">{{$comment->body}}</p>
         </div>
     </li>
     @include('partial.comments-display', ['comments' => $comment->replies])
     @endforeach
-    <script>
-        function replyFunc(thiss){
-            $('.reply-form').css('display', 'none');
-            $elem = $(thiss).closest('li').find('.reply-form');
-            $elem.css('display', 'block');
-            $elem.find('textarea').focus();
-        }
-        
-        function canReplyFunc(thiss){
-            $(thiss).closest('li').find('.reply-form').css('display', 'none');
-        }
-    </script>
 </div>
+
+
+
+@section('comments-display-style')
+<link href="https://fonts.maateen.me/solaiman-lipi/font.css" rel="stylesheet">
+<style>
+    #comment-body {
+        font-family: 'SolaimanLipi', sans-serif;
+    }
+</style>
+@endsection
+
+@section('comments-display-script')
+<script>
+    function replyFunc(thiss){
+        $('.reply-form').css('display', 'none');
+        $elem = $(thiss).closest('li').find('.reply-form');
+        $elem.css('display', 'block');
+        $elem.find('textarea').focus();
+    }
+
+    function canReplyFunc(thiss){
+        $(thiss).closest('li').find('.reply-form').css('display', 'none');
+    }
+</script>
+@endsection
+

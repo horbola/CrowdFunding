@@ -30,7 +30,40 @@
             </div>
         </div>
         <div class="col-6 text-right">
-            here will be put short link
+            <div class="position-relative" id="copy-text">
+                <input type="text" value="{{ route('campaign.shortLink', $campaign->id) }}" onclick="copyText(this);" readonly>
+                <span class="invisible copied">Link copied to clipboard</span>
+                <script>
+                    function copyText(textElem) {
+                        navigator.clipboard.writeText(textElem.value);
+                        $('#copy-text .copied').removeClass('hide-copy-text invisible');
+                        setTimeout( function() {
+                            $('#copy-text .copied').addClass('hide-copy-text');
+                        }, 2000);
+                      }
+                </script>
+                <style>
+                    #copy-text .copied {
+                        position: absolute;
+                        top: -35px;
+                        right: 15px;
+                        background-color: white;
+                        color: red;
+                        z-index: 100;
+                        border-radius: 5px;
+                        border: 1px solid green;
+                        padding: 3px;
+                    }
+                    
+                    .hide-copy-text {
+                        opacity: 0;
+                        transition: opacity 1s linear;
+                        -webkit-transition: opacity 1s linear;
+                        -moz-transition: opacity 1s linear;
+                        -o-transition: opacity 1s linear;
+                    }
+                </style>
+            </div>
         </div>
     </div>
 </div>

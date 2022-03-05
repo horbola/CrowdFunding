@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 
 class TwoFactor
 {
@@ -27,6 +28,7 @@ class TwoFactor
             }
 
             if (!$request->is('verify*')) {
+                session(['twoFactorCurrentRoute' => URL::current()]);
                 return redirect()->route('verify.index');
             }
         }

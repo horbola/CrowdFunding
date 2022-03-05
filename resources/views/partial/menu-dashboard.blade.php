@@ -1,5 +1,6 @@
 <div id="menu-dashboard" class="widget" style="overflow-y: auto; height: 100vh;">
     <ul class="list-unstyled sidebar-nav mb-0 p-0" id="navmenu-nav">
+        <!---------- donor activity menus ---------------------------------------------------------------------------------->
         @php
             $profile = (Route::currentRouteName() === 'user.show'
             || Route::currentRouteName() === 'user.edit'
@@ -50,8 +51,12 @@
             </a>
         </li>
         <hr />
+        <!---------- donor activity menus end ---------------------------------------------------------------------------------->
         
-        @if(Auth::user()->hasRole('campaigner'))
+        
+        
+        
+        <!---------- campaigner menus ---------------------------------------------------------------------------------->
         @php $myCampaign = (Request::segment(3) === 'my-campaigns-panel'); @endphp
         <li class="navbar-item account-menu px-0 mt-2 {{ $myCampaign ? 'active' : '' }}">
             <a href="{{ route('campaign.indexMyCampaignsPanel')}}" class="navbar-link d-flex rounded shadow align-items-center py-2 px-4">
@@ -67,17 +72,20 @@
             </a>
         </li>
 
-        <li class="navbar-item account-menu px-0 mt-2 {{ (Route::currentRouteName() === 'wallet.showCampaignerWallet') ? 'active' : '' }}">
-            <a href="{{ route('wallet.showCampaignerWallet')}}" class="navbar-link d-flex rounded shadow align-items-center py-2 px-4">
+        @php $campaignerFundPanel = (Request::segment(3) === 'campaigner-fund-panel'); @endphp
+        <li class="navbar-item account-menu px-0 mt-2 {{ $campaignerFundPanel ? 'active' : '' }}">
+            <a href="{{ route('fund.indexCampaignerFundPanel')}}" class="navbar-link d-flex rounded shadow align-items-center py-2 px-4">
                 <span class="h4 mb-0"><i class="uil uil-transaction"></i></span>
                 <h6 class="mb-0 ms-2">Withdraw Fund</h6>
             </a>
         </li>
         <hr />
-        @endif
+        <!---------- campaigner menus end ---------------------------------------------------------------------------------->
         
         
         
+        
+        <!---------- volunteer menus ---------------------------------------------------------------------------------->
         @php
             $volunteer = (Route::currentRouteName() === 'volunteer.create'
             || Route::currentRouteName() === 'volunteer.store'
@@ -120,11 +128,15 @@
             </a>
         </li>
         <hr />
+        <!---------- volunteer menus end ---------------------------------------------------------------------------------->
         
         
         
         
-        @if(Auth::user()->hasRole('staff'))
+        
+        
+        <!---------- admin menus ---------------------------------------------------------------------------------->
+        @if( (Auth::user()->is_admin === 1) || (Auth::user()->is_super === 1) )
         @php $adminUsersPanel = (Request::segment(3) === 'users-panel' ||
                                 (isset($request)? $request->user_panel_fraction : false));
         @endphp
@@ -137,16 +149,16 @@
         </li>
 
         @php $adminCampaignsPanel = (Request::segment(3) === 'admin-campaign-panel'); @endphp
-        <li id="campaigns" class="navbar-item account-menu px-0 mt-2 {{ $adminCampaignsPanel ? 'active' : '' }}">
+        <li id="campaigns" class="navbar-item account-menu px-0 mt-2 {{ $adminCampaignsPanel || ($request->adminCampaignMenu?? 0) ? 'active' : '' }}">
             <a href="{{ route('campaign.indexAdminCampaignPanel')}}" class="navbar-link d-flex rounded shadow align-items-center py-2 px-4">
                 <span class="h4 mb-0"><i class="uil uil-file"></i></span>
                 <h6 class="mb-0 ms-2">Campaigns</h6>
             </a>
         </li>
-        
-        @php $fundPanel = (Request::segment(3) === 'fund-panel'); @endphp
-        <li class="navbar-item account-menu px-0 mt-2 {{ $fundPanel ? 'active' : '' }}">
-            <a href="{{ route('fund.indexFundPanel')}}" class="navbar-link d-flex rounded shadow align-items-center py-2 px-4">
+
+        @php $adminFundPanel = (Request::segment(3) === 'admin-fund-panel'); @endphp
+        <li class="navbar-item account-menu px-0 mt-2 {{ $adminFundPanel ? 'active' : '' }}">
+            <a href="{{ route('fund.indexAdminFundPanel')}}" class="navbar-link d-flex rounded shadow align-items-center py-2 px-4">
                 <span class="h4 mb-0"><i class="uil uil-envelope-star"></i></span>
                 <h6 class="mb-0 ms-2">Fund</h6>
             </a>
@@ -168,5 +180,6 @@
                 <h6 class="mb-0 ms-2">Preferences</h6>
             </a>
         </li>
+        <!---------- admin menus end ---------------------------------------------------------------------------------->
     </ul>
 </div>

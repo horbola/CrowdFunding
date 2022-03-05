@@ -1,0 +1,124 @@
+
+
+--------------------------------------------------------------------------------------
+breadcrumbs:
+
+home
+home > master
+home > master > detail
+home > register
+home > login
+home > dashboard > profile
+home > dashboard > profile > edit profile
+home > dashboard > donated campaign
+home > dashboard > commented campaign
+home > dashboard > liked campaign
+home > dashboard > viewed campaign
+home > dashboard > shared campaign
+home > dashboard > my campaign > all campaign
+home > dashboard > my campaign > active campaign
+home > dashboard > my campaign > completed campaign
+home > dashboard > my campaign > pending campaign
+home > dashboard > my campaign > cancelled campaign
+home > dashboard > my campaign > blocked campaign
+home > dashboard > my campaign > declined campaign
+home > dashboard > create campaign
+home > dashboard > withdraw fund
+home > dashboard > be a volunteer
+home > dashboard > my investigation
+home > dashboard > investigate
+home > dashboard > investigate > upload investigation info
+home > dashboard > users
+home > dashboard > users > all users
+home > dashboard > users > all users > user detail
+home > dashboard > users > all users > user detail > edit user
+home > dashboard > users > active users
+home > dashboard > users > malicious users
+home > dashboard > users > blocked users
+home > dashboard > users > left users
+home > dashboard > users > paused users
+home > dashboard > users > donors
+home > dashboard > users > campaigners
+home > dashboard > users > volunteer request
+home > dashboard > users > volunteers
+home > dashboard > users > volunteers
+home > dashboard > users > admins
+home > dashboard > users > super
+home > dashboard > admin campaigns > all campaign > campaign detail > edit
+home > dashboard > admin campaigns > active campaign > campaign detail > edit
+home > dashboard > admin campaigns > completed campaign > campaign detail > edit
+home > dashboard > admin campaigns > pending campaign > campaign detail > edit
+home > dashboard > admin campaigns > cancelled campaign > campaign detail > edit
+home > dashboard > admin campaigns > blocked campaign > campaign detail > edit
+home > dashboard > admin campaigns > declined campaign > campaign detail > edit
+home > dashboard > fund
+home > dashboard > platform
+home > dashboard > platform > settings
+home > dashboard > platform > category
+home > dashboard > platform > blog
+home > dashboard > preferences
+breadcrumb --------------------------------------------------------------------------------------
+
+
+
+
+
+
+--------------------------------------------------------------------------------------
+site-map:
+
+home
+home > master
+home > master > detail
+home > register
+home > login
+home > dashboard > profile
+home > dashboard > profile > edit profile
+home > dashboard > donated campaign
+home > dashboard > commented campaign
+home > dashboard > liked campaign
+home > dashboard > viewed campaign
+home > dashboard > shared campaign
+home > dashboard > my campaign > all campaign
+home > dashboard > my campaign > active campaign
+home > dashboard > my campaign > completed campaign
+home > dashboard > my campaign > pending campaign
+home > dashboard > my campaign > cancelled campaign
+home > dashboard > my campaign > blocked campaign
+home > dashboard > my campaign > declined campaign
+home > dashboard > create campaign
+home > dashboard > withdraw fund
+home > dashboard > be a volunteer
+home > dashboard > my investigation
+home > dashboard > investigate
+home > dashboard > investigate > upload investigation info
+home > dashboard > users
+home > dashboard > users > all users
+home > dashboard > users > all users > user detail
+home > dashboard > users > all users > user detail > edit user
+home > dashboard > users > active users
+home > dashboard > users > malicious users
+home > dashboard > users > blocked users
+home > dashboard > users > left users
+home > dashboard > users > paused users
+home > dashboard > users > donors
+home > dashboard > users > campaigners
+home > dashboard > users > volunteer request
+home > dashboard > users > volunteers
+home > dashboard > users > volunteers
+home > dashboard > users > admins
+home > dashboard > users > super
+home > dashboard > admin campaigns > all campaign > campaign detail > edit
+home > dashboard > admin campaigns > active campaign > campaign detail > edit
+home > dashboard > admin campaigns > completed campaign > campaign detail > edit
+home > dashboard > admin campaigns > pending campaign > campaign detail > edit
+home > dashboard > admin campaigns > cancelled campaign > campaign detail > edit
+home > dashboard > admin campaigns > blocked campaign > campaign detail > edit
+home > dashboard > admin campaigns > declined campaign > campaign detail > edit
+home > dashboard > fund
+home > dashboard > platform
+home > dashboard > platform > settings
+home > dashboard > platform > category
+home > dashboard > platform > blog
+home > dashboard > preferences
+site-map --------------------------------------------------------------------------------------

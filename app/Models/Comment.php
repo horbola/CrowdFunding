@@ -13,6 +13,9 @@ class Comment extends Model
     use HasFactory;
     
     protected $fillable = ['user_id', 'campaign_id', 'parent_id', 'body'];
+    
+    
+    
 
     public function campaign() {
         return $this->belongsTo(Campaign::class);

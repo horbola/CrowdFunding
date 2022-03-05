@@ -6,9 +6,24 @@ use Illuminate\Http\Request;
 use App\Models\Donation;
 use App\Models\Payment;
 use App\Models\User;
+use App\Models\UserExtra;
 use App\Models\Address;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
+
+/*
+ * each donation or order has theree steps to complete.
+ * 1. checkout
+ * 2. payment
+ * 3. delivery
+ * order table will have a status column with those three status
+ * 
+ * payment has two steps
+ * 1. request 
+ * 2. validation
+ */
 class DonationController extends Controller
 {
     
@@ -21,35 +36,50 @@ class DonationController extends Controller
         }
     }
     
+    // it's called by 'login' link
     public function createPaymentInfoFromLogin(Request $request) {
         return view('donation.payment-info-dialogue', compact('request'));
     }
     
+    // it's called by 'complete donation' button
     public function createPaymentInfo(Request $request) {
         $rules = [
             'name' => 'required|string:100',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:App\Models\User,email',
             'phone' => 'numeric',
         ];
         $validated = $this->validate($request, $rules);
+        
+//        $userExists = User::where('email', $validated['email'])->get()->count();
+//        if($userExists){
+//            $message = 'This email is already used. If you are registered before with this email, then try to login.'
+//                    . 'Credential was sent to you via this email. Or you can change your password if you have'
+//                    . 'provided any alternate method to reach you';
+//            return back()->withInput();
+//        }
+        
         // create user and transform into logged in
-        $data = [
+        $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => '123456',
-        ];
-        $user = User::create($data);
+            'password' => Hash::make(Str::random(10)),
+        ]);
+        
+        $userExtra = UserExtra::create([
+            'user_id' => $user->id,
+            'phone' => $validated['phone'],
+        ]);
         
         $address = Address::create([
             'user_id' => $user->id,
-            'phone' => $validated['email'],
-            'careof' => 'jwel',
-            'holding' => '24',
-            'road' => '10',
-            'city' => 'dhaka',
-            'division' => 'dhaka',
+            'type' => 'current',
             'country_id' => '18',
-            'nid' => '1990751105700003',
+        ]);
+        
+        $address = Address::create([
+            'user_id' => $user->id,
+            'type' => 'permanent',
+            'country_id' => '18',
         ]);
         
         Auth::login($user, true);

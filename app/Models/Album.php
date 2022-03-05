@@ -11,6 +11,14 @@ class Album extends Model
     
     protected $fillable = ['campaign_id', 'image_path', 'video_path'];
     
+    
+    public function campaign() {
+        return $this->belongsTo(Campaign::class);
+    }
+    
+    
+    
+    
     public function thumbImagePath() {
         return $thumbImagePath = str_replace('full', 'thumb', $this->image_path);
     }

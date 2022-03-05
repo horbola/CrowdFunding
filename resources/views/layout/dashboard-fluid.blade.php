@@ -17,9 +17,29 @@
 <!-- hero -->
 
 
+
 <!-- dashboard menu and content (fluid area) -->
 <section class="section">
     <div class="container-fluid">
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title position-relative">
+                    <div class="title-text">{{ $title?? '' }}</div>
+                </div>
+                <style>
+                    .title-text {
+                        position: absolute;
+                        top: -50px;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        font-weight: 600;
+                        font-size: 30px;
+                    }
+                </style>
+            </div>
+        </div>
+        
         <div class="row">
             <div class="col-lg-3 col-md-4 col-12">
                 <div class="sidebar sticky-bar p-2 rounded shadow">

@@ -2,6 +2,9 @@
 
 
 @section('dashboard-content')
+@php
+    use App\Models\Campaign;
+@endphp
 <div id="campaigns-panel-mine">
     <div class="row">
         <div class="col">
@@ -17,7 +20,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                1050
+                                {{ Campaign::where('user_id', Auth::user()->id)->count() }}
                             </div>
                         </div>
                     </div>
@@ -32,7 +35,12 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                50
+                                @php
+                                $campaign = Campaign::whereStatus(1)->where('user_id', Auth::user()->id)->get()->filter(function ($value, $key) {
+                                    return $value->isActive();
+                                });
+                                echo $campaign->count();
+                                @endphp
                             </div>
                         </div>
                     </div>
@@ -47,7 +55,12 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                @php
+                                $campaign = Campaign::whereStatus(1)->where('user_id', Auth::user()->id)->get()->filter(function ($value, $key) {
+                                    return $value->isCompleted();
+                                });
+                                echo $campaign->count();
+                                @endphp
                             </div>
                         </div>
                     </div>
@@ -62,7 +75,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                {{ Campaign::whereStatus(0)->where('user_id', Auth::user()->id)->count() }}
                             </div>
                         </div>
                     </div>
@@ -77,7 +90,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                {{ Campaign::whereStatus(2)->where('user_id', Auth::user()->id)->count() }}
                             </div>
                         </div>
                     </div>
@@ -92,7 +105,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                {{ Campaign::whereStatus(3)->where('user_id', Auth::user()->id)->count() }}
                             </div>
                         </div>
                     </div>
@@ -107,7 +120,7 @@
                         </div>
                         <div class="col">
                             <div class="two h3 ps-2  text-muted">
-                                14
+                                {{ Campaign::whereStatus(4)->where('user_id', Auth::user()->id)->count() }}
                             </div>
                         </div>
                     </div>

@@ -10033,31 +10033,59 @@ h3 {
   top: 70px;
 }
 
+/*
+// two column information table starts
 .two-column-table {
-  max-width: 600px;
+    max-width: 600px;
+    .legend {
+        top: -0.8rem;
+        left: 1rem;
+        padding: 0 0.5rem;
+    }
+
+    .row {
+        margin: 0;
+    }
+
+    .row:hover {
+        background-color: #f3f3f3;
+    }
+
+    .col {
+
+    }
+
+    .one {
+
+    }
+
+    .two {
+
+    }
 }
-.two-column-table .legend {
-  top: -0.8rem;
-  left: 1rem;
-  padding: 0 0.5rem;
+// two column information table ends
+
+
+
+// profile-content starts
+#profile {
+    .field {
+        .info {
+            border: 1px solid transparent;
+            .iconn {
+                visibility: hidden;
+            }
+        }
+        .info:hover {
+            border: 1px solid $border-color;
+            border-radius: 3px;
+            box-shadow: $box-shadow-sm;
+            .iconn {
+                visibility: visible;
+            }
+        }
+    }
 }
-.two-column-table .row {
-  margin: 0;
-}
-.two-column-table .row:hover {
-  background-color: #f3f3f3;
-}
-#profile .field .info {
-  border: 1px solid transparent;
-}
-#profile .field .info .iconn {
-  visibility: hidden;
-}
-#profile .field .info:hover {
-  border: 1px solid #dee2e6;
-  border-radius: 3px;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-}
-#profile .field .info:hover .iconn {
-  visibility: visible;
-}
+// profile-content ends
+// custom components sass ends
+*/

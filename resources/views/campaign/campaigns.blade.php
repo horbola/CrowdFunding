@@ -6,7 +6,7 @@
     <div class="row align-items-center">
         <div class="col-lg-8 col-md-7 text-center text-md-start">
             <div class="section-title">
-                @if($campaigns->count() && $campaigns instanceof Paginator)
+                @if($campaigns->count() && $campaigns instanceof Illuminate\Contracts\Pagination\Paginator)
                 <h5 class="mb-0 mt-4 mt-md-0">Showing {{$campaigns->firstItem()}}–{{$campaigns->lastItem()}} of {{$campaigns->total()}} results</h5>
                 @endif
             </div>
@@ -36,7 +36,7 @@
         
         <!-- PAGINATION START -->
         <div class="col-12 mt-4 mb-0 pt-2 pagination justify-content-center">
-            @if($campaigns instanceof Paginator)
+            @if($campaigns instanceof Illuminate\Contracts\Pagination\Paginator)
             {{$campaigns->links()}}
             @endif
         </div>

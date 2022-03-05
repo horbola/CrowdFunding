@@ -9,6 +9,17 @@ class Category extends Model
 {
     use HasFactory;
     
+    protected $fillable = [
+        'category_name',
+        'category_slug',
+        'category_image',
+        'show_in_home',
+    ];
+    
     protected $guarded = [];
-    protected $fillable = ['category_name', 'category_slug', 'category_image', 'show_in_home',];
+    
+    
+    public function campaigns() {
+        return $this->hasMany(Campaign::class);
+    }
 }

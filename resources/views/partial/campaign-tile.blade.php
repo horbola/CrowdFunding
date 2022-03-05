@@ -1,25 +1,30 @@
+{{-- <div class="card blog shop-list rounded border-0 shadow-lg overflow-hidden" onclick="clickCampTile('{{ route('campaign.showGuestCampaign', $campaign->id) }}', '{{request()->indexInvestigation}}', 'get');"> --}}
 <div class="card blog shop-list rounded border-0 shadow-lg overflow-hidden">
     <ul class="label list-unstyled mb-0">
-        @if(Route::currentRouteName() === 'campaign.indexViewedCampaign')
-        <li><a href="javascript:void(0)" class="badge badge-link rounded-pill bg-primary">Viewed: {{$campaign->count}}</a></li>
-        @endif
-        @if(Route::currentRouteName() === 'campaign.indexDonatedCampaign')
+        @if((Route::currentRouteName() === 'campaign.indexGuestCampaign') && $campaign->isVerified)
+            <li><a href="javascript:void(0)" class="badge badge-link rounded-pill bg-success">Verified {{$campaign->count}}</a></li>
+        @elseif(Route::currentRouteName() === 'campaign.indexViewedCampaign')
+            <li><a href="javascript:void(0)" class="badge badge-link rounded-pill bg-primary">Viewed: {{$campaign->count}}</a></li>
+        @elseif(Route::currentRouteName() === 'campaign.indexDonatedCampaign')
             @if(Auth::check() && (Auth::user()->id === $campaign->user_id))
-            <li><a href="javascript:void(0)" class="badge badge-link rounded-pill bg-success">Donated: {{$campaign->count}}-Own</a></li>
+                <li><a href="javascript:void(0)" class="badge badge-link rounded-pill bg-success">Donated: {{$campaign->count}}-Own</a></li>
             @else
-            <li><a href="javascript:void(0)" class="badge badge-link rounded-pill bg-success">Donated: {{$campaign->count}}</a></li>
+                <li><a href="javascript:void(0)" class="badge badge-link rounded-pill bg-success">Donated: {{$campaign->count}}</a></li>
             @endif
         @endif
         <li><a href="javascript:void(0)" class="badge badge-link rounded-pill bg-warning"></a></li>
     </ul>
     <div class="shop-image position-relative">
         <a href="{{ route('campaign.showGuestCampaign', ['campaignId' => $campaign->id, 'indexInvestigation' => request()->indexInvestigation]) }}">
-            <img src="/images/course/1.jpg" class="card-img-top" alt="...">
+        {{-- <a href="javascript:void(0)"> --}}
+            <img src="{{ $campaign->feature_image }}" class="card-img-top" alt="...">
             <div class="overlay bg-dark"></div>
         </a>
         <ul class="list-unstyled shop-icons">
             <li>
-                <button type="button" class="btn btn-icon btn-pills btn-soft-danger {{$campaign->hasLiked() ? 'active' : ''}}" onclick="createLike(this, {{$campaign->id}} )"><i data-feather="heart" class="icons"></i></button>
+                <button type="button" class="btn btn-icon btn-pills btn-soft-danger {{$campaign->hasLiked() ? 'active' : ''}}" onclick="createLike(this, {{$campaign->id}} )">
+                    <i data-feather="heart" class="icons"></i>
+                </button>
             </li>
             <!--
             <li>
@@ -28,11 +33,11 @@
                     <button type="submit" class="btn btn-icon btn-pills btn-soft-danger"><i data-feather="heart" class="icons"></i></<button>
                 </form>
             </li>
-            -->
             <li class="mt-2"><a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#productview" class="btn btn-icon btn-pills btn-soft-primary"><i data-feather="eye" class="icons"></i></a></li>
+            -->
         </ul>
         <div class="teacher d-flex align-items-center">
-            <img src="/images/client/01.jpg" class="avatar avatar-md-sm rounded-circle shadow" alt="">
+            <img src="{{ $campaign->campaigner->avatar() }}" class="avatar avatar-md-sm rounded-circle shadow" alt="">
             <div class="ms-2">
                 <h6 class="mb-0"><a href="javascript:void(0)" class="text-light user">{{ $campaign->campaigner->name }}</a></h6>
                 <p class="text-light small my-0">{{ $campaign->campaigner->location() }}</p>
@@ -77,6 +82,15 @@
         </ul>
     </div>
     <script>
+        function clickCampTile(location, indexInvestigation, method){
+            var form = new Form(location, method);
+            if(indexInvestigation){
+                form.append('indexInvestigation', indexInvestigation);
+            }
+            form.submit();
+        }
+    </script>
+    <script>
         function createLike(thiss, campaignId){
             $.ajax({
                 url: `/update-like/${campaignId}`,
@@ -87,9 +101,11 @@
                 success: function(data){
                     if(data.created){
                         $(thiss).text('like');
+                        $(thiss).addclass('active');
                     }
                     else {
                         $(thiss).text('not');
+                        $(thiss).removeclass('active');
                     }
                 }
             });

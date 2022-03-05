@@ -9,6 +9,7 @@ class Update extends Model
 {
     use HasFactory;
     protected $fillable = ['campaign_id', 'descrip'];
+
     
     public function updateItems() {
         return $this->hasMany(UpdateItem::class);

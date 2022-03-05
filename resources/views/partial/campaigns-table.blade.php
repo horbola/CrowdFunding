@@ -5,7 +5,6 @@
                 <th>Serial</th>
                 <th>Campaigner Name</th>
                 <th>Country</th>
-                <th>Address</th>
                 <th>Category</th>
                 <th>Title</th>
                 <th>Description</th>
@@ -25,8 +24,7 @@
                 @php $serial++ @endphp
                 <td>{{$serial}}</td>
                 <td>{{$campaign->campaigner->name}}</td>
-                <td>{{$campaign->country->nicename}}</td>
-                <td>{{$campaign->address}}</td>
+                <td>{{$campaign->campaigner->currentAddress()->country->nicename}}</td>
                 <td>{{$campaign->category->category_name}}</td>
                 <td>{{$campaign->title}}</td>
                 <td>{{$campaign->short_description}}</td>
@@ -35,25 +33,30 @@
                 <td>{{$campaign->start_date}}</td>
                 <td>{{$campaign->end_date}}</td>
                 @switch($campaign->status)
-                    @case(0)
-                        <td>{{'Pending'}}</td>
+                    @case(0) <td>{{'Pending'}}</td>
                         @break
-                    @case(1)
-                        <td>{{'Approved'}}</td>
+                    @case(1) <td>{{'Approved'}}</td>
                         @break
-                    @case(2)
-                        <td>{{'Cancelled'}}</td>
+                    @case(2) <td>{{'Cancelled'}}</td>
                         @break
-                    @case(3)
-                        <td>{{'Blocked'}}</td>
+                    @case(3) <td>{{'Blocked'}}</td>
                         @break
-                    @case(4)
-                        <td>{{'Declined'}}</td>
+                    @case(4) <td>{{'Declined'}}</td>
                         @break
                     @default
                         'Can\'t Define'
                 @endswitch
-                <td>{{$campaign->is_funded}}</td>
+                <td>
+                @switch($campaign->is_funded)
+                    @case(0) {{'Not Requested'}}
+                        @break
+                    @case(1) {{'Requested'}}
+                        @break
+                    @case(2) {{'Funded'}}
+                        @break
+                    @case(3) {{'Blocked'}}
+                @endswitch
+                </td>
                 <td>
                     <a href="{{ route('campaign.showGuestCampaign', $campaign->id) }}">View</a>
                 </td>
