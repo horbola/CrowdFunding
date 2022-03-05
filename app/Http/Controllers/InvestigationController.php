@@ -119,7 +119,8 @@ class InvestigationController extends Controller
         
         $created = Investigation::create($data);
         if($created){
-            return back()->with('success', "Your investigation report has succesfully posted");
+//            return back()->with('success', "Your investigation report has succesfully posted");
+            return redirect(route('campaign.showGuestCampaign', Campaign::find($campaignId)->slug));
         }
         return back()->with('error', 'Sorry, there\'s an error occured');
     }

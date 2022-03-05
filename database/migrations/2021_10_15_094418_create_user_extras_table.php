@@ -17,12 +17,12 @@ class CreateUserExtrasTable extends Migration
             $table->id();
             $table->foreignId('user_id');
             $table->date('birth_date')->nullable();
-            $table->bigInteger('phone')->nullable()->unsigned();
-            $table->bigInteger('nid')->nullable();
+            $table->string('phone')->nullable();
+            $table->bigInteger('nid')->nullable()->unique();
             $table->string('facebook')->nullable();
             $table->string('twitter')->nullable();
             $table->string('careof')->nullable();
-            $table->bigInteger('careof_phone')->nullable()->unsigned();
+            $table->string('careof_phone')->nullable();
             $table->timestamps();
         });
     }

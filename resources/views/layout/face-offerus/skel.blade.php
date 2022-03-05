@@ -12,6 +12,8 @@
     <!--<title>{{ config('app.name', 'Oporajoy Crowd Funding') }}</title>-->
     <title>{{ $title?? '' }}</title>
     
+    @yield('og')
+    
     <!-- icons -->
     <link href="{{ asset('images/logo-b.png') }}" rel="shortcut icon">
     <script src="https://kit.fontawesome.com/ee1b5a4573.js" crossorigin="anonymous"></script>
@@ -52,13 +54,16 @@
         @include('layout.face.header-offer-land')
     @endif
     <main>
+        @include('partial.search-panel')
         @yield('content')
     </main><!-- end main content -->
     @include('layout.face-offerus.footer')
+    @include('partial.search-script')
 </div><!-- end app -->
 @yield('page-script-bottom')
 @yield('campaign-detail-image-script-bottom')
 @yield('campaign-detail-image-test-script-bottom')
+@yield('campaign-detail-tabs-script-bottom')
 @yield('comments-script-bottom')
 @yield('camp-detail-sidebar-script-bottom')
 </body>

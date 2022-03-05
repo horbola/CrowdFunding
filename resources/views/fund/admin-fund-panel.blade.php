@@ -135,7 +135,10 @@
                         <h4 class="title mb-0">Total Requested Fund</h4>
                     </div>
                     <div class="">
-                        <h4 class="title mb-0">{{ Helper::formatMoneyFigure($totalReqFund) }}</h4>
+                        @php
+                            $normalized = Helper::normReqFund($totalFund, $totalReqFund)
+                        @endphp
+                        <h4 class="title mb-0">{{ Helper::formatMoneyFigure($normalized) }}</h4>
                     </div>
                 </div>
             </a>

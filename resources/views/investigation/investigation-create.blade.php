@@ -48,13 +48,29 @@
                                                     <label for="description" class="col-12 form-label pt-md-2">Investigation Report<span class="text-danger">*</span></label>
                                                     <div class="col-12">
                                                         <div class=" form-icon position-relative">
-                                                            <i data-feather="user" class="fea icon-sm icons"></i>
+                                                            <i data-feather="type" class="fea icon-sm icons"></i>
                                                             <textarea name="text_report" class="form-control description ps-5" rows="8" required>{{ old('investigation-report') }}</textarea>
                                                         </div>
                                                         {!! $errors->has('investigation-report')? '<p class="help-block">'.$errors->first('investigation-report').'</p>':'' !!}
                                                         <!--<p class="text-info"> @lang('app.description_info_text')</p>-->
                                                     </div>
                                                 </div>
+                                                
+                                                <div class="col-12 mb-3 mt-3 border border-0" style="max-height: 100px; overflow-y: auto;">
+                                                    <p class="form-label">
+                                                        this is the lincense textthis is the lincense textthis is the lincense text's
+                                                        this is the lincense textthis is the lincense textthis is the lincense text
+                                                        this is the lincense textthis is the lincense textvthis is the lincense textthis is the lincense textthis is the lincense text's
+                                                        this is the lincense textthis is the lincense textthis is the lincense text
+                                                        this is the lincense textthis is the lincense textvthis is the lincense textthis is the lincense textthis is the lincense text's
+                                                        this is the lincense textthis is the lincense textthis is the lincense text
+                                                        this is the lincense textthis is the lincense textvthis is the lincense textthis is the lincense textthis is the lincense text's
+                                                        this is the lincense textthis is the lincense textthis is the lincense text
+                                                        this is the lincense textthis is the lincense textvthis is the lincense textthis is the lincense textthis is the lincense text's
+                                                        this is the lincense textthis is the lincense textthis is the lincense text
+                                                        this is the lincense textthis is the lincense textv
+                                                    </p>
+                                                </div><!--end col-->
                                                 
                                                 <div class="col-12">
                                                     <div class="mb-3">

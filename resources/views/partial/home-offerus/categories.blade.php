@@ -90,7 +90,7 @@
                                 <div class="singular text-center d-flex align-items-center">
                                     <div class="m-auto">
                                         <img class="img-fluid" src="images/icons/g-icon7.png" alt="">
-                                        <h4>Woman & Children</h4>
+                                        <h4>Children</h4>
                                     </div>
                                 </div>
                             </a>

@@ -60,17 +60,17 @@ class Helper {
     }
     
     static function formatMoneyFigure($figure) {
-        return number_format($figure, 2).'tk';
+        return 'Tk '.number_format($figure, 2);
     }
     
     
     static function decodeStatus($status) {
-        switch ($status) {
+        switch ( (int)$status ) {
             case 0: return 'Pending';   break;
             case 2: return 'Cancelled'; break;
             case 3: return 'Blocked';   break;
             case 4: return 'Declined';  break;
-            default: return 'Can\'t define';
+            default: return 'Can\'t define Status';
         }
     }
     
@@ -89,6 +89,14 @@ class Helper {
         } catch (\Exception $e) {
             return $e->getMessage();
         }
+    }
+    
+    static function normReqFund($raised, $req) {
+        if( (int)$req > (int)$raised ){
+            $req = $raised;
+            return $req;
+        }
+        return $req;
     }
     
     

@@ -18,7 +18,7 @@
         <li><a href="javascript:void(0)" class="badge badge-link rounded-pill bg-warning"></a></li>
     </ul>
     <div class="shop-image position-relative">
-        <a href="{{ route('campaign.showGuestCampaign', ['campaignId' => $campaign->id, 'indexInvestigation' => request()->indexInvestigation]) }}">
+        <a href="{{ route('campaign.showGuestCampaign', ['campaignSlug' => $campaign->slug, 'indexInvestigation' => request()->indexInvestigation]) }}">
             <img src="{{ $campaign->feature_image }}" class="card-img-top" alt="...">
             <div class="overlay bg-dark"></div>
         </a>
@@ -40,9 +40,8 @@
             -->
         </ul>
         <div class="teacher d-flex align-items-center">
-            <a href="{{ route('user.show', $campaign->campaigner->id) }}"><img src="{{ $campaign->campaigner->avatar() }}" class="avatar avatar-md-sm rounded-circle shadow" alt=""></a>
             <div class="ms-2">
-                <h6 class="mb-0"><a href="{{ route('user.show', $campaign->campaigner->id) }}" class="text-light user">{{ $campaign->campaigner->name }}</a></h6>
+                <h6 class="mb-0"><a href="javascript:void(0)" class="text-light user">{{ $campaign->campaigner->name }}</a></h6>
                 <p class="text-light small my-0 py-0">{{ $campaign->campaigner->location() }}</p>
             </div>
         </div>
@@ -61,31 +60,33 @@
             </svg>
         </div>
     </div>
-    <div class="card-body content">
-        <h5 class="mt-2"><a href="{{ route('campaign.showGuestCampaign', ['campaignId' => $campaign->id, 'indexInvestigation' => request()->indexInvestigation]) }}" class="title text-dark">{{ $campaign->title }}</a></h5>
-        <p class="text-muted">{{ $campaign->short_description }}</p>
-        <div class="progress-box">
-            @php
-                $totalDonation = $campaign->totalSuccessfulDonation(true);
-                $goal = $campaign->goal;
-                $parcent = ((100/$goal) * $totalDonation);
-            @endphp
-            <div class="d-flex justify-content-between">
-                <h6 class="title text-muted">{{ Helper::formatMoneyFigure($totalDonation)}} raised of {{ Helper::formatMoneyFigure($goal) }}</h6>
-                <span class="d-block">{{round($parcent)}}%</span>
-            </div>
-            <div class="progress">
-                <div class="progress-bar position-relative bg-primary" style="width:0%;">
-                    <div class="progress-value d-block text-muted h6"></div>
+    <a href="{{ route('campaign.showGuestCampaign', ['campaignSlug' => $campaign->slug, 'indexInvestigation' => request()->indexInvestigation]) }}" class="title text-dark">
+        <div class="card-body content">
+            <h5 class="mt-2">{{ $campaign->title }}</h5>
+            <p class="text-muted">{{ $campaign->short_description }}</p>
+            <div class="progress-box">
+                @php
+                    $totalDonation = $campaign->totalSuccessfulDonation(true);
+                    $goal = $campaign->goal;
+                    $parcent = ((100/$goal) * $totalDonation);
+                @endphp
+                <div class="d-flex justify-content-between">
+                    <h6 class="title text-muted">{{ Helper::formatMoneyFigure($totalDonation)}} raised of {{ Helper::formatMoneyFigure($goal) }}</h6>
+                    <span class="d-block">{{round($parcent)}}%</span>
                 </div>
-                <script>$('.progress-bar').css('width', '{{ $parcent }}%')</script>
-            </div>
-        </div> 
-        <ul class="list-unstyled d-flex justify-content-between border-top mt-3 pt-3 mb-0">
-            <li class="text-bold small d-flex align-items-center"><i data-feather="book" class="fea icon-sm text-info me-1"></i> {{$campaign->daysLeft()}}</li>
-            <li class="text-bold small d-flex align-items-center"><i data-feather="clock" class="fea icon-sm text-warning me-1"></i>{{$campaign->donorsCount()}} Donors</li>
-        </ul>
-    </div>
+                <div class="progress">
+                    <div class="progress-bar position-relative bg-primary" style="width:0%;">
+                        <div class="progress-value d-block text-muted h6"></div>
+                    </div>
+                    <script>$('.progress-bar').css('width', '{{ $parcent }}%')</script>
+                </div>
+            </div> 
+            <ul class="list-unstyled d-flex justify-content-between border-top mt-3 pt-3 mb-0">
+                <li class="text-bold small d-flex align-items-center"><i data-feather="book" class="fea icon-sm text-info me-1"></i> {{$campaign->daysLeft()}}</li>
+                <li class="text-bold small d-flex align-items-center"><i data-feather="clock" class="fea icon-sm text-warning me-1"></i>{{$campaign->donorsCount()}} Donors</li>
+            </ul>
+        </div>
+    </a>
     <!--
     <script>
         function clickCampTile(location, indexInvestigation, method){

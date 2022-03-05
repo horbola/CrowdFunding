@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 use App\Mail\AccountCreation;
 
@@ -28,40 +29,27 @@ use App\Mail\AccountCreation;
  * 1. request 
  * 2. validation
  */
-class DonationController extends Controller
-{
+class DonationController extends Controller {
     
     public function createDialogues(Request $request) {
+        $title = 'Donating to a Campaign';
+        $countries = Country::all();
         if(Auth::check()){
-            return view('donation.payment-info-dialogue', compact('request'));
+            $title = 'Add Your Current Address';
+            return view('donation.address', compact('request', 'title', 'countries'));
         }
         else {
-            $countries = Country::all();
-            return view('donation.donor-info-dialogue', compact('request', 'countries'));
+            return view('donation.donor-info-dialogue', compact('request', 'countries', 'title'));
         }
     }
-    
-    // it's called by 'login' link
-    public function createPaymentInfoFromLogin(Request $request) {
-        return view('donation.payment-info-dialogue', compact('request'));
-    }
-
     
     // it's called by 'complete donation' button
     public function createPaymentInfo(Request $request) {
-        $rules = [
-            'name' => 'required|string:100',
-            'email' => 'required|email',
-            'phone' => 'numeric',
-            'current_holding' => 'nullable|string:30',
-            'current_road' => 'nullable|string:30',
-            'current_post_code' => 'nullable|string:30',
-            'current_upazilla' => 'nullable|string:30',
-            'current_district' => 'nullable|string:30',
-            'current_country' => 'nullable|numeric',
-        ];
-        $validated = $this->validate($request, $rules);
-
+        // if donor is donating as logged in or her account is created anew
+        // then keep loggedin. but logout in other case to avoid risk of if
+        // he enters already an existing account's email
+        $request->logout = true;
+        $validated = $this->validating($request);
         $user = User::where('email', '=', $request->input('email'))->first();
         if ($user === null) {
             $randPass = Str::random(10);
@@ -76,18 +64,108 @@ class DonationController extends Controller
                 'phone' => $validated['phone'],
             ]);
             
+            $request->logout = false;
             Mail::to($user)->send(new AccountCreation($user, $randPass));
         }
         
+        // this code changes the actual current address of donor.
+        // the risk if the donor uses someones's email to donate while 
+        // not logged in, then that email holder's current address is changed
         $currAddr = $this->isCurrAddrData($validated, $user);
-        if ($currAddr)
-            $currAddr->save();
+        $currAddr->save();
 
         Auth::login($user, true);
         $request->user_id = $user->id;
-        return view('donation.payment-info-dialogue', compact('request'));
+        $title = 'Donating to a Campaign';
+        return view('donation.payment-info-dialogue', compact('request', 'title'));
     }
     
+    // it's called when a logged in user donates.
+    public function createPaymentInfoFromAddress(Request $request) {
+        $validated = $this->validatingCurrAddr($request);
+        $user = Auth::user();
+        $currAddr = $this->isCurrAddrData($validated, $user);
+        $currAddr->save();
+        $request->user_id = $user->id;
+        $title = 'Donating to a Campaign';
+        return view('donation.payment-info-dialogue', compact('request', 'title'));
+    }
+    
+    // it's called by 'Login' link
+    public function createPaymentInfoFromLogin(Request $request) {
+        $title = 'Donating to a Campaign';
+        return view('donation.payment-info-dialogue', compact('request', 'title'));
+    }
+    
+    
+
+    
+    private function validating($request) {
+        $rules = [
+            'name' => 'required|string:100',
+            'email' => 'required|email',
+            'phone' => 'required|numeric:20',
+            'current_holding' => 'required|string:30',
+            'current_road' => 'required|string:30',
+            'current_post_code' => 'required|string:30',
+            'current_upazilla' => 'required|string:30',
+            'current_district' => 'required|string:30',
+            'current_country' => 'required|numeric:3',
+        ];
+        return $this->validate($request, $rules, $this->donorInfoValidnMsg());
+    }
+    
+    private function donorInfoValidnMsg() {
+        return $validnMsg = [
+            'name.required' => 'You must provide your name.',
+            'name.string' => 'Name should be in characters and must be within 30 characters',
+            'email.required' => 'You must provide your email address',
+            'email.email' => 'You have to provide a valid email address in this input box',
+            'phone.required' => 'You must provide your phone number',
+            'phone.numeric' => 'Input your phone number in digits',
+            'current_holding.required' => 'You must provide your current holding name',
+            'current_holding.string' => 'Your current holding name can be in only numbers and characters',
+            'current_road.required' => 'You must provide your current road number or village name in case',
+            'current_road.string' => 'Your current road can be in only numbers and characters',
+            'current_post_code.required' => 'You must provide your current post code',
+            'current_post_code.string' => 'Your current post code can be in only numbers and characters',
+            'current_upazilla.required' => 'You must provide your current upazila name',
+            'current_upazilla.string' => 'Your current upazila name can be in only numbers and characters',
+            'current_district.required' => 'You must provide your current district',
+            'current_district.string' => 'Your current district can be in only numbers and characters',
+            'current_country.required' => 'Select your country',
+            'current_country.numeric' => 'Select your country',
+        ];
+    }
+    
+    private function validatingCurrAddr($request) {
+        $rules = [
+            'current_holding' => 'required|string:30',
+            'current_road' => 'required|string:30',
+            'current_post_code' => 'required|string:30',
+            'current_upazilla' => 'required|string:30',
+            'current_district' => 'required|string:30',
+            'current_country' => 'required|numeric:3',
+        ];
+        return $this->validate($request, $rules, $this->donorCurrAddrValidnMsg());
+    }
+    
+    private function donorCurrAddrValidnMsg() {
+        return $validnMsg = [
+            'current_holding.required' => 'You must provide your current holding name',
+            'current_holding.string' => 'Your current holding name can be in only numbers and characters',
+            'current_road.required' => 'You must provide your current road number or village name in case',
+            'current_road.string' => 'Your current road can be in only numbers and characters',
+            'current_post_code.required' => 'You must provide your current post code',
+            'current_post_code.string' => 'Your current post code can be in only numbers and characters',
+            'current_upazilla.required' => 'You must provide your current upazila name',
+            'current_upazilla.string' => 'Your current upazila name can be in only numbers and characters',
+            'current_district.required' => 'You must provide your current district',
+            'current_district.string' => 'Your current district can be in only numbers and characters',
+            'current_country.required' => 'Select your country',
+            'current_country.numeric' => 'Select your country',
+        ];
+    }
     
     private function isCurrAddrData($validated, $user) {
         $isAvailable = isset($validated['current_holding']) &&

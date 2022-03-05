@@ -193,10 +193,10 @@ function progCircle(thiss){
 
 //campaign slider triggerd
 $(document).ready(function () {
+    
     $(".reply-bt").on("click",function(){
-    $(this).parent().parent().find('.reply-form').toggle();
-});
-
+        $(this).parent().parent().find('.reply-form').toggle();
+    });
 
     $('.owl-carouselCamp').owlCarousel({
         loop: true,
@@ -217,10 +217,10 @@ $(document).ready(function () {
                 nav: true,
                 loop: true,
                 margin: 60
-            },
+            }
         }
-    })
-})
+    });
+});
 
 
 
@@ -249,8 +249,9 @@ $('.Trending').slick({
         }
       }
     ]
-  });
-  $('.slider-2').slick({
+});
+  
+$('.slider-2').slick({
     autoplay:true,
     autoplaySpeed: 1000,
     infinite: true,
@@ -274,10 +275,10 @@ $('.Trending').slick({
         }
       }
     ]
-  });
+});
 
 
-  $('.slider-3').slick({
+$('.slider-3').slick({
     autoplay:true,
     autoplaySpeed: 1000,
     infinite: true,
@@ -301,29 +302,28 @@ $('.Trending').slick({
         }
       }
     ]
-  });
+});
 
-  /*  Sticky Header */
-  $(window).on('scroll', function () {
+/*  Sticky Header */
+$(window).on('scroll', function () {
     var scroll = $(window).scrollTop();
     if (scroll >= 10) {
       $(".header-bottombar").addClass("header-sticky");
     } else {
       $(".header-bottombar").removeClass("header-sticky");
     }
-  });
+});
 
 
 
 // navbar home scroller
 if ($('body').hasClass('home')) {
-const navbar = document.querySelector('.home');
-window.onscroll = () => {
-    if (window.scrollY > 10) {
-        navbar.classList.add('sc');
-    } else {
-        navbar.classList.remove('sc');
-    }
-};
-
+    const navbar = document.querySelector('.home');
+    window.onscroll = () => {
+        if (window.scrollY > 10) {
+            navbar.classList.add('sc');
+        } else {
+            navbar.classList.remove('sc');
+        }
+    };
 }

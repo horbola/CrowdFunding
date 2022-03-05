@@ -1,20 +1,41 @@
-@extends('layout.face.skel')
+@extends('layout.form.skel')
 
 
 @section('content')
 <section class="bg-profile d-table w-100 bg-primary" style="background: url('images/account/bg.png') center center;">
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="page-title position-relative">
+                <div class="title-text text-white">{{ $title?? '' }}</div>
+            </div>
+            <style>
+                .title-text {
+                    position: absolute;
+                    top: -30px;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-weight: 600;
+                    font-size: 30px;
+                }
+            </style>
+        </div>
+    </div>
+    
     <div id="donation-model" class="container">
         <form action="{{route('donation.createPaymentInfo')}}" method="get">
+            @method('get')
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Payment Details</h5>
+                    <h5 class="modal-title"></h5>
                 </div>
                 <div class="modal-body">
                     <div class="form-group form-row {{ $errors->has('amount')? 'has-error':'' }}">
                         <label for="amount" class="col-sm-12 col-md-5 form-label pt-md-2">Amount to donate</label>
                         <div class="col-sm-12 col-md-7 form-icon position-relative">
-                            <i data-feather="dollar-sign" class="fea icon-sm icons"></i>
+                            <!--<i data-feather="dollar-sign" class="fea icon-sm icons"></i>-->
+                            <span class="icon-sm icons" style="top:7px;"><strong>Tk</strong></span>
                             <input type="text" class="form-control ps-5" id="amount" value="{{ $request->amount }}" name="amount" readonly>
                             {!! $errors->has('amount')? '<p class="help-block text-bold text-danger">'.$errors->first('amount').'</p>':'' !!}
                         </div>
@@ -22,7 +43,7 @@
                     <div class="form-group form-row">
                         <label for="amount" class="col-sm-12 col-md-5 form-label pt-md-2">As Anonymous</label>
                         <div class="col-sm-12 col-md-7 form-icon position-relative">
-                            <i data-feather="eye-off" class="fea icon-sm icons"></i>
+                            <i data-feather="{{ $request->anonymous === 'Yes'? 'eye-off' : 'eye' }}" class="fea icon-sm icons"></i>
                             <input type="text" class="form-control ps-5" id="amount" value="{{ $request->anonymous === 'Yes'? 'Yes' : 'Open' }}" name="amount" maxlength="255" readonly>
                             <p class="text-info p-0"> {{ $request->anonymous === 'Yes'? 'No one can see your name' : 'Everyone can see your name' }} </p>
                         </div>
@@ -30,36 +51,36 @@
 
                     <hr />
 
-                    <div class="text-center text-bold mb-4">Fill these info or
+                    <div class="text-bold offset-md-5 mb-4">To Complete Donation Fill These Info or
                         <a href="{{route('donation.createPaymentInfoFromLogin', [
                             'campaign_id' => $request->campaign_id,
                             'amount' => $request->amount,
                             'anonymous' => $request->anonymous,
-                        ])}}">login</a>
+                        ])}}"><strong>Login</strong></a>
                     </div>
 
                     <div class="form-group form-row {{ $errors->has('name')? 'has-error':'' }}">
-                        <label for="name" class="col-sm-12 col-md-5 form-label pt-md-2">Full Name</label>
+                        <label for="name" class="col-sm-12 col-md-5 form-label pt-md-2">Full Name<span class="text-danger"> *</span></label>
                         <div class="col-sm-12 col-md-7 form-icon position-relative">
-                            <i data-feather="type" class="fea icon-sm icons"></i>
+                            <i data-feather="user" class="fea icon-sm icons"></i>
                             <input type="text" class="form-control ps-5" id="name" value="{{ old('name') }}" name="name">
                             {!! $errors->has('name')? '<p class="help-block text-bold text-danger">'.$errors->first('name').'</p>':'' !!}
                         </div>
                     </div>
 
                     <div class="form-group form-row {{ $errors->has('email')? 'has-error':'' }}">
-                        <label for="mail" class="col-sm-12 col-md-5 form-label pt-md-2">Email Address</label>
+                        <label for="mail" class="col-sm-12 col-md-5 form-label pt-md-2">Email Address<span class="text-danger"> *</span></label>
                         <div class="col-sm-12 col-md-7 form-icon position-relative">
-                            <i data-feather="user" class="fea icon-sm icons"></i>
+                            <i data-feather="mail" class="fea icon-sm icons"></i>
                             <input type="email" class="form-control ps-5" id="email" value="{{ old('email') }}" name="email">
                             {!! $errors->has('email')? '<p class="help-block text-bold text-danger">'.$errors->first('email').'</p>':'' !!}
                         </div>
                     </div>
 
                     <div class="form-group form-row {{ $errors->has('phone')? 'has-error':'' }}">
-                        <label for="smartphone" class="col-sm-12 col-md-5 form-label pt-md-2">Phone Number</label>
+                        <label for="smartphone" class="col-sm-12 col-md-5 form-label pt-md-2">Phone Number<span class="text-danger"> *</span></label>
                         <div class="col-sm-12 col-md-7 form-icon position-relative">
-                            <i data-feather="user" class="fea icon-sm icons"></i>
+                            <i data-feather="phone" class="fea icon-sm icons"></i>
                             <input type="text" class="form-control ps-5" id="phone" value="{{ old('phone') }}" name="phone">
                             {!! $errors->has('phone')? '<p class="help-block text-bold text-danger">'.$errors->first('phone').'</p>':'' !!}
                         </div>
@@ -67,11 +88,11 @@
                     
                     
                     <div class="form-group form-row">
-                        <label class="col-sm-12 col-md-5 form-label pt-md-2">Current Address (Optional)</label>
+                        <label class="col-sm-12 col-md-5 form-label pt-md-2">Current Address<span class="text-danger"> *</span></label>
                         <div class="col-sm-12 col-md-7 form-icon position-relative">
                             <div class="row mt-3">
                                 <div class="col-6 form-group {{ $errors->has('current_holding')? 'has-error' : '' }}">
-                                    <label for="current_holding" class="labels">Holding</label>
+                                    <label for="current_holding" class="labels">Holding / House</label>
                                     <input type="text" class="form-control mb-2 {{ $errors->has('current_holding')? 'error-border' : '' }}" id="current_holding" value="" name="current_holding" placeholder="Holding" maxlength="255">
                                     {!! $errors->has('current_holding')? '<p class="help-block text-bold text-danger">'.$errors->first('current_holding').'</p>' : '' !!}
                                 </div>
@@ -86,7 +107,7 @@
                                     {!! $errors->has('current_post_code')? '<p class="help-block text-bold text-danger">'.$errors->first('current_post_code').'</p>' : '' !!}
                                 </div>
                                 <div class="col-6 form-group {{ $errors->has('current_upazilla')? 'has-error' : '' }}">
-                                    <label for="current_upazilla" class="labels">Upazilla</label>
+                                    <label for="current_upazilla" class="labels">Upazilla / City </label>
                                     <input type="text" class="form-control mb-2 {{ $errors->has('current_upazilla')? 'error-border' : '' }}" id="current_upazilla" value="" name="current_upazilla" placeholder="Upazilla" maxlength="255">
                                     {!! $errors->has('current_upazilla')? '<p class="help-block text-bold text-danger">'.$errors->first('current_upazilla').'</p>' : '' !!}
                                 </div>
@@ -98,7 +119,7 @@
                                 <div class="col-6 form-group {{ $errors->has('current_country')? 'has-error' : '' }}">
                                     <label for="current_country" class="labels">Country</label>
                                     <select class="form-select form-control" id="current_country" name="current_country">
-                                        <option value="18"></option>
+                                        <option value="18">Bangladesh</option>
                                         @foreach ($countries as $country)
                                         <option value="{{ $country->id }}">{{ $country->nicename }}</option>
                                         @endforeach

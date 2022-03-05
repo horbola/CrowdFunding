@@ -46,8 +46,8 @@
         <div class="form-group form-row {{ $errors->has('name')? 'has-error' : '' }}">
             <label for="name" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Name <span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
-                <i data-feather="type" class="fea icon-sm icons"></i>
-                <input type="text" class="form-control ps-5 {{ $errors->has('name')? 'error-border' : '' }}" id="name" value="{{$user->name}}" name="name" placeholder="Name" maxlength="255">
+                <i data-feather="user" class="fea icon-sm icons"></i>
+                <input type="text" class="form-control ps-5 {{ $errors->has('name')? 'error-border' : '' }}" id="name" value="{{ old('name', $user->name) }}" name="name" placeholder="Name" maxlength="255">
                 {!! $errors->has('name')? '<p class="help-block text-bold text-danger">'.$errors->first('name').'</p>' : '' !!}
             </div>
         </div>
@@ -58,7 +58,8 @@
             <label for="birth_date" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Date Of Birth<span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="calendar" class="fea icon-sm icons"></i>
-                <input type="date" class="form-control ps-5 {{ $errors->has('birth_date')? 'error-border' : '' }}" id="birth_date" value="{{$uExtra? ($uExtra->birth_date? $uExtra->birth_date : '') : ''}}" name="birth_date"  maxlength="255">
+                @php $birthDate = $uExtra? ($uExtra->birth_date? $uExtra->birth_date : '') : ''; @endphp
+                <input type="date" class="form-control ps-5 {{ $errors->has('birth_date')? 'error-border' : '' }}" id="birth_date" value="{{ old('birth_date', $birthDate ?? '') }}" name="birth_date"  maxlength="255">
                 {!! $errors->has('birth_date')? '<p class="help-block text-bold text-danger">'.$errors->first('birth_date').'</p>' : '' !!}
             </div>
         </div>
@@ -70,19 +71,31 @@
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <div class="custom-control custom-radio custom-control-inline">
                     <div class="form-check mb-0">
-                        <input class="form-check-input" {{ ($user->gender == 'male')? "checked" : ""}} type="radio" name="gender" value="male" id="gender1">
+                        @php
+                            $isChecked = $user->gender == 'male' ? "checked" : "";
+                            $isChecked = old('gender') ? ( old('gender') === 'male' ? 'checked' : '' ) : $isChecked;
+                        @endphp
+                        <input class="form-check-input" {{ $isChecked }} type="radio" name="gender" value="male" id="gender1">
                         <label class="form-check-label" for="gender1">Male</label>
                     </div>
                 </div>
                 <div class="custom-control custom-radio custom-control-inline">
                     <div class="form-check mb-0">
-                        <input class="form-check-input" {{ ($user->gender == 'female')? "checked" : ""}} type="radio" name="gender" value="female" id="gender2">
+                        @php
+                            $isChecked = $user->gender == 'female' ? "checked" : "";
+                            $isChecked = old('gender') ? ( old('gender') === 'female' ? 'checked' : '' ) : $isChecked;
+                        @endphp
+                        <input class="form-check-input" {{ $isChecked }} type="radio" name="gender" value="female" id="gender2">
                         <label class="form-check-label" for="gender2">Female</label>
                     </div>
                 </div>
                 <div class="custom-control custom-radio custom-control-inline">
                     <div class="form-check mb-0">
-                        <input class="form-check-input" {{ ($user->gender == 'others')? "checked" : ""}} type="radio" name="gender"  value="others" id="gender3">
+                        @php
+                            $isChecked = $user->gender == 'female' ? "others" : "";
+                            $isChecked = old('gender') ? ( old('gender') === 'others' ? 'checked' : '' ) : $isChecked;
+                        @endphp
+                        <input class="form-check-input" {{ $isChecked }} type="radio" name="gender"  value="others" id="gender3">
                         <label class="form-check-label" for="gender3">Others</label>
                     </div>
                 </div>
@@ -90,12 +103,13 @@
         </div>
         @endif
         
-        @if($show)
+        @php $nid = ($user->userExtra && $user->userExtra->nid) ? $user->userExtra->nid : ''; @endphp
+        @if($show && !$nid)
         <div class="form-group form-row {{ $errors->has('nid')? 'has-error' : '' }}">
             <label for="nid" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">NID <span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
-                <i data-feather="type" class="fea icon-sm icons"></i>
-                <input type="text" class="form-control ps-5 {{ $errors->has('nid')? 'error-border' : '' }}" id="nid" value="{{$user->userExtra && $user->userExtra->nid? $user->userExtra->nid : ''}}" name="nid" placeholder="National ID" maxlength="255">
+                <i data-feather="key" class="fea icon-sm icons"></i>
+                <input type="text" class="form-control ps-5 {{ $errors->has('nid')? 'error-border' : '' }}" id="nid" value="{{ old('nid', $nid ?? '') }}" name="nid" placeholder="National ID" maxlength="255">
                 {!! $errors->has('nid')? '<p class="help-block text-bold text-danger">'.$errors->first('nid').'</p>' : '' !!}
             </div>
         </div>
@@ -117,7 +131,8 @@
             <label for="phone" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Phone <span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="smartphone" class="fea icon-sm icons"></i>
-                <input type="text" class="form-control ps-5 {{ $errors->has('phone')? 'error-border' : '' }}" id="phone" value="{{$uExtra? ($uExtra->phone? $uExtra->phone : '') : ''}}" name="phone" placeholder="Phone Number" maxlength="255">
+                @php $phone = $uExtra? ($uExtra->phone? $uExtra->phone : '') : ''; @endphp
+                <input type="text" class="form-control ps-5 {{ $errors->has('phone')? 'error-border' : '' }}" id="phone" value="{{ old('phone', $phone ?? '') }}" name="phone" placeholder="Phone Number" maxlength="255">
                 {!! $errors->has('phone')? '<p class="help-block text-bold text-danger">'.$errors->first('phone').'</p>' : '' !!}
             </div>
         </div>
@@ -126,7 +141,8 @@
             <label for="facebook" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Facebook <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="facebook" class="fea icon-sm icons"></i>
-                <input type="text" class="form-control ps-5 {{ $errors->has('facebook')? 'error-border' : '' }}" id="facebook" value="{{$uExtra? ($uExtra->facebook? $uExtra->facebook : '') : ''}}" name="facebook" placeholder="FaceBook" maxlength="255">
+                @php $facebook = $uExtra? ($uExtra->facebook? $uExtra->facebook : '') : ''; @endphp
+                <input type="text" class="form-control ps-5 {{ $errors->has('facebook')? 'error-border' : '' }}" id="facebook" value="{{ old('facebook', $facebook ?? '') }}" name="facebook" placeholder="FaceBook" maxlength="255">
                 {!! $errors->has('facebook')? '<p class="help-block text-bold text-danger">'.$errors->first('facebook').'</p>' : '' !!}
             </div>
         </div>
@@ -135,7 +151,8 @@
             <label for="twitter" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Twitter <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="twitter" class="fea icon-sm icons"></i>
-                <input type="text" class="form-control ps-5 {{ $errors->has('twitter')? 'error-border' : '' }}" id="twitter" value="{{$uExtra? ($uExtra->twitter? $uExtra->twitter : '') : ''}}" name="twitter" placeholder="Twitter" maxlength="255">
+                @php $twitter = $uExtra? ($uExtra->twitter? $uExtra->twitter : '') : ''; @endphp
+                <input type="text" class="form-control ps-5 {{ $errors->has('twitter')? 'error-border' : '' }}" id="twitter" value="{{ old('twitter', $twitter ?? '') }}" name="twitter" placeholder="Twitter" maxlength="255">
                 {!! $errors->has('twitter')? '<p class="help-block text-bold text-danger">'.$errors->first('twitter').'</p>' : '' !!}
             </div>
         </div>
@@ -144,12 +161,13 @@
             <label for="about" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">About Yourself<span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="type" class="fea icon-sm icons"></i>
-                <textarea name="about" class="form-control ps-5" rows="2" maxlength="300">{{ old('about') }}</textarea>
+                <textarea name="about" class="form-control ps-5" rows="2" maxlength="300">{{ old('about', $user->about) }}</textarea>
                 <p class="text-info"></p>
                 {!! $errors->has('about')? '<p class="help-block text-bold text-danger">'.$errors->first('about').'</p>' : '' !!}
             </div>
         </div>
         
+        <!--current address-->
         @if($show)
         <div class="form-group form-row">
             <label class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Current Address <span class="text-danger">*</span> <span> :</span></label>
@@ -157,33 +175,38 @@
                 <div class="row mt-3">
                     <div class="col-6 form-group {{ $errors->has('current_holding')? 'has-error' : '' }}">
                         <label for="current_holding" class="labels">Holding <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control mb-2 {{ $errors->has('current_holding')? 'error-border' : '' }}" id="current_holding" value="{{$cAddr? ($cAddr->holding? $cAddr->holding : '') : ''}}" name="current_holding" placeholder="Holding" maxlength="255">
+                        @php $currentHolding = $cAddr? ($cAddr->holding? $cAddr->holding : '') : ''; @endphp
+                        <input type="text" class="form-control mb-2 {{ $errors->has('current_holding')? 'error-border' : '' }}" id="current_holding" value="{{ old('current_holding', $currentHolding ?? '') }}" name="current_holding" placeholder="Holding" maxlength="255">
                         {!! $errors->has('current_holding')? '<p class="help-block text-bold text-danger">'.$errors->first('current_holding').'</p>' : '' !!}
                     </div>
                     <div class="col-6 form-group {{ $errors->has('current_road')? 'has-error' : '' }}">
                         <label for="current_road" class="labels">Road <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control mb-2 {{ $errors->has('current_road')? 'error-border' : '' }}" id="current_road" value="{{$cAddr? ($cAddr->road? $cAddr->road : '') : ''}}" name="current_road" placeholder="Road" maxlength="255" >
+                        @php $currentRoad = $cAddr? ($cAddr->road? $cAddr->road : '') : ''; @endphp
+                        <input type="text" class="form-control mb-2 {{ $errors->has('current_road')? 'error-border' : '' }}" id="current_road" value="{{ old('current_road', $currentRoad ?? '') }}" name="current_road" placeholder="Road" maxlength="255" >
                         {!! $errors->has('current_road')? '<p class="help-block text-bold text-danger">'.$errors->first('current_road').'</p>' : '' !!}
                     </div>
                     <div class="col-6 form-group {{ $errors->has('current_post_code')? 'has-error' : '' }}">
                         <label for="current_post_code" class="labels">Post Code <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control mb-2 {{ $errors->has('current_post_code')? 'error-border' : '' }}" id="current_post_code" value="{{$cAddr? ($cAddr->post_code? $cAddr->post_code : '') : ''}}" name="current_post_code" placeholder="Post Code" maxlength="255" >
+                        @php $currentPostCode = $cAddr? ($cAddr->post_code? $cAddr->post_code : '') : ''; @endphp
+                        <input type="text" class="form-control mb-2 {{ $errors->has('current_post_code')? 'error-border' : '' }}" id="current_post_code" value="{{ old('current_post_code', $currentPostCode ?? '') }}" name="current_post_code" placeholder="Post Code" maxlength="255" >
                         {!! $errors->has('current_post_code')? '<p class="help-block text-bold text-danger">'.$errors->first('current_post_code').'</p>' : '' !!}
                     </div>
                     <div class="col-6 form-group {{ $errors->has('current_upazilla')? 'has-error' : '' }}">
                         <label for="current_upazilla" class="labels">Upazilla <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control mb-2 {{ $errors->has('current_upazilla')? 'error-border' : '' }}" id="current_upazilla" value="{{$cAddr? ($cAddr->upazilla? $cAddr->upazilla : '') : ''}}" name="current_upazilla" placeholder="Upazilla" maxlength="255">
+                        @php $currentUpazilla = $cAddr? ($cAddr->upazilla? $cAddr->upazilla : '') : ''; @endphp
+                        <input type="text" class="form-control mb-2 {{ $errors->has('current_upazilla')? 'error-border' : '' }}" id="current_upazilla" value="{{ old('current_upazilla', $currentUpazilla ?? '') }}" name="current_upazilla" placeholder="Upazilla" maxlength="255">
                         {!! $errors->has('current_upazilla')? '<p class="help-block text-bold text-danger">'.$errors->first('current_upazilla').'</p>' : '' !!}
                     </div>
                     <div class="col-6 form-group {{ $errors->has('current_district')? 'has-error' : '' }}">
                         <label for="current_district" class="labels">District <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control mb-2 {{ $errors->has('current_district')? 'error-border' : '' }}" id="current_district" value="{{$cAddr? ($cAddr->district? $cAddr->district : '') : ''}}" name="current_district" placeholder="District" maxlength="255">
+                        @php $currentDistrict = $cAddr? ($cAddr->district? $cAddr->district : '') : ''; @endphp
+                        <input type="text" class="form-control mb-2 {{ $errors->has('current_district')? 'error-border' : '' }}" id="current_district" value="{{ old('current_district', $currentDistrict ?? '') }}" name="current_district" placeholder="District" maxlength="255">
                         {!! $errors->has('current_district')? '<p class="help-block text-bold text-danger">'.$errors->first('current_district').'</p>' : '' !!}
                     </div>
                     <div class="col-6 form-group {{ $errors->has('current_country')? 'has-error' : '' }}">
                         <label for="current_country" class="labels">Country <span class="text-danger">*</span></label>
                         <select class="form-select form-control" id="current_country" name="current_country">
-                            <option value="{{$cAddr? ($cAddr->country? $cAddr->country->id : '18') : '18'}}">{{$cAddr? ($cAddr->country? $cAddr->country->nicename : 'No Current Country Is Setup') : 'No Current Country Is Setup'}}</option>
+                            <option value="{{$cAddr? ($cAddr->country? $cAddr->country->id : '18') : '18'}}">{{$cAddr? ($cAddr->country? $cAddr->country->nicename : 'Bangladesh') : 'Bangladesh'}}</option>
                             @foreach ($countries as $country)
                             <option value="{{ $country->id }}">{{ $country->nicename }}</option>
                             @endforeach
@@ -194,39 +217,45 @@
             </div>
         </div>
         
+        <!--permanent address-->
         <div class="form-group form-row">
             <label for="facebook" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Permanent Address <span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-8  border border-1 rounded-3 ms-1 address">
                 <div class="row mt-3">
                     <div class="col-6 form-group {{ $errors->has('permanent_holding')? 'has-error' : '' }}">
                         <label for="permanent_holding" class="labels">Holding <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control mb-2 {{ $errors->has('permanent_holding')? 'error-border' : '' }}" id="permanent_holding" value="{{$pAddr? ($pAddr->holding? $pAddr->holding : '') : ''}}" name="permanent_holding" placeholder="Holding" maxlength="255">
+                        @php $permanentHolding = $pAddr? ($pAddr->holding? $pAddr->holding : '') : ''; @endphp
+                        <input type="text" class="form-control mb-2 {{ $errors->has('permanent_holding')? 'error-border' : '' }}" id="permanent_holding" value="{{ old('permanent_holding', $permanentHolding ?? '') }}" name="permanent_holding" placeholder="Holding" maxlength="255">
                         {!! $errors->has('permanent_holding')? '<p class="help-block text-bold text-danger">'.$errors->first('permanent_holding').'</p>' : '' !!}
                     </div>
                     <div class="col-6 form-group {{ $errors->has('permanent_road')? 'has-error' : '' }}">
                         <label for="permanent_road" class="labels">Road <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control mb-2 {{ $errors->has('permanent_road')? 'error-border' : '' }}" id="permanent_road" value="{{$pAddr? ($pAddr->road? $pAddr->road : '') : ''}}" name="permanent_road" placeholder="Road" maxlength="255">
+                        @php $permanentRoad = $pAddr? ($pAddr->road? $pAddr->road : '') : ''; @endphp
+                        <input type="text" class="form-control mb-2 {{ $errors->has('permanent_road')? 'error-border' : '' }}" id="permanent_road" value="{{ old('permanent_road', $permanentRoad ?? '') }}" name="permanent_road" placeholder="Road" maxlength="255">
                         {!! $errors->has('permanent_road')? '<p class="help-block text-bold text-danger">'.$errors->first('permanent_road').'</p>' : '' !!}
                     </div>
-                    <div class="col-6 form-group {{ $errors->has('current_post_code')? 'has-error' : '' }}">
+                    <div class="col-6 form-group {{ $errors->has('permanent_post_code')? 'has-error' : '' }}">
                         <label for="permanent_post_code" class="labels">Post Code <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control mb-2 {{ $errors->has('current_post_code')? 'error-border' : '' }}" id="current_post_code" value="{{$pAddr? ($pAddr->post_code? $pAddr->post_code : '') : ''}}" name="permanent_post_code" placeholder="Post Code" maxlength="255" >
-                        {!! $errors->has('current_post_code')? '<p class="help-block text-bold text-danger">'.$errors->first('current_post_code').'</p>' : '' !!}
+                        @php $permanentPostCode = $pAddr? ($pAddr->post_code? $pAddr->post_code : '') : ''; @endphp
+                        <input type="text" class="form-control mb-2 {{ $errors->has('permanent_post_code')? 'error-border' : '' }}" id="current_post_code" value="{{ old('permanent_post_code', $permanentPostCode ?? '') }}" name="permanent_post_code" placeholder="Post Code" maxlength="255" >
+                        {!! $errors->has('permanent_post_code')? '<p class="help-block text-bold text-danger">'.$errors->first('permanent_post_code').'</p>' : '' !!}
                     </div>
                     <div class="col-6 form-group {{ $errors->has('permanent_upazilla')? 'has-error' : '' }}">
                         <label for="permanent_upazilla" class="labels">Upazilla <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control mb-2 {{ $errors->has('permanent_upazilla')? 'error-border' : '' }}" id="permanent_upazilla" value="{{$pAddr? ($pAddr->upazilla? $pAddr->upazilla : '') : ''}}" name="permanent_upazilla" placeholder="Upazilla" maxlength="255">
+                        @php $permanentUpazilla = $pAddr? ($pAddr->upazilla? $pAddr->upazilla : '') : ''; @endphp
+                        <input type="text" class="form-control mb-2 {{ $errors->has('permanent_upazilla')? 'error-border' : '' }}" id="permanent_upazilla" value="{{ old('permanent_upazilla', $permanentUpazilla ?? '') }}" name="permanent_upazilla" placeholder="Upazilla" maxlength="255">
                         {!! $errors->has('permanent_upazilla')? '<p class="help-block text-bold text-danger">'.$errors->first('permanent_upazilla').'</p>' : '' !!}
                     </div>
                     <div class="col-6 form-group {{ $errors->has('permanent_district')? 'has-error' : '' }}">
                         <label for="permanent_district" class="labels">District <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control mb-2 {{ $errors->has('permanent_district')? 'error-border' : '' }}" id="permanent_district" value="{{$pAddr? ($pAddr->upazilla? $pAddr->upazilla : '') : ''}}" name="permanent_district" placeholder="District" maxlength="255">
+                        @php $permanentDistrict = $pAddr? ($pAddr->district? $pAddr->district : '') : ''; @endphp
+                        <input type="text" class="form-control mb-2 {{ $errors->has('permanent_district')? 'error-border' : '' }}" id="permanent_district" value="{{ old('permanent_district', $permanentDistrict ?? '') }}" name="permanent_district" placeholder="District" maxlength="255">
                         {!! $errors->has('permanent_district')? '<p class="help-block text-bold text-danger">'.$errors->first('permanent_district').'</p>' : '' !!}
                     </div>
                     <div class="col-6 form-group {{ $errors->has('permanent_country')? 'has-error' : '' }}">
                         <label for="permanent_country" class="labels">Country <span class="text-danger">*</span></label>
                         <select class="form-select form-control" id="permanent_country" name="permanent_country">
-                            <option value="{{$pAddr? ($pAddr->country? $pAddr->country->id : '18') : '18'}}">{{$pAddr? ($pAddr->country? $pAddr->country->nicename : '') : ''}}</option>
+                            <option value="{{$pAddr? ($pAddr->country? $pAddr->country->id : '18') : '18'}}">{{$pAddr? ($pAddr->country? $pAddr->country->nicename : 'Bangladesh') : 'Bangladesh'}}</option>
                             @foreach ($countries as $country)
                             <option value="{{ $country->id }}">{{ $country->nicename }}</option>
                             @endforeach
@@ -242,8 +271,9 @@
         <div class="form-group form-row {{ $errors->has('careof')? 'has-error' : '' }}">
             <label for="facebook" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Care-Of <span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
-                <i data-feather="type" class="fea icon-sm icons"></i>
-                <input type="text" class="form-control ps-5 {{ $errors->has('careof')? 'error-border' : '' }}" id="facebook" value="{{$uExtra? ($uExtra->careof? $uExtra->careof : '') : ''}}" name="careof" placeholder="Care-Of" maxlength="255">
+                <i data-feather="user" class="fea icon-sm icons"></i>
+                @php $careof = $uExtra? ($uExtra->careof? $uExtra->careof : '') : ''; @endphp
+                <input type="text" class="form-control ps-5 {{ $errors->has('careof')? 'error-border' : '' }}" id="facebook" value="{{ old('careof', $careof ?? '') }}" name="careof" placeholder="Care-Of" maxlength="255">
                 {!! $errors->has('careof')? '<p class="help-block text-bold text-danger">'.$errors->first('careof').'</p>' : '' !!}
             </div>
         </div>
@@ -254,7 +284,8 @@
             <label for="careof_phone" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Care-Of Phone <span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="smartphone" class="fea icon-sm icons"></i>
-                <input type="text" class="form-control ps-5 {{ $errors->has('careof_phone')? 'error-border' : '' }}" id="careof_phone" value="{{$uExtra? ($uExtra->careof_phone? $uExtra->careof_phone : '') : ''}}" name="careof_phone" placeholder="Care-Of Phonne" maxlength="255">
+                @php $careofPhone = $uExtra? ($uExtra->careof_phone? $uExtra->careof_phone : '') : ''; @endphp
+                <input type="text" class="form-control ps-5 {{ $errors->has('careof_phone')? 'error-border' : '' }}" id="careof_phone" value="{{ old('careof_phone', $careofPhone ?? '') }}" name="careof_phone" placeholder="Care-Of Phonne" maxlength="255">
                 {!! $errors->has('careof_phone')? '<p class="help-block text-bold text-danger">'.$errors->first('careof_phone').'</p>' : '' !!}
             </div>
         </div>

@@ -24,7 +24,7 @@
                         <td>{{$item->campaign->totalSuccessfulDonation()}}</td>
                         <td>{{$item->campaign->totalPaidFund()}}</td>
                         <td class="req-amount">{{$item->requested_amount}}</td>
-                        <td><a href="{{route('campaign.showGuestCampaign', ['campaignId' => $item->campaign->id, 'user_panel_fraction' => Request::segment(4)])}}">View</a></td>
+                        <td><a href="{{route('campaign.showGuestCampaign', ['campaignSlug' => $item->campaign->slug, 'user_panel_fraction' => Request::segment(4)])}}">View</a></td>
                         <td><input type="number" name="payable_amount" class="form-control" style="min-width: 150px;" value="{{ old('payable_amount')? old('payable_amount') : $item->requested_amount }}" onkeyup="calcTotalPayable();"></td>
                         <td>
                             <div class="form-check">
@@ -58,9 +58,8 @@
                     <th></th>
                     <th></th>
                     <th></th>
-                    <th></th>
                     <th>Total</th>
-                    <th id="totalPayable">500000</th>
+                    <th id="totalPayable" class="d-inline-block ps-4"></th>
                     <script>
                         $(calcTotalPayable);
                         function calcTotalPayable(){
@@ -72,6 +71,7 @@
                             $('#totalPayable').text(total);
                         }
                     </script>
+                    <th></th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -340,7 +340,6 @@
                             col.block_msg = $(this).find('input[name=block_msg]').val().trim();
                             rows.push(col);
                         });
-                        var pay_meth_type = $('#pending-req-table').find('input[name=pay_meth_type]').val().trim();
                         var pay_meth_type = $('#pending-req-table').find('input[name=pay_meth_type]').val().trim();
                         var trans_id = $('#pending-req-table').find('input[name=trans_id]').val().trim();
                         

@@ -60,7 +60,7 @@
                     @endswitch
                     </td>
                     <td>
-                        <a href="{{ route('campaign.showGuestCampaign', $campaign->id) }}" target="_blank">View</a>
+                        <a href="{{ route('campaign.showGuestCampaign', $campaign->slug) }}" target="_blank">View</a>
                     </td>
                     
                     @if( isset($option) && $option==='picked' )

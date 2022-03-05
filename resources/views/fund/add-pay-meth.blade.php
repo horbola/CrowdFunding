@@ -32,6 +32,7 @@
                             </div>
                         </div>
                     </div>
+                    <!--
                     <div>
                         <div class="form-group form-row {{ $errors->has('bank_swift_code')? 'has-error' : '' }}">
                             <label for="bank_swift_code" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Bank Routing Number<span class="text-danger">* </span> <span> :</span></label>
@@ -42,6 +43,7 @@
                             </div>
                         </div>
                     </div>
+                    -->
                     <div>
                         <div class="form-group form-row {{ $errors->has('branch_name')? 'has-error' : '' }}">
                             <label for="branch_name" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Branch Name<span class="text-danger">* </span> <span> :</span></label>
@@ -52,6 +54,7 @@
                             </div>
                         </div>
                     </div>
+                    <!--
                     <div>
                         <div class="form-group form-row {{ $errors->has('branch_swift_code')? 'has-error' : '' }}">
                             <label for="branch_swift_code" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Branch Routing Number<span class="text-danger">* </span> <span> :</span></label>
@@ -62,6 +65,7 @@
                             </div>
                         </div>
                     </div>
+                    -->
                     <div>
                         <div class="form-group form-row {{ $errors->has('acc_number')? 'has-error' : '' }}">
                             <label for="acc_number" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Account number<span class="text-danger">* </span> <span> :</span></label>
@@ -121,7 +125,7 @@
                         </div>
                     </div>
                 </div>
-                <input type="hidden" name="pay_meth_type" value="mobile-bank">
+                <input type="hidden" name="pay_meth_type" value="bank">
             </div>
             <div class="text-right">
                 <button type="submit" class="btn btn-primary">Save</button>

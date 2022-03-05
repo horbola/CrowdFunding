@@ -36,10 +36,7 @@
                     </div><!--end col-->
                     <div class="col-md-5 text-md-end text-center">
                         <ul class="list-unstyled social-icon social mb-0 mt-4">
-                            <li class="list-inline-item"><a href="javascript:void(0)" class="rounded" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Add Friend"><i class="uil uil-user-plus align-middle"></i></a></li>
-                            <li class="list-inline-item"><a href="javascript:void(0)" class="rounded" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Messages"><i class="uil uil-comment align-middle"></i></a></li>
-                            <li class="list-inline-item"><a href="javascript:void(0)" class="rounded" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Notifications"><i class="uil uil-bell align-middle"></i></a></li>
-                            <li class="list-inline-item"><a href="account-setting.html" class="rounded" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Settings"><i class="uil uil-cog align-middle"></i></a></li>
+                            <li class="list-inline-item"><a href="{{route('preference.index')}}" class="rounded" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Settings"><i class="uil uil-cog align-middle"></i></a></li>
                         </ul><!--end icon-->
                     </div><!--end col-->
                 </div><!--end row-->

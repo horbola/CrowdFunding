@@ -59,7 +59,7 @@
                                                     <div class="mb-3">
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" value="agreed" id="licenseCheckBox" name="licenseCheckBox">
-                                                            <label class="form-check-label" for="licenseCheckBox">I Accept Terms And Condition</label>
+                                                            <label class="form-check-label" for="licenseCheckBox">I Accept Terms And Conditions</label>
                                                             <!--<label class="form-check-label" for="flexCheckDefault">I Accept <a href="javasccript:void(0)" class="text-primary">Terms And Condition</a></label>-->
                                                         </div>
                                                     </div>

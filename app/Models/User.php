@@ -319,13 +319,11 @@ class User extends Authenticatable implements MustVerifyEmail
     * a common placeholder avatar.
     */
     public function avatar() {
-        if(!$this->photo)
-            return '/uploads/placeholder/avatar/common.png';
-        
-        $avatarPath = public_path().$this->photo;
-        if(file_exists($avatarPath)){
+        // use this in the live server in case, typical way of getting the public_html doesn't work.
+        // use $root in place of public_path()
+//        $root = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", "", $_SERVER['SCRIPT_FILENAME']);
+        if( $this->photo && file_exists(public_path().$this->photo) )
             return $this->photo;
-        }
         else {
             switch ($this->gender) {
                 case 'male' : return '/uploads/placeholder/avatar/boy.jpg';
@@ -527,7 +525,7 @@ class User extends Authenticatable implements MustVerifyEmail
                 case 1:
                 case 3:
                 case 4:
-                    return $aCampaign->isNotFunded();
+                    return $aCampaign->isNotFunded() && !$aCampaign->hasNoMoneyRaised();
                 default:
                     return false;
             }

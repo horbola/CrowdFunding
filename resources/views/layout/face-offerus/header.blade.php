@@ -6,10 +6,30 @@
             <a class="navbar-brand logoB" href="#"><img src="/images/logo-b.png" alt=""></a>
 
             <form class="d-flex search-fields">
-                <input class="form-control me-2" type="text" placeholder="Search..." aria-label="Search">
-                <input class="search-icon logoA" type="image" src="/images/icons/search-icon.png" alt="Submit Form" />
-                <input class="search-icon logoB" type="image" src="/images/icons/search-icon-dark.png" alt="Submit Form" />
+                <input id="search-campaign-main" name="q" type="text" class="form-control me-2 search-input" placeholder="Search...">
+                <!--<input class="search-icon logoA" type="image" src="/images/icons/search-icon.png" alt="Submit Form" />-->
+                <!--<input class="search-icon logoB" type="image" src="/images/icons/search-icon-dark.png" alt="Submit Form" />-->
+                <div  id="searchsubmit">
+                    <div class="search-icon logoA"><img src="/images/icons/search-icon.png" alt="Submit Form"/></div>
+                    <div class="search-icon logoB"><img src="/images/icons/search-icon-dark.png" alt="Submit Form"/></div>
+                </div>
             </form>
+            <style>
+                .search-input:focus {
+                    color: #333 !important;
+                }
+                .search-input {
+                    color: #333 !important;
+                }
+                #searchsubmit {
+                    order: 0;
+                    padding: 10px 20px;
+                    position: absolute;
+                    right: 10px;
+                    top: 0px;
+                }
+            </style>
+            
 
             <button class="mobile-toggle navbar-dark collapsed" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false"

@@ -352,112 +352,18 @@ class UserController extends Controller {
                 // the 'user_panel_fraction' is uploaded from user-panel blade
                 // so that after updating user information the admin can go to 
                 // the appropriate original section of user-panel.
-                return redirect('/dashboard/admin/users-panel/'.$request->user_panel_fraction.'?menuName=users')->with('success', $request->profileItem.' has been updated');
+                return redirect('/dashboard/admin/users-panel/'.$request->user_panel_fraction.'?menuName=users')->with('success', 'Profile updated');
             }
             else if( !$request->id ) {
                 // returns to client profile from this else block
-                return redirect(route('user.show', ['menuName'=> 'profile']))->with('success', $request->profileItem.' has been updated');
+//                return redirect(route('user.show', ['menuName'=> 'profile']))->with('success', $request->profileItem.' has been updated');
+                return redirect(route('user.show', ['menuName'=> 'profile']))->with('success', 'Profile updated');
             }
         }
-        return back()->with('error', 'sorry the changes you are trying to make couldn\'t be possible');
+        return back()->with('error', 'Sorry the changes you are trying to make couldn\'t be possible');
     }
     
-    private function UpdInfoValidn($request) {
-        $rules = [
-            'name' => 'string:255',
-            'birth_date' => 'date',
-            'gender' => 'string:10',
-            'phone' => 'numeric',
-            'nid' => 'numeric',
-            //'email' => 'email',
-            'facebook' => 'string:50',
-            'twitter' => 'nullable|string:50',
-            'about' => 'string:500',
-            'current_holding' => 'string:30',
-            'current_road' => 'string:30',
-            'current_post_code' => 'string:30',
-            'current_upazilla' => 'string:30',
-            'current_district' => 'string:30',
-            'current_country' => 'numeric',
-            'permanent_holding' => 'string:30',
-            'permanent_road' => 'string:30',
-            'permanent_post_code' => 'string:30',
-            'permanent_upazilla' => 'string:30',
-            'permanent_district' => 'string:30',
-            'permanent_country' => 'numeric',
-            'careof' => 'string:255',
-            'careof_phone' => 'numeric',
-        ];
-        return $request->validate($rules);
-    }
     
-    private function isUserExtraData($validated, $user) {
-        $isAvailable = isset($validated['birth_date']) ||
-        isset($validated['phone']) ||
-        isset($validated['nid']) ||
-        isset($validated['facebook']) ||
-        isset($validated['twitter']) ||
-        isset($validated['careof']) ||
-        isset($validated['careof_phone']);
-        
-        if($isAvailable){
-            $userExtra = UserExtra::firstOrNew(['user_id' => $user->id]);
-            if(isset($validated['birth_date'])) $userExtra->birth_date = $validated['birth_date'];
-            if(isset($validated['phone'])) $userExtra->phone = $validated['phone'];
-            if(isset($validated['nid'])) $userExtra->nid = $validated['nid'];
-            if(isset($validated['facebook'])) $userExtra->facebook = $validated['facebook'];
-            if(isset($validated['twitter'])) $userExtra->twitter = $validated['twitter'];
-            if(isset($validated['careof'])) $userExtra->careof = $validated['careof'];
-            if(isset($validated['careof_phone'])) $userExtra->careof_phone = $validated['careof_phone'];
-            // $userExtra->save();
-            return $userExtra;
-        }
-        return null;
-    }
-    
-    private function isCurrAddrData($validated, $user) {
-        $isAvailable = isset($validated['current_holding']) &&
-            isset($validated['current_road']) &&
-            isset($validated['current_post_code']) &&
-            isset($validated['current_upazilla']) &&
-            isset($validated['current_district']) &&
-            isset($validated['current_country']);
-        
-        if($isAvailable){
-            $currentAddress = Address::firstOrNew(['user_id' => $user->id, 'type' => 'current']);
-            if(isset($validated['current_holding'])) $currentAddress->holding = $validated['current_holding'];
-            if(isset($validated['current_road'])) $currentAddress->road = $validated['current_road'];
-            if(isset($validated['current_post_code'])) $currentAddress->post_code = $validated['current_post_code'];
-            if(isset($validated['current_upazilla'])) $currentAddress->upazilla = $validated['current_upazilla'];
-            if(isset($validated['current_district'])) $currentAddress->district = $validated['current_district'];
-            if(isset($validated['current_country'])) $currentAddress->country_id = $validated['current_country'];
-            // $currentAddress->save();
-            return $currentAddress;
-        }
-        return null;
-    }
-    
-    private function isPermAddrData($validated, $user) {
-        $isAvailable = isset($validated['permanent_holding']) &&
-            isset($validated['permanent_road']) &&
-            isset($validated['permanent_post_code']) &&
-            isset($validated['permanent_upazilla']) &&
-            isset($validated['permanent_district']) &&
-            isset($validated['permanent_country']);
-        
-        if($isAvailable){
-            $permanentAddress = Address::firstOrNew(['user_id' => $user->id, 'type' => 'permanent']);
-            if(isset($validated['permanent_holding'])) $permanentAddress->holding = $validated['permanent_holding'];
-            if(isset($validated['permanent_road'])) $permanentAddress->road = $validated['permanent_road'];
-            if(isset($validated['permanent_post_code'])) $permanentAddress->post_code = $validated['permanent_post_code'];
-            if(isset($validated['permanent_upazilla'])) $permanentAddress->upazilla = $validated['permanent_upazilla'];
-            if(isset($validated['permanent_district'])) $permanentAddress->district = $validated['permanent_district'];
-            if(isset($validated['permanent_country'])) $permanentAddress->country_id = $validated['permanent_country'];
-            // $permanentAddress->save();
-            return $permanentAddress;
-        }
-        return null;
-    }
     
     public function updatePhoto(Request $req, $id=0) {
         $user = Auth::user();
@@ -504,7 +410,7 @@ class UserController extends Controller {
 
         $user->refresh();
         if($req->hasFile('avatar')){
-            return redirect(route('user.show', ['menuName'=>'profile']))->with(['success' => $req->profileItem.' has been updated', 'user' => $user]);
+            return redirect(route('user.show', ['menuName'=>'profile']))->with(['success' => 'Profile updated', 'user' => $user]);
         }
         return back()->with('error', 'sorry the changes you are trying to make couldn\'t be possible');
     }
@@ -604,4 +510,131 @@ class UserController extends Controller {
      * admin deletes an user from database
      */
     public function destroy() {}
+    
+    
+    
+    private function UpdInfoValidn($request) {
+        $rules = [
+            'name' => 'string:30',
+            'birth_date' => 'date',
+            'gender' => 'string:10',
+            'phone' => 'string',
+            'nid' => 'unique:user_extras|numeric',
+            //'email' => 'email',
+            'facebook' => 'string:50',
+            'twitter' => 'nullable|string:50',
+            'about' => 'string:500',
+            'current_holding' => 'string:30',
+            'current_road' => 'string:30',
+            'current_post_code' => 'string:30',
+            'current_upazilla' => 'string:30',
+            'current_district' => 'string:30',
+            'current_country' => 'numeric',
+            'permanent_holding' => 'string:30',
+            'permanent_road' => 'string:30',
+            'permanent_post_code' => 'string:30',
+            'permanent_upazilla' => 'string:30',
+            'permanent_district' => 'string:30',
+            'permanent_country' => 'numeric',
+            'careof' => 'string:255',
+            'careof_phone' => 'string',
+        ];
+        return $request->validate($rules, $this->UpdInfoValidnMsg());
+    }
+    
+    private function UpdInfoValidnMsg() {
+        return $validnMsg = [
+            'name.string' => 'Name should be in characters and must be within 30 characters',
+            'birth_date.date' => 'Birth date should look like a date',
+            'gender.string' => 'Gender code should be placed here',
+            'phone.numeric' => 'Input your phone number in digits',
+            'nid.numeric' => 'Input your NID number in digits',
+            'nid.unique' => 'You must provide your nid number. Please provide only your own nid number',
+            'facebook.string' => 'Facebook address is in characters',
+            'twitter.string' => 'Twitter address is in characters',
+            'about.string' => 'To write about yourself use only characters and numbers (if needed)',
+            'current_holding.string' => 'Your current holding name can be in only numbers and characters',
+            'current_road.string' => 'Your current road can be in only numbers and characters',
+            'current_post_code.string' => 'Your current post code can be in only numbers and characters',
+            'current_upazilla.string' => 'Your current upazila name can be in only numbers and characters',
+            'current_district.string' => 'Your current district can be in only numbers and characters',
+            'current_country.numeric' => 'Select your country',
+            'permanent_holding.string' => 'Your permanent holding name can be in only numbers and characters',
+            'permanent_road.string' => 'Your permanent road can be in only numbers and characters',
+            'permanent_post_code.string' => 'Your permanent post code can be in only numbers and characters',
+            'permanent_upazilla.string' => 'Your permanent upazila name can be in only numbers and characters',
+            'permanent_district.string' => 'Your permanent district can be in only numbers and characters',
+            'permanent_country.numeric' => 'Select your permanent country',
+            'cateof.string' => 'Name of the person who is at your care, must be in characters',
+            'cateof_phone.numeric' => 'Phone number of the person who is st your care, must be in digits',
+        ];
+    }
+    
+    private function isUserExtraData($validated, $user) {
+        $isAvailable = isset($validated['birth_date']) ||
+        isset($validated['phone']) ||
+        isset($validated['nid']) ||
+        isset($validated['facebook']) ||
+        isset($validated['twitter']) ||
+        isset($validated['careof']) ||
+        isset($validated['careof_phone']);
+        
+        if($isAvailable){
+            $userExtra = UserExtra::firstOrNew(['user_id' => $user->id]);
+            if(isset($validated['birth_date'])) $userExtra->birth_date = $validated['birth_date'];
+            if(isset($validated['phone'])) $userExtra->phone = $validated['phone'];
+            if(isset($validated['nid'])) $userExtra->nid = $validated['nid'];
+            if(isset($validated['facebook'])) $userExtra->facebook = $validated['facebook'];
+            if(isset($validated['twitter'])) $userExtra->twitter = $validated['twitter'];
+            if(isset($validated['careof'])) $userExtra->careof = $validated['careof'];
+            if(isset($validated['careof_phone'])) $userExtra->careof_phone = $validated['careof_phone'];
+            // $userExtra->save();
+            return $userExtra;
+        }
+        return null;
+    }
+    
+    private function isCurrAddrData($validated, $user) {
+        $isAvailable = isset($validated['current_holding']) &&
+            isset($validated['current_road']) &&
+            isset($validated['current_post_code']) &&
+            isset($validated['current_upazilla']) &&
+            isset($validated['current_district']) &&
+            isset($validated['current_country']);
+        
+        if($isAvailable){
+            $currentAddress = Address::firstOrNew(['user_id' => $user->id, 'type' => 'current']);
+            if(isset($validated['current_holding'])) $currentAddress->holding = $validated['current_holding'];
+            if(isset($validated['current_road'])) $currentAddress->road = $validated['current_road'];
+            if(isset($validated['current_post_code'])) $currentAddress->post_code = $validated['current_post_code'];
+            if(isset($validated['current_upazilla'])) $currentAddress->upazilla = $validated['current_upazilla'];
+            if(isset($validated['current_district'])) $currentAddress->district = $validated['current_district'];
+            if(isset($validated['current_country'])) $currentAddress->country_id = $validated['current_country'];
+            // $currentAddress->save();
+            return $currentAddress;
+        }
+        return null;
+    }
+    
+    private function isPermAddrData($validated, $user) {
+        $isAvailable = isset($validated['permanent_holding']) &&
+            isset($validated['permanent_road']) &&
+            isset($validated['permanent_post_code']) &&
+            isset($validated['permanent_upazilla']) &&
+            isset($validated['permanent_district']) &&
+            isset($validated['permanent_country']);
+        
+        if($isAvailable){
+            $permanentAddress = Address::firstOrNew(['user_id' => $user->id, 'type' => 'permanent']);
+            if(isset($validated['permanent_holding'])) $permanentAddress->holding = $validated['permanent_holding'];
+            if(isset($validated['permanent_road'])) $permanentAddress->road = $validated['permanent_road'];
+            if(isset($validated['permanent_post_code'])) $permanentAddress->post_code = $validated['permanent_post_code'];
+            if(isset($validated['permanent_upazilla'])) $permanentAddress->upazilla = $validated['permanent_upazilla'];
+            if(isset($validated['permanent_district'])) $permanentAddress->district = $validated['permanent_district'];
+            if(isset($validated['permanent_country'])) $permanentAddress->country_id = $validated['permanent_country'];
+            // $permanentAddress->save();
+            return $permanentAddress;
+        }
+        return null;
+    }
 }

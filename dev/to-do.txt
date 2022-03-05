@@ -1,0 +1,20 @@
+
+
+
+searchbar rendering (header)
+button color (#2eb396)
+avatar
+social login
+actual payment gateway
+blogging system
+checking up input validation
+
+error msg relevancy
+load more (find further)
+
+
+document image size configuration
+related camp link
+block and malicious button removal from volunteer request page in admin panel
+time correction
+total requested amount exceeded the total raised amount

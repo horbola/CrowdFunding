@@ -11,6 +11,8 @@
     <!--<title>{{ config('app.name', 'Oporajoy Crowd Funding') }}</title>-->
     <title>{{ $title?? '' }}</title>
     
+    @yield('og')
+    
     <!-- icons -->
     <link href="{{ asset('images/logo-b.png') }}" rel="shortcut icon">
     <link href="{{ asset('css/materialdesignicons.min.css') }}" rel="stylesheet" type="text/css" />
@@ -62,41 +64,11 @@
 <div id="app">
     @include('layout.face.header-offer-land')
     <main>
-        <section id="search-panel">
-            <div class="container">
-                <div class="row position-relative">
-                    <div class="col-12 text-center">
-                        <div class="search-content d-none position-absolute"></div>
-                        <style>
-                            #search-panel .search-content {
-                                top: 0;
-                                left: 0;
-                                z-index: 100;
-                                width: 100%;
-                                background-color: #FFF;
-                                padding: 20px;
-                                max-height: 400px;
-                                overflow-y: scroll;
-                                margin-top: 100px;
-                                margin-bottom: 20px;
-                                border: 1px solid red;
-                            }
-                        </style>
-                        <script>
-//                            $(document).click(function(){
-//                                $('#search-panel .search-content').removeClass('d-block').addClass('d-none');
-//                            });
-                            $(function(){
-                                $('#search-panel .searchNext').text('lajsd');
-                            });
-                        </script>
-                    </div>
-                </div>
-            </div>
-        </section>
+        @include('partial.search-panel')
         @yield('content')
     </main><!-- end main content -->
     @include('layout.face-offerus.footer')
+    @include('partial.search-script')
     <!-- Back to top -->
     <a href="#" onclick="topFunction()" id="back-to-top" class="btn btn-icon btn-primary back-to-top"><i data-feather="arrow-up" class="icons"></i></a>
 </div><!-- end app -->

@@ -23,7 +23,7 @@
                 <td>{{$item->paid_amount}}</td>
                 <td>{{$item->block_msg}}</td>
                 <td>
-                    <a href="{{route('campaign.showGuestCampaign', ['campaignId' => $item->campaign_id, 'user_panel_fraction' => Request::segment(4)])}}">View</a>
+                    <a href="{{route('campaign.showGuestCampaign', ['campaignSlug' => $item->campaign->slug, 'user_panel_fraction' => Request::segment(4)])}}">View</a>
                 </td>
             </tr>
             @endforeach

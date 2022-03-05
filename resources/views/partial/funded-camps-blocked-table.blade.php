@@ -3,7 +3,6 @@
         <thead>
             <tr>
                 <th>Serial</th>
-                <th>Image</th>
                 <th>Title</th>
                 <th>Raised</th>
                 <th>Paid</th>
@@ -16,19 +15,17 @@
             <tr>
                 @php $serial++ @endphp
                 <td>{{$serial}}</td>
-                <td>$item->image</td>
                 <td>{{$item->title}}</td>
                 <td>{{$item->totalSuccessfulDonation()}}</td>
                 <td>{{$item->totalPaidFund()}}</td>
                 <td>
-                    <a href="{{route('campaign.showGuestCampaign', ['campaignId' => $item->id])}}">View</a>
+                    <a href="{{route('campaign.showGuestCampaign', ['campaignSlug' => $item->slug])}}">View</a>
                 </td>
             </tr>
             @endforeach
         </tbody>
         <tfoot>
             <tr>
-                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>

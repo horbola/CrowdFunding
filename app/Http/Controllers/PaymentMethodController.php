@@ -20,6 +20,19 @@ class PaymentMethodController extends Controller{
         $stored = null;
         Auth::user()->makeAllPayMethPast();
         if($request->pay_meth_type && strtolower($request->pay_meth_type) === 'bank'){
+            $rules = [
+                'user_id' => 'integer:30',
+                'bank_name' => 'string:30',
+                'bank_swift_code' => 'nullable|string:30', 
+                'branch_name' => 'string:30', 
+                'branch_swift_code' => 'nullable|string:30',
+                'owner_name' => 'string:30',
+                'owner_nid' => 'string:30',
+                'acc_number' => 'integer:30',
+                'status' => 'integer:1', 
+            ];
+            $request->validate($rules);
+            
             $stored = Bank::create([
                'user_id' => Auth::user()->id,
                'bank_name' => $request->bank_name,
@@ -33,6 +46,16 @@ class PaymentMethodController extends Controller{
             ]);
         }
         else if($request->pay_meth_type && strtolower($request->pay_meth_type) === 'mobile-bank') {
+            $rules = [
+                'user_id' => 'integer:30',
+                'brand_name' => 'string:30',
+                'mobile_number' => 'string:30',
+                'owner_name' => 'string:30',
+                'owner_nid' => 'string:30',
+                'status' => 'integer:1',
+            ];
+            $request->validate($rules);
+            
             $stored = MobileBank::create([
                 'user_id' => Auth::user()->id,
                 'brand_name' => $request->brand_name,

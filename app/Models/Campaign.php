@@ -178,6 +178,26 @@ class Campaign extends Model
     }
     
     /*
+     * finds all the donations for this campaign
+     */
+    public function donationsLimit() {
+        return $this->donations()
+                ->orderBy('created_at','DESC')
+                ->skip(0)
+                ->take(100);
+    }
+    
+    /*
+     * finds all the donations for this campaign which raised money isn't zero.
+     */
+    public function donationsLimitFilteredZero() {
+        // iterates through all donations for this campaign.
+        return $this->donationsLimit->reject(function($aDonation){
+            return !$aDonation->totalPayableAmount();
+        });
+    }
+    
+    /*
      * finds all the donations of a single user for this campaign
      */
     public function donationsSingleUser($donorId) {
@@ -303,9 +323,25 @@ class Campaign extends Model
         return $partly;
     }
     
+    /**
+     * 
+     * @return type Boolean
+     * 
+     * if totalPaidFund() is 0, then, it's not included.
+     */
     public function isNotFunded() {
-//        return $this->totalPaidFund() === 0.00;
         return !$this->totalPaidFund() && !$this->isFundingBlocked() && !$this->isPending();
+    }
+    
+    
+    /**
+     * 
+     * @return type Boolean
+     * 
+     * determines if total raised money is zero or not.
+     */
+    public function hasNoMoneyRaised() {
+        return !$this->totalSuccessfulDonation() || $this->totalSuccessfulDonation() === 0;
     }
     
     
@@ -366,7 +402,7 @@ class Campaign extends Model
         // seconds/minute*minutes/hour*hours/day)
         $days = floor($diff/(60*60*24));
         
-        if($this->status === 1){
+        if( (int)$this->status === 1 ){
             if($days >= 0) {
                 switch ($days) {
                     case 0:
@@ -388,20 +424,37 @@ class Campaign extends Model
         return $days;
     }
     
+    /*
+     * if a campaign is active then the days number should be shown.
+     * else if the campaign is not active but status is 1, that means
+     * it's ended by goal achieved, then the status should be 'Completed'.
+     * and in any other case campaign status would be as to the status code
+     * in the database literally.
+     */
+    public function completionStatus(){
+        if ($this->isActive()){
+            return $this->daysLeft();
+        }
+        else if ( (int)$this->status === 1 ){
+            return 'Completed';
+        }
+        else return Helper::decodeStatus($this->status);
+    }
+    
     public function isActive() {
         // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
-        if($this->status !== 1){
+        if( (int)$this->status !== 1 ){
             return false;
         }
             
         // 0:ends-by-date, 1:ends-by-goal
-        if ($this->end_method == 0){
-            if (Carbon::today()->toDateString() < $this->end_date){
-                return true;
-            }
-        }elseif ($this->end_method == 1){
+        if ( (int)$this->end_method == 0 ){
             $raised = $this->totalSuccessfulDonation();
             if ($raised <= $this->goal){
+                return true;
+            }
+        }elseif ( (int)$this->end_method == 1 ){
+            if (Carbon::today()->toDateString() < $this->end_date){
                 return true;
             }
         }
@@ -411,16 +464,16 @@ class Campaign extends Model
     
     public function isCompleted() {
         // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
-        if($this->status !== 1){
+        if( (int)$this->status !== 1 ){
             return false;
         }
         
         // 0:ends-by-date, 1:ends-by-goal
-        if ($this->end_method == 0){
+        if ( (int)$this->end_method == 0 ){
             if (Carbon::today()->toDateString() > $this->end_date){
                 return true;
             }
-        }elseif ($this->end_method == 1){
+        }elseif ( (int)$this->end_method == 1 ){
             $raised = $this->totalSuccessfulDonation();
             if ($raised > $this->goal){
                 return true;

@@ -1,6 +1,6 @@
 <!-- === founder === -->
 <section class="container-fluid founder-area position-relative">
-    <div class="container founder-container">
+    <div class="container">
         <div class="row">
             <div class="col-lg-6 col-xl-5 py-50">
                 <div class="heading">

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
@@ -46,6 +48,11 @@ class CampaignController extends Controller {
         $categories = Category::all();
         $categoryId = $request->categoryId ? $request->categoryId : 0;
         $active = $categoryId;
+        $title = 'Oporajoy (Campaign List)';
+        
+        if($categoryId){
+            $title = $title . ' - ' . Category::find($categoryId)->category_name;
+        }
         
         $campaigns = Campaign::where('category_id', $categoryId)->paginate(15);
         if(request()->searching){
@@ -57,7 +64,7 @@ class CampaignController extends Controller {
         });
         $campaigns->setCollection($campsCollect);
 
-        return view('face.camp-master', compact('categories', 'active', 'campaigns'));
+        return view('face.camp-master', compact('categories', 'active', 'campaigns', 'title'));
     }
     
    
@@ -65,9 +72,10 @@ class CampaignController extends Controller {
      * shows a campaign on the basis of it's id which is provided by the master page.
      * it records each show before showing.
      */
-    public function showGuestCampaign($campaignId){
+    public function showGuestCampaign($campaignSlug){
         session(['adminCampaignsUrl' => URL::previous()]);
-        $campaign = Campaign::find($campaignId);
+        $campaign = Campaign::where('slug', $campaignSlug)->first();
+        $title = 'Oporajoy - ' . $campaign->title;
         if($campaign){
             // every show of any campaign is recoreded by this portion.
             // but recorded only if the visitor is logged in and not campaign creator himself.
@@ -79,10 +87,10 @@ class CampaignController extends Controller {
                 View::create($data);
             }
             
-            return view('face.camp-offerus', compact('campaign'));
+            return view('face.camp-offerus', compact('campaign', 'title'));
         }
         else {
-            return view('face.camp-not-found');
+            return view('face.camp-not-found', 'title');
         }
     }
     
@@ -588,55 +596,15 @@ class CampaignController extends Controller {
         if($isAnyCampPending)
             return back()->with('error', 'Sorry! you cannot create another campaign while you have a campaign already pending.');
         
-        $rules = [
-            'title' => 'required|string:255',
-            'category' => 'required|numeric',
-            'short_description' => 'required|string:400',
-            'description' => 'required|string',
-            'feature_image' => 'required|file',
-            'album' => 'array',
-            'documents' => 'required|array',
-            // 'feature_video' => 'required|file',
-            'goal' => 'required|numeric',
-            'end_method' => 'required|numeric',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-            'min_amount' => 'numeric',
-            'max_amount' => 'numeric',
-            'recommended_amount' => 'numeric',
-            'amount_prefilled' => 'string:255',
-        ];
-        $this->validate($request, $rules);
+        $this->validate($request, $this->createCampValidn(), $this->createCampValidnMsg());
 
         $user_id = Auth::user()->id;
         $slug = Helper::unique_slug($request->title);
         
         if($preview) $status = -1;
         else $status = 0;
-        $data = [
-            'user_id' => $user_id,
-            'category_id' => $request->category,
-            
-            'slug' => $slug,
-            'title' => $request->title,
-            'short_description' => $request->short_description,
-            'description' => $request->description,
-            'feature_image' => $this->storeImage($request),
-            // 'feature_video' => $request->video,
-            
-            'goal' => $request->goal,
-            // 0:ends-by-date, 1:ends-by-goal
-            'end_method' => $request->end_method,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'min_amount' => $request->min_amount,
-            'max_amount' => $request->max_amount,
-            'recommended_amount' => $request->recommended_amount,
-            'amount_prefilled' => $request->amount_prefilled,
-            
-            'status' => $status,
-        ];
-        $create = Campaign::create($data);
+        
+        $create = Campaign::create( $this->createCampData($request, $user_id, $slug, $status) );
         // if any image for supplimenting feature image to this campaign
         // those are uploaded by this method
         if ($request->hasFile('album')) {
@@ -650,7 +618,7 @@ class CampaignController extends Controller {
 
         if ($create) {
             // if($preview) session (['previewedId' => $created->id]);
-            return redirect(route('campaign.showGuestCampaign', $create->id));
+            return redirect(route('campaign.showGuestCampaign', $create->slug));
         }
         return back()->with('error', trans('app.something_went_wrong'))->withInput($request->input());
     }
@@ -675,7 +643,7 @@ class CampaignController extends Controller {
             mkdir($featureImageFullPath, 0777, true);
         }
         
-        $resized = Image::make($image)->resize(300, null, function ($constraint) {
+        $resized = Image::make($image)->resize(730, null, function ($constraint) {
             $constraint->aspectRatio();
         });
         
@@ -710,48 +678,12 @@ class CampaignController extends Controller {
     }
     
     public function update(Request $request, $campaignId) {
-        $rules = [
-            'title' => 'string',
-            'category' => 'numeric',
-            'short_description' => 'string',
-            'description' => 'string',
-            'feature_image' => 'file',
-            'album' => 'array',
-            'documents' => 'array',
-            // 'feature_video' => 'required|file',
-            'goal' => 'numeric',
-            'end_method' => 'numeric',
-            'start_date' => 'date',
-            'end_date' => 'date',
-            'min_amount' => 'numeric',
-            'max_amount' => 'numeric',
-            'recommended_amount' => 'numeric',
-            'amount_prefilled' => 'string',
-        ];
-        $this->validate($request, $rules);
-        
-        $campaign = Campaign::find($campaignId);
-        
-        $slug = Helper::unique_slug($request->title);
-        
-        $campaign->category_id = $request->category;
-        // $campaign->country_id = $request->country_id;
-        
-        $campaign->title = $request->title;
-        $campaign->slug = $slug;
-        $campaign->short_description = $request->short_description;
-        $campaign->description = $request->description;
-        $campaign->feature_image = $this->updateImage($request, $campaign);
-        $campaign->feature_video = $request->video;
+        $this->validate($request, $this->updateCampValidn(), $this->updateCampValidnMsg());
 
-        $campaign->goal = $request->goal;
-        $campaign->end_method = $request->end_method;
-        $campaign->start_date = $request->start_date;
-        $campaign->end_date = $request->end_date;
-        $campaign->min_amount = $request->min_amount;
-        $campaign->max_amount = $request->max_amount;
-        $campaign->recommended_amount = $request->recommended_amount;
-        $campaign->amount_prefilled = $request->amount_prefilled;
+        $campaign = Campaign::find($campaignId);
+        $slug = Helper::unique_slug($request->title);
+         
+        $this->updateCampData($request, $campaign, $slug);
         
         $updated = $campaign->update();
         // if any image for supplimenting feature image to this campaign
@@ -768,10 +700,19 @@ class CampaignController extends Controller {
         if ($updated) {
 //            session(['approving' => 'true']);
 //            $request->request->add(['editing' => 'yes']);
-            return redirect(route('campaign.showGuestCampaign', ['campaignId' => $campaignId, 'editing' => 'true']));
+            return redirect(route('campaign.showGuestCampaign', ['campaignSlug' => $campaign->slug, 'editing' => 'true']));
 //            return redirect()->back()->with(['success' => trans('app.campaign_created'), 'editing' => 'yes']);
         }
         return back()->with('error', trans('app.something_went_wrong'))->withInput($request->input());
+    }
+    
+    public function updateDes(Request $request, $campId) {
+        $camp = Campaign::find($campId);
+        if($request->description){
+            $camp->description = $request->description;
+            $camp->update();
+        }
+        return $camp->description;
     }
     
     private function updateImage($request, $campaign) {
@@ -1058,5 +999,156 @@ class CampaignController extends Controller {
         }
     }
     
+    private function escape($string) {
+        $str = str_replace('\'', '\\\'', $string); // Replaces all spaces with backslash + single qoute.
+        return $str;
+//        return preg_replace('/[^A-Za-z0-9\-]/', '', $str);
+//        return preg_replace('[^A-Za-z0-9.#\-$]', '', $str);
+    }
+    
+    
+    // --------------- validation rules functions -----------------------------------
+    private function createCampValidn() {
+        return $rules = [
+            'title' => 'required|string:255',
+            'category' => 'required|numeric',
+            'short_description' => 'required|string:500',
+//            'description' => 'nullable|string:5000',
+            'feature_image' => 'required|file',
+//            'feature_image' => 'mimes:jpeg,jpg,png',
+            'album' => 'array',
+//            'album' => 'nullable|mimes:jpeg,jpg,png',
+            'documents' => 'array',
+//            'documents' => 'nullable|mimes:jpeg,jpg,png',
+            // 'feature_video' => 'required|file',
+            'goal' => 'required|numeric',
+            'end_method' => 'required|numeric',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'min_amount' => 'nullable|numeric',
+            'max_amount' => 'nullable|numeric',
+            'recommended_amount' => 'nullable|numeric',
+            'amount_prefilled' => 'nullable|string:255',
+        ];
+    }
+    
+    private function createCampValidnMsg() {
+        return $msg = [
+            'title.required' => 'You didn\'t provide this campaign with a title',
+            'title.string' => 'The title should be in text. You may have put some invalid characters',
+            'category.required' => 'You didn\'t select a category',
+            'category.numeric' => 'You didn\'t select a category',
+            'short_description.required' => 'You didn\'t provide this campaign with a short description. Don\'t leave it empty',
+            'short_description.string' => 'Write this short description with text. Don\'t put any file or others in this',
+            'feature_image.required' => 'You didn\'t set a feature image. Don\'t leave it empty',
+            'goal.required' => 'You didn\'t set a goal. Don\'t leave it empty',
+            'goal.numeric' => 'You can put just number in setting a goal.',
+            'end_method.required' => 'You didn\'t decide what end method should be. Don\'t leave it empty',
+            'end_method.numeric' => 'You did\'t select any end method.',
+            'start_date.required' => 'You didn\'t set when this campaign will start. Please Select a date',
+            'start_date.date' => 'The input you\ve entered isn\'t a date. Please Select a date',
+            'end_date.required' => 'You didn\'t set when this campaign will end. Please Select a date',
+            'end_date.date' => 'The input you\ve entered isn\'t a date. Please Select a date',
+            'min_amount.numeric' => 'You can put just number in setting a minimum amount.',
+            'max_amount.numeric' => 'You can put just number in setting a maximum amount.',
+            'recommended_amount.numeric' => 'You can put just number in setting recommended amount.',
+            'amount_prefilled.string' => 'Write these numbers separating by commas.',
+        ];
+    }
+    
+    private function createCampData($request, $user_id, $slug, $status) {
+        return $data = [
+            'user_id' => $user_id,
+            'category_id' => $request->category,
+            
+            'slug' => $slug,
+            'title' => $request->title,
+            'short_description' => $request->short_description,
+            'description' => ($request->description == null || $request->description == '') ? '' : $request->description,
+//            'description' => ($request->description == null || $request->description == '') ? 'There\'s no description yet. You can easily edit this campaign to add a nice description with some pretty images' : $request->description,
+            'feature_image' => $this->storeImage($request),
+            // 'feature_video' => $request->video,
+            
+            'goal' => $request->goal,
+            // 0:ends-by-date, 1:ends-by-goal
+            'end_method' => $request->end_method,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'min_amount' => $request->min_amount,
+            'max_amount' => $request->max_amount,
+            'recommended_amount' => $request->recommended_amount,
+            'amount_prefilled' => $request->amount_prefilled,
+            
+            'status' => $status,
+        ];
+    }
+    
+    private function updateCampValidn() {
+        return $rules = [
+            'title' => 'string:255',
+            'category' => 'numeric',
+            'short_description' => 'string:500',
+            'description' => 'string:5000',
+            'feature_image' => 'file',
+            'album' => 'array',
+//            'album' => 'nullable|mimes:jpeg,jpg,png',
+            'documents' => 'array',
+//            'documents' => 'nullable|mimes:jpeg,jpg,png',
+            // 'feature_video' => 'required|file',
+            'goal' => 'numeric',
+            'end_method' => 'numeric',
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'min_amount' => 'numeric',
+            'max_amount' => 'numeric',
+            'recommended_amount' => 'numeric',
+            'amount_prefilled' => 'string',
+        ];
+    }
+    
+    private function updateCampValidnMsg() {
+        return $msg = [
+            'title.required' => 'You didn\'t provide this campaign with a title',
+            'title.string' => 'The title should be in text. You may have put some invalid characters',
+            'category.required' => 'You didn\'t select a category',
+            'category.numeric' => 'You didn\'t select a category',
+            'short_description.required' => 'You didn\'t provide this campaign with a short description. Don\'t leave it empty',
+            'short_description.string' => 'Write this short description with text. Don\'t put any file or others in this',
+            'feature_image.required' => 'You didn\'t set a feature image. Don\'t leave it empty',
+            'goal.required' => 'You didn\'t set a goal. Don\'t leave it empty',
+            'goal.numeric' => 'You can put just number in setting a goal.',
+            'end_method.required' => 'You didn\'t decide what end method should be. Don\'t leave it empty',
+            'end_method.numeric' => 'You did\'t select any end method.',
+            'start_date.required' => 'You didn\'t set when this campaign will start. Please Select a date',
+            'start_date.date' => 'The input you\ve entered isn\'t a date. Please Select a date',
+            'end_date.required' => 'You didn\'t set when this campaign will end. Please Select a date',
+            'end_date.date' => 'The input you\ve entered isn\'t a date. Please Select a date',
+            'min_amount.numeric' => 'You can put just number in setting a minimum amount.',
+            'max_amount.numeric' => 'You can put just number in setting a maximum amount.',
+            'recommended_amount.numeric' => 'You can put just number in setting recommended amount.',
+            'amount_prefilled.string' => 'Write these numbers separating by commas.',
+        ];
+    }
+    
+    private function updateCampData($request, $campaign, $slug) {
+        $campaign->category_id = $request->category;
+        // $campaign->country_id = $request->country_id;
+        $campaign->title = $request->title;
+        $campaign->slug = $slug;
+        $campaign->short_description = $request->short_description;
+        $campaign->description = $request->description;
+        $campaign->feature_image = $this->updateImage($request, $campaign);
+        $campaign->feature_video = $request->video;
+
+        $campaign->goal = $request->goal;
+        $campaign->end_method = $request->end_method;
+        $campaign->start_date = $request->start_date;
+        $campaign->end_date = $request->end_date;
+        $campaign->min_amount = $request->min_amount;
+        $campaign->max_amount = $request->max_amount;
+        $campaign->recommended_amount = $request->recommended_amount;
+        $campaign->amount_prefilled = $request->amount_prefilled;
+    }
+        
 
 }

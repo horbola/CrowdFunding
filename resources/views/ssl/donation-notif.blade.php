@@ -21,8 +21,8 @@
                     <p class="alert alert-info">{{ $cancel }}</p>
                     @endif
                     
-                    @if ( isset($campaignId) )
-                    <p>Go back to the <a href="{{ route('campaign.showGuestCampaign', $campaignId) }}">campaign</a> where you were donating for</p>
+                    @if ( isset($campaignSlug) )
+                    <p>Go back to the <a href="{{ route('campaign.showGuestCampaign', $campaignSlug) }}">campaign</a> where you were donating for</p>
                     @endif
                     
                     <p>If you see yourself logged out, you can log in again after being redirected.</p>

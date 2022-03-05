@@ -5,13 +5,10 @@
             <thead>
                 <tr>
                     <th>Serial</th>
-                    <th>Image</th>
                     <th>Title</th>
                     <th>Raised</th>
                     <th>Paid</th>
-                    @if(isset($partly))
                     <th>Residual</th>
-                    @endif
                     <th>View Campaign</th>
                     <th>Include to withdraw request</th>
                     <th>Request Amount</th>
@@ -23,14 +20,11 @@
                     <tr>
                         @php $serial++ @endphp
                         <td>{{$serial}}</td>
-                        <td>$item->image</td>
                         <td>{{$item->title}}</td>
                         <td id="raised-fund">{{$item->totalSuccessfulDonation()}}</td>
                         <td>{{$item->totalPaidFund()}}</td>
-                        @if(isset($partly))
                         <td id="residual-fund">{{$item->totalSuccessfulDonation() - $item->totalPaidFund()}}</td>
-                        @endif
-                        <td><a href="{{route('campaign.showGuestCampaign', ['campaignId' => $item->id, 'user_panel_fraction' => Request::segment(4)])}}">View</a></td>
+                        <td><a href="{{route('campaign.showGuestCampaign', ['campaignSlug' => $item->slug, 'user_panel_fraction' => Request::segment(4)])}}">View</a></td>
                         <td>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="request_check" onclick="fillReqAmount(this);">
@@ -72,9 +66,6 @@
                     <th></th>
                     <th></th>
                     <th></th>
-                    @if(isset($partly))
-                    <th></th>
-                    @endif
                     <th></th>
                     <th></th>
                     <th><button type="button" class="btn btn-primary" onclick="submitData(this);" {{ !$not->count() ? 'disabled' : '' }}>Withdraw</button></th>

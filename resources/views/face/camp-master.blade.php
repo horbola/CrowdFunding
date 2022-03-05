@@ -1,6 +1,7 @@
 @extends('layout.face.skel')
 
 
+
 @section('content')
 <section class="pb-0 bg-light d-table w-100 overflow-hidden border border-2" style="background: url('/images/shapes/shape2.png') top; z-index: 0; margin-top: 90px;">
     <div class="container">

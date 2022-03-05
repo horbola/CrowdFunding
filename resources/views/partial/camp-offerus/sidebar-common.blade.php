@@ -1,4 +1,4 @@
-<div class="section-444 d-flex justify-content-between">
+<div class="section-444 d-flex justify-content-between position-relative">
     @php
         use App\Library\Helper;
     @endphp
@@ -11,16 +11,14 @@
         <img class="img-fluid verimg" src="/images/verify.png" alt=""> Not Verified
     </p>
     @endif
-    <p>
-        <img class="img-fluid verimg" src="/images/icons/share.png" alt=""> Share
-    </p>
+    @include('partial.camp-offerus.share-btns')
 </div>
 <div class="section-445 d-flex justify-content-between">
     <p>
-        <i class="fas fa-clock" aria-hidden="true"></i> {{$campaign->daysLeft()}}
+        <i class="fas fa-clock" aria-hidden="true"></i> {{$campaign->completionStatus()}}
     </p>
     <p>
-        <i class="fas fa-user" aria-hidden="true"></i> {{$campaign->donorsCount()}} donors
+        <i class="fas fa-user" aria-hidden="true"></i> {{$campaign->donationsLimitFilteredZero()->count()}} donors
     </p>
 </div>
 
@@ -49,8 +47,20 @@
 
 <div class="section-447">
     <form action="{{route('donation.createDialogues')}}" method="get">
+        @method('get')
         @csrf
-        <input class="donation-amount" type="number" name="amount" placeholder="2000.00 tk" required>
+        <div class="donation-amount-block position-relative">
+            <span>Tk.</span>
+            <input class="donation-amount" type="number" name="amount" placeholder="2000.00" required>
+            <style>
+                .donation-amount-block span {
+                    position: absolute;
+                    top: 11px;
+                    left: 20px;
+                    color: #fff;
+                }
+            </style>
+        </div>
         <div class="btns-holder">
             <div class="d-flex justify-content-between">
                 @foreach($campaign->parseAmountPrefilled() as $amount)
@@ -60,7 +70,7 @@
                     function enterAmount(thiss){
                         $(thiss).siblings().css('box-shadow', 'none');
                         $(thiss).css('box-shadow', '1px 1px 2px 2px rgba(0, 0, 0, 0.15)');
-                        $(thiss).closest('form').find('input[name=amount]').val($(thiss).text()).focus();
+                        $(thiss).closest('form').find('.donation-amount').val( $(thiss).text().trim() ).focus();
                     }
                 </script>
             </div>

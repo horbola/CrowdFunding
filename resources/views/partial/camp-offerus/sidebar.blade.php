@@ -10,7 +10,12 @@
             </div>
             <div class="pInfo d-flex align-items-center">
                 <div>
-                    <p class="name">{{ $campaign->campaigner->name }} <img class="verimg" src="/images/verify.png" alt=""></p>
+                    <p class="name">
+                        {{ $campaign->campaigner->name }}
+                        @if( $campaign->campaigner->isVolunteer() )
+                            <img class="verimg" src="/images/verify.png" alt="">
+                        @endif
+                    </p>
                     <p class="title">Organizing this Fundraiser</p>
                 </div>
             </div>

@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use App\Models\Campaign;
 use App\Models\Donation;
 use App\Models\Payment;
+use App\Models\Country;
 
 use App\Mail\Donation as DonationMail;
 
@@ -28,63 +30,88 @@ class SslCommerzPaymentController extends Controller
         return view('ssl.exampleHosted');
     }
 
-    public function index(Request $request)
-    {
+    public function index(Request $request){
         # Here you have to receive all the order data to initate the payment.
         # Let's say, your oder transaction informations are saving in a table called "orders"
-        # In "orders" table, order unique identity is "transaction_id". "status" field contain status of the transaction, "amount" is the order amount to be paid and "currency" is for storing Site Currency which will be checked with paid currency.
+        # In "orders" table, order unique identity is "transaction_id". "status" field contain
+        # status of the transaction, "amount" is the order amount to be paid and "currency" is
+        # for storing Site Currency which will be checked with paid currency.
 
+        $user = Auth::user();
+        $userExtra = $user->userExtra;
+        $address = $user->currentAddress();
+        $country = $address? Country::find($address->country_id) : null;
+        $campaign = Campaign::find($request->campaign_id);
+        
         $post_data = array();
-        $post_data['total_amount'] = '10'; # You cant not pay less than 10
+        $post_data['total_amount'] = $request->amount; # You cant not pay less than 10
         $post_data['currency'] = "BDT";
         $post_data['tran_id'] = uniqid(); // tran_id must be unique
 
         # CUSTOMER INFORMATION
-        $post_data['cus_name'] = 'Customer Name';
-        $post_data['cus_email'] = 'customer@mail.com';
-        $post_data['cus_add1'] = 'Customer Address';
+        $post_data['cus_name'] = $user->name;
+        $post_data['cus_email'] = $user->email;
+        $post_data['cus_add1'] = $address? $address->toString() : 'No Address is Provided';
         $post_data['cus_add2'] = "";
-        $post_data['cus_city'] = "";
-        $post_data['cus_state'] = "";
+        $post_data['cus_city'] = $address? $address->upazilla : 'No Address is Provided';
+        $post_data['cus_state'] = $address? $address->division : 'No Address is Provided';
         $post_data['cus_postcode'] = "";
-        $post_data['cus_country'] = "Bangladesh";
-        $post_data['cus_phone'] = '8801XXXXXXXXX';
+        $post_data['cus_country'] = $country? $country->nicename : 'No Address is Provided';
+        $post_data['cus_phone'] = $userExtra->phone;
         $post_data['cus_fax'] = "";
-
+        
         # SHIPMENT INFORMATION
-        $post_data['ship_name'] = "Store Test";
-        $post_data['ship_add1'] = "Dhaka";
-        $post_data['ship_add2'] = "Dhaka";
-        $post_data['ship_city'] = "Dhaka";
-        $post_data['ship_state'] = "Dhaka";
-        $post_data['ship_postcode'] = "1000";
+        $post_data['ship_name'] = "Not Applicable";
+        $post_data['ship_add1'] = "Not Applicable";
+        $post_data['ship_add2'] = "Not Applicable";
+        $post_data['ship_city'] = "Not Applicable";
+        $post_data['ship_state'] = "Not Applicable";
+        $post_data['ship_postcode'] = "Not Applicable";
         $post_data['ship_phone'] = "";
-        $post_data['ship_country'] = "Bangladesh";
-
+        $post_data['ship_country'] = "Not Applicable";
         $post_data['shipping_method'] = "NO";
-        $post_data['product_name'] = "Computer";
-        $post_data['product_category'] = "Goods";
+        $post_data['num_of_item'] = "0";
+        
+        $post_data['product_name'] = 'donation';
+        $post_data['product_category'] = 'donation';
         $post_data['product_profile'] = "physical-goods";
 
         # OPTIONAL PARAMETERS
-        $post_data['value_a'] = "ref001";
-        $post_data['value_b'] = "ref002";
+        $post_data['value_a'] = $request->campaign_id;
+        $post_data['value_b'] = $request->logout;
         $post_data['value_c'] = "ref003";
         $post_data['value_d'] = "ref004";
 
-        #Before  going to initiate the payment order status need to insert or update as Pending.
-        $update_product = DB::table('orders')
-            ->where('transaction_id', $post_data['tran_id'])
+        # Before  going to initiate the payment donation and payment status need to update as Pending.
+        # if this payment is one of multiple payment of a prevously made donation then that donation model
+        # will used instead of creating a brand new.
+        $donation = null;
+        if(isset($request->donation_id)){
+            $donation = Donation::find($request->donation_id);
+        }
+        else {
+            $data = [
+                'user_id' => Auth::user()->id,
+                'campaign_id' => $campaign->id,
+                'anonymous' => $request->anonymous,
+            ];
+            $donation = Donation::create($data);
+        }
+        
+        $update_payment = Payment::where('trans_id', $post_data['tran_id'])
             ->updateOrInsert([
-                'name' => $post_data['cus_name'],
-                'email' => $post_data['cus_email'],
-                'phone' => $post_data['cus_phone'],
+                'donation_id' => $donation->id,
                 'amount' => $post_data['total_amount'],
+                'currency' => $post_data['currency'],
+                'trans_id' => $post_data['tran_id'],
                 'status' => 'Pending',
-                'address' => $post_data['cus_add1'],
-                'transaction_id' => $post_data['tran_id'],
-                'currency' => $post_data['currency']
             ]);
+        
+        if(Auth::check() && $request->logout == true){
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         $sslc = new SslCommerzNotification();
         # initiate(Transaction Data , false: Redirect to SSLCOMMERZ gateway/ true: Show all the Payement gateway here )
@@ -94,13 +121,13 @@ class SslCommerzPaymentController extends Controller
             print_r($payment_options);
             $payment_options = array();
         }
-
     }
 
     public function payViaAjax(Request $request){
         # Here you have to receive all the order data to initate the payment.
         # Lets your oder trnsaction informations are saving in a table called "orders"
-        # In orders table order uniq identity is "transaction_id","status" field contain status of the transaction, "amount" is the order amount to be paid and "currency" is for storing Site Currency which will be checked with paid currency.
+        # In orders table order uniq identity is "transaction_id","status" field contain status of the transaction,
+        # "amount" is the order amount to be paid and "currency" is for storing Site Currency which will be checked with paid currency.
 
         $cart_php = json_decode($request->cart_json);
         $user = Auth::user();
@@ -181,11 +208,32 @@ class SslCommerzPaymentController extends Controller
             print_r($payment_options);
             $payment_options = array();
         }
+        
+        if(Auth::check()){
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
     }
 
-    public function success(Request $request)
-    {
-
+    public function success(Request $request){
+        $tran_id = $request->input('tran_id');
+        $campaign = Campaign::find($request->input('value_a'));
+        $update_payment = Payment::where('trans_id', $tran_id)->update(['status' => 'Processing']);
+        // sending a mail notification to the campaigner
+        $payment = Payment::where('trans_id', $tran_id)->first();
+        
+        if(Auth::check() && $request->input('value_b') == true){
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+        
+        Mail::to($campaign->campaigner)->send(new DonationMail($payment));
+        return view('ssl.donation-notif')->with(['success' => 'Your donation has made successfully to the fundraiser', 'campaignSlug' =>$campaign->slug]);
+    }
+    
+    public function successOrig(Request $request){
         $tran_id = $request->input('tran_id');
         $amount = $request->input('amount');
         $currency = $request->input('currency');
@@ -197,8 +245,8 @@ class SslCommerzPaymentController extends Controller
         $payment_details = Payment::where('trans_id', $tran_id)->select('trans_id', 'status', 'currency', 'amount')->first();
 
         if ($payment_details->status == 'Pending') {
-            $validation = $sslc->orderValidate($request->all(), $tran_id, $amount, $currency);
-
+            $validation = $sslc->orderValidate($request->all(), $tran_id, $payment_details->amount, $payment_details->currency);
+            
             if ($validation == TRUE) {
                 /*
                 That means IPN did not work or IPN URL was not set in your merchant panel. Here you need to update order status
@@ -220,31 +268,35 @@ class SslCommerzPaymentController extends Controller
                 # to-do: send a mail to this donor from this place
                 return view('ssl.donation-notif')->with(['fail' => 'Your donation couldn\'t be made to the fundraiser', 'campaignId' => $campaign_id]);
             }
-        } else if ($payment_details->status == 'Processing' || $payment_details->status == 'Complete') {
+        } else if ($payment_details->status == 'Processing') {
             /*
              That means through IPN Order status already updated. Now you can just show the customer that transaction is completed. No need to udate database.
              */
             # to-do: send mails to this donor, campaigner and all commentor, liker, viewer, sharer of this campaign from this place
-            return view('ssl.donation-notif')->with(['success' => 'Your donation has made successfully to the fundraiser', 'campaignId' => $campaign_id]);
+            return view('ssl.donation-notif')->with(['info' => 'Your donation is pending']);
         } else {
             #That means something wrong happened. You can redirect customer to your product page.
             # to-do: send a mail to this donor from this place
-            return view('ssl.donation-notif')->with(['fail' => 'Your donation couldn\'t be made successfully to the fundraiser because this transaction isn\'t valid']);
+            return view('ssl.donation-notif')->with(['success' => 'Your donation has alreadry made to the fundraiser', 'campaignId' => $campaign_id]);
         }
-
     }
 
     public function fail(Request $request)
     {
         $tran_id = $request->input('tran_id');
-        $campaign_id = $request->input('value_a');
+        $campaign = Campaign::find($request->input('value_a'));
+        if(Auth::check() && $request->input('value_b') == true){
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         $payment_details = Payment::where('trans_id', $tran_id)->select('trans_id', 'status', 'currency', 'amount')->first();
 
         if ($payment_details->status == 'Pending') {
             $update_payment = Payment::where('trans_id', $tran_id)->update(['status' => 'Failed']);
             # to-do: send a mail to this donor from this place
-            return view('ssl.donation-notif')->with(['fail' => 'Your donation couldn\'t be made successfully to the fundraiser.', 'campaignId' => $campaign_id]);
+            return view('ssl.donation-notif')->with(['fail' => 'Your donation couldn\'t be made successfully to the fundraiser.', 'campaignSlug' => $campaign->slug]);
         } else if ($payment_details->status == 'Processing' || $payment_details->status == 'Complete') {
             # echo "Transaction is already Successful";
         } else {
@@ -257,24 +309,32 @@ class SslCommerzPaymentController extends Controller
     public function cancel(Request $request)
     {
         $tran_id = $request->input('tran_id');
-        $campaign_id = $request->input('value_a');
+        $campaign = Campaign::find($request->input('value_a'));
+        if(Auth::check() && $request->input('value_b') == true){
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         $payment_details = Payment::where('trans_id', $tran_id)->select('trans_id', 'status', 'currency', 'amount')->first();
 
         if ($payment_details->status == 'Pending') {
             $update_payment = Payment::where('trans_id', $tran_id)->update(['status' => 'Canceled']);
             # to-do: send a mail to this donor from this place
-            return view('ssl.donation-notif')->with(['cancel' => 'Your donation couldn\'t be made successfully to the fundraiser because this transaction is cancelled', 'campaignId' => $campaign_id]);
+            return view('ssl.donation-notif')->with(['cancel' => 'Your donation couldn\'t be made successfully to the fundraiser because this transaction is cancelled', 'campaignSlug' => $campaign->slug]);
         } else if ($payment_details->status == 'Processing' || $payment_details->status == 'Complete') {
             # echo "Transaction is already Successful";
         } else {
             # to-do: send a mail to this donor from this place
-            return view('ssl.donation-notif')->with(['fail' => 'Your donation couldn\'t be made successfully to the fundraiser because this transaction isn\'t valid', 'campaignId' => $campaign_id]);
+            return view('ssl.donation-notif')->with(['fail' => 'Your donation couldn\'t be made successfully to the fundraiser because this transaction isn\'t valid', 'campaignSlug' => $campaign->slug]);
         }
 
     }
 
-    public function ipn(Request $request)
+    public function ipn(Request $request){}
+    
+    
+    public function ipn_orig(Request $request)
     {
         #Received all the payement information from the gateway
         if ($request->input('tran_id')) #Check transation id is posted or not.

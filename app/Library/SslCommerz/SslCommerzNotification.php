@@ -1,6 +1,8 @@
 <?php
 namespace App\Library\SslCommerz;
 
+use Illuminate\Support\Facades\Log;
+
 class SslCommerzNotification extends AbstractSslCommerz
 {
     protected $data = [];
@@ -24,24 +26,30 @@ class SslCommerzNotification extends AbstractSslCommerz
 
     public function orderValidate($post_data, $trx_id = '', $amount = 0, $currency = "BDT")
     {
+        Log::debug('orderValidate entered');
         if ($post_data == '' && $trx_id == '' && !is_array($post_data)) {
             $this->error = "Please provide valid transaction ID and post request data";
             return $this->error;
         }
 
         $validation = $this->validate($trx_id, $amount, $currency, $post_data);
+        Log::debug("validation in orderValidate: $validation");
 
         if ($validation) {
+            Log::debug('orderValidate exited from true block');
             return true;
         } else {
+            Log::debug('orderValidate exited from false block');
             return false;
         }
+        Log::debug('orderValidate exited');
     }
 
 
     # VALIDATE SSLCOMMERZ TRANSACTION
     protected function validate($merchant_trans_id, $merchant_trans_amount, $merchant_trans_currency, $post_data)
     {
+        Log::debug('validate entered');
         # MERCHANT SYSTEM INFO
         if ($merchant_trans_id != "" && $merchant_trans_amount != 0) {
 
@@ -70,10 +78,13 @@ class SslCommerzNotification extends AbstractSslCommerz
 
 
                 $result = curl_exec($handle);
-
+                Log::debug('result from curl');
+                Log::debug($result);
+                
                 $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
                 if ($code == 200 && !(curl_errno($handle))) {
+                    Log::debug('status 200');
 
                     # TO CONVERT AS ARRAY
                     # $result = json_decode($result, true);
@@ -84,65 +95,76 @@ class SslCommerzNotification extends AbstractSslCommerz
                     $this->sslc_data = $result;
 
                     # TRANSACTION INFO
-                    $status = $result->status;
-                    $tran_date = $result->tran_date;
-                    $tran_id = $result->tran_id;
-                    $val_id = $result->val_id;
-                    $amount = $result->amount;
-                    $store_amount = $result->store_amount;
-                    $bank_tran_id = $result->bank_tran_id;
-                    $card_type = $result->card_type;
-                    $currency_type = $result->currency_type;
-                    $currency_amount = $result->currency_amount;
+                    $status = $result->status ?? '';
+                    $tran_date = $result->tran_date ?? '';
+                    $tran_id = $result->tran_id ?? '';
+                    $val_id = $result->val_id ?? '';
+                    $amount = $result->amount ?? '';
+                    $store_amount = $result->store_amount ?? '';
+                    $bank_tran_id = $result->bank_tran_id ?? '';
+                    $card_type = $result->card_type ?? '';
+                    $currency_type = $result->currency_type ?? '';
+                    $currency_amount = $result->currency_amount ?? '';
 
                     # ISSUER INFO
-                    $card_no = $result->card_no;
-                    $card_issuer = $result->card_issuer;
-                    $card_brand = $result->card_brand;
-                    $card_issuer_country = $result->card_issuer_country;
-                    $card_issuer_country_code = $result->card_issuer_country_code;
+                    $card_no = $result->card_no ?? '';
+                    $card_issuer = $result->card_issuer ?? '';
+                    $card_brand = $result->card_brand ?? '';
+                    $card_issuer_country = $result->card_issuer_country ?? '';
+                    $card_issuer_country_code = $result->card_issuer_country_code ?? '';
 
                     # API AUTHENTICATION
-                    $APIConnect = $result->APIConnect;
-                    $validated_on = $result->validated_on;
-                    $gw_version = $result->gw_version;
+                    $APIConnect = $result->APIConnect ?? '';
+                    $validated_on = $result->validated_on ?? '';
+                    $gw_version = $result->gw_version ?? '';
+                    Log::debug('after value retrival from curl result');
 
                     # GIVE SERVICE
                     if ($status == "VALID" || $status == "VALIDATED") {
+                        Log::debug('valid true');
                         if ($merchant_trans_currency == "BDT") {
+                            Log::debug('currency bdt');
                             if (trim($merchant_trans_id) == trim($tran_id) && (abs($merchant_trans_amount - $amount) < 1) && trim($merchant_trans_currency) == trim('BDT')) {
+                                Log::debug('currency bdt if block');
                                 return true;
                             } else {
                                 # DATA TEMPERED
+                                Log::debug('currency bdt else block');
                                 $this->error = "Data has been tempered";
                                 return false;
                             }
                         } else {
                             //echo "trim($merchant_trans_id) == trim($tran_id) && ( abs($merchant_trans_amount-$currency_amount) < 1 ) && trim($merchant_trans_currency)==trim($currency_type)";
                             if (trim($merchant_trans_id) == trim($tran_id) && (abs($merchant_trans_amount - $currency_amount) < 1) && trim($merchant_trans_currency) == trim($currency_type)) {
+                                Log::debug('currency random if block');
                                 return true;
                             } else {
+                                Log::debug('currency random else block');
                                 # DATA TEMPERED
                                 $this->error = "Data has been tempered";
                                 return false;
                             }
                         }
                     } else {
+                        Log::debug('valid false');
                         # FAILED TRANSACTION
                         $this->error = "Failed Transaction";
                         return false;
                     }
                 } else {
+                    Log::debug('not 200');
                     # Failed to connect with SSLCOMMERZ
                     $this->error = "Faile to connect with SSLCOMMERZ";
                     return false;
                 }
             } else {
+                Log::debug('hash not varified');
                 # Hash validation failed
                 $this->error = "Hash validation failed";
                 return false;
             }
         } else {
+            Log::debug('not trx_id or amount');
             # INVALID DATA
             $this->error = "Invalid data";
             return false;
@@ -198,6 +220,7 @@ class SslCommerzNotification extends AbstractSslCommerz
      */
     public function makePayment(array $requestData, $type = 'checkout', $pattern = 'json')
     {
+        Log::debug('makePayment entered');
         if (empty($requestData)) {
             return "Please provide a valid information list about transaction with transaction id, amount, success url, fail url, cancel url, store id and pass at least";
         }
@@ -219,6 +242,7 @@ class SslCommerzNotification extends AbstractSslCommerz
 
         if ($type == 'hosted') {
             if (isset($formattedResponse['GatewayPageURL']) && $formattedResponse['GatewayPageURL'] != '') {
+                Log::debug('reidrected from makePayment');
                 $this->redirect($formattedResponse['GatewayPageURL']);
             } else {
                 $errorMessage = "No redirect URL found!";
@@ -227,6 +251,7 @@ class SslCommerzNotification extends AbstractSslCommerz
         } else {
             return $formattedResponse;
         }
+        Log::debug('makePayment exited');
     }
 
 

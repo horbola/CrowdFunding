@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Campaign;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
@@ -47,8 +48,42 @@ class HomeController extends Controller
     }
     
     
-    // <a href="' .route('user.show', ['id' => $campaign->campaigner->id]). '" class="text-dark user">' .$campaign->campaigner->name. '</a>
+    
     private function buildSearRes($campaigns) {
+        if($campaigns){
+            $searRes = '';
+            foreach($campaigns as $campaign){
+                $route = route('campaign.showGuestCampaign', $campaign->slug);
+                $searRes .= <<<END
+                    <a href=" $route ">
+                        <div class="teacher d-flex my-3">
+                            <img src=" {$campaign->thumbImagePath()} " class="avatar avatar-md-sm rounded-circle shadow" alt="">
+                            <div class="ms-3">
+                                <h6 class="mb-0"> {$campaign->campaigner->name} </h6>
+                                <p class="text-dark small my-0 py-0 px-0"> {$campaign->campaigner->location()} </p>
+                                <p class="text-dark small my-0 py-0 px-0"> {$campaign->title} </p>
+                            </div>
+                        </div>
+                    </a>
+END;
+            }
+
+            $pagination = '';
+            if ($campaigns->nextPageUrl()) {
+                $pagination .= <<<END
+                    <div class="pagination">
+                        <button type="button" class="btn btn-sm btn-primary mx-auto searchNext" onclick="exeAjax(' {$campaigns->nextPageUrl()} ', event)">Next</button>
+                    </div>
+\n
+END;
+            }
+            return $searRes . $pagination;
+        }
+    }
+    
+    
+    // <a href="' .route('user.show', ['id' => $campaign->campaigner->id]). '" class="text-dark user">' .$campaign->campaigner->name. '</a>
+    private function buildSearRes2($campaigns) {
         if($campaigns){
             $searRes = '';
             foreach($campaigns as $campaign){
@@ -62,9 +97,12 @@ class HomeController extends Controller
                 .'</div>';
             }
             
-            $pagination = '<div class="pagination">'
-                            .'<button type="button" class="btn btn-sm btn-primary mx-auto searchNext" onclick="exeAjax(' .$campaigns->nextPageUrl(). ')">Next</button>'
-                        .'</div>';
+            $pagination = '';
+            if($campaigns->nextPageUrl()){
+                $pagination = '<div class="pagination">'
+                        . '<button type="button" class="btn btn-sm btn-primary mx-auto searchNext" onclick="exeAjax(\'' . $campaigns->nextPageUrl() . '\')">Next</button>'
+                        . '</div>';
+            }
             
             return $searRes . $pagination;
         }

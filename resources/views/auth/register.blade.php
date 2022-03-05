@@ -9,12 +9,12 @@
 <section class="bg-half d-flex align-items-center">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-7 col-md-6">
+            <div class="d-none d-lg-block col-lg-7">
                 <div class="me-lg-5">   
                     <img src="images/user/signup.svg" class="img-fluid d-block mx-auto" alt="">
                 </div>
             </div>
-            <div class="col-lg-5 col-md-6">
+            <div class="col-12 col-lg-5">
                 <div class="card shadow rounded border-0">
                     <div class="card-body">
                         <h4 class="card-title text-center">Signup</h4>
@@ -96,7 +96,7 @@
                                     <div class="mb-3">
                                         <label class="form-label">Your Phone <span class="text-danger">*</span></label>
                                         <div class="form-icon position-relative">
-                                            <i data-feather="mail" class="fea icon-sm icons"></i>
+                                            <i data-feather="phone" class="fea icon-sm icons"></i>
                                             <input id="phone"
                                                    name="phone"
                                                    type="text"
@@ -113,7 +113,32 @@
                                         </div>
                                     </div>
                                 </div><!--end col-->
-
+                                
+                                <!--
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Your NID <span class="text-danger">*</span></label>
+                                        <div class="form-icon position-relative">
+                                            <i data-feather="key" class="fea icon-sm icons"></i>
+                                            <input id="nid"
+                                                   name="nid"
+                                                   type="number"
+                                                   class="form-control ps-5 @error('nid') is-invalid @enderror"
+                                                   placeholder="National ID"
+                                                   required
+                                                   autocomplete="nid"
+                                                   value=""
+                                                   maxlength="255">
+                                            @error('nid')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div><!--end col
+                                -->
+                                
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <label class="form-label">Password <span class="text-danger">*</span></label>

@@ -38,7 +38,7 @@
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="type" class="fea icon-sm icons"></i>
                 <input type="text" class="form-control ps-5" id="title" value="{{ old('title') }}" name="title" placeholder="@lang('app.title')" maxlength="255">
-                <p class="text-info"></p>
+                <p class="text-info">Provide this campaign with a title. Keep this within 255 characters.</p>
                 {!! $errors->has('title')? '<p class="help-block text-bold text-danger">'.$errors->first('title').'</p>' : '' !!}
             </div>
         </div>
@@ -48,12 +48,18 @@
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="arrow-down-circle" class="fea icon-sm icons"></i>
                 <select class="form-select form-control ps-5" name="category">
-                    <option selected>@lang('app.select_a_category')</option>
+                    @php
+                        $catName;
+                        if( old('category') ){
+                            $catName = \app\Models\Category::find( old('category') )->category_name;
+                        }
+                    @endphp
+                    <option value="{{ old('category') }}" selected>{{ $catName ?? 'Select a category' }}</option>
                     @foreach ($categories as $category)
                     <option value="{{ $category->id }}">{{ $category->category_name }}</option>
                     @endforeach
                 </select>
-                <p class="text-info"></p>
+                <p class="text-info">Try to place select a relevant category, which will help reach more people.</p>
                 {!! $errors->has('category')? '<p class="help-block text-bold text-danger">'.$errors->first('category').'</p>' : '' !!}
             </div>
         </div>
@@ -63,31 +69,33 @@
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="type" class="fea icon-sm icons"></i>
                 <textarea name="short_description" class="form-control ps-5" rows="2" maxlength="300">{{ old('short_description') }}</textarea>
-                <p class="text-info"></p>
+                <p class="text-info">Write a short description within 500 characters. This description will be used to give people a quick introduction about this campaign.</p>
                 {!! $errors->has('short_description')? '<p class="help-block text-bold text-danger">'.$errors->first('short_description').'</p>' : '' !!}
             </div>
         </div>
 
+        <!--
         <div class="form-group form-row {{ $errors->has('description')? 'has-error' : '' }}">
             <label for="description" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.description') <span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-9">
-                <!--<div class="alert alert-info"> @lang('app.image_insert_limitation') </div>-->
+                <!--<div class="alert alert-info"> @lang('app.image_insert_limitation') </div>
                 <div class=" form-icon position-relative">
                     <i data-feather="type" class="fea icon-sm icons"></i>
                     <textarea id="description" name="description" class="form-control description ps-5"></textarea>
-                    <!--<div id="description"></div> this is for ckeditor-->
+                    <!--<div id="description"></div> this is for ckeditor
                 </div>
-                <p class="text-info"></p>
+                <p class="text-info">Write a detailed description for this campaign. Keep it within 5000 characters. Include all necessary information.</p>
                 {!! $errors->has('description')? '<p class="help-block text-bold text-danger">'.$errors->first('description').'</p>' : '' !!}
             </div>
         </div>
+        -->
 
         <div class="form-group form-row {{ $errors->has('feature_image')? 'has-error':'' }}">
             <label for="feature_image" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.feature_image') <span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="image" class="fea icon-sm icons"></i>
-                <input type="file" class="form-control ps-5" id="feature_image" value="" name="feature_image" placeholder="@lang('app.feature_image')">
-                <p class="text-info"></p>
+                <input type="file" class="form-control ps-5" id="feature_image" value="{{ old('file') }}" name="feature_image" placeholder="@lang('app.feature_image')" accept="image/*">
+                <p class="text-info">Upload images of type jpg, png, gif. These images will be used at top of your campaign's detail page and used to share and also to characterize your campaign</p>
                 {!! $errors->has('feature_image')? '<p class="help-block text-bold text-danger">'.$errors->first('feature_image').'</p>' : '' !!}
             </div>
         </div>
@@ -96,8 +104,8 @@
             <label for="album" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Album <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="image" class="fea icon-sm icons"></i>
-                <input type="file" class="form-control ps-5" id="album" value="" name="album[]" multiple placeholder="Album">
-                <p class="text-info"></p>
+                <input type="file" class="form-control ps-5" id="album" value="" name="album[]" multiple placeholder="Album"  accept="image/*">
+                <p class="text-info">Upload images of type jpg, png, gif. These images will be used at top of your campaign's detail page along the feature image</p>
                 {!! $errors->has('album')? '<p class="help-block text-bold text-danger">'.$errors->first('album').'</p>':'' !!}
             </div>
         </div>
@@ -118,8 +126,8 @@
             <label for="documents" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Documents <span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="image" class="fea icon-sm icons"></i>
-                <input type="file" class="form-control ps-5" id="documents" value="" name="documents[]" multiple placeholder="Documents">
-                <p class="text-info"></p>
+                <input type="file" class="form-control ps-5" id="documents" value="" name="documents[]" multiple placeholder="Documents"  accept="image/*">
+                <p class="text-info">Upload images of type jpg, png, gif. These images will be used at document tab of your campaign's detail page</p>
                 {!! $errors->has('documents')? '<p class="help-block text-bold text-danger">'.$errors->first('documents').'</p>' : '' !!}
             </div>
         </div>
@@ -128,13 +136,14 @@
             <label for="goal" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.goal') <span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <div class=" form-icon position-relative">
-                    <i data-feather="dollar-sign" class="fea icon-sm icons"></i>
+                    <!--<i data-feather="dollar-sign" class="fea icon-sm icons"></i>-->
+                    <span class="icon-sm icons" style="top:7px;"><strong>Tk</strong></span>
                     <input type="number" class="form-control ps-5" id="goal" value="{{ old('goal') }}" name="goal" placeholder="@lang('app.goal')">
                 </div>
                 <div class="alert alert-info mt-2">
                     <i class="fa fa-money"></i> @lang('app.you_will_get') {{ 'put the amount' }}% @lang('app.of_total_raised')
                 </div>
-                <p class="text-info"></p>
+                <p class="text-info">Your campaign will raise fund to this amount</p>
                 {!! $errors->has('goal')? '<p class="help-block text-bold text-danger">'.$errors->first('goal').'</p>' : '' !!}
             </div>
         </div>
@@ -143,11 +152,11 @@
             <label for="end_method" class="col-sm-12 col-md-3 form-label text-left text-md-right">@lang('app.campaign_end_method') <span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <label>
-                    <input type="radio" name="end_method"  value="1" @if(old('end_method') === 1) checked="checked" @endif> @lang('app.after_goal_achieve')
+                    <input type="radio" name="end_method" value="0"> @lang('app.after_goal_achieve')
                  <span> :</span></label> <br />
                 
                 <label>
-                    <input type="radio" name="end_method" value="0"  @if(old('end_method') === 0) checked="checked" @endif> @lang('app.after_end_date')
+                    <input type="radio" name="end_method" value="1"> @lang('app.after_end_date')
                  <span> :</span></label> <br />
 
                 {{--
@@ -155,7 +164,7 @@
                     <input type="radio" name="end_method" value="both"  @if(old('end_method') == 'both') checked="checked" @endif > @lang('app.both_need')
                  <span> :</span></label>
                 --}}
-                <p class="text-info"></p>
+                <p class="text-info">Specify how you want your campaign to stop raising fund</p>
                 {!! $errors->has('end_method')? '<p class="help-block text-bold text-danger">'.$errors->first('end_method').'</p>' : '' !!}
             </div>
             <script>if ( !$('[name=end_method]').is(':checked') ) { $('[value=1]').prop('checked', 'checked'); }</script>
@@ -166,7 +175,7 @@
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="calendar" class="fea icon-sm icons"></i>
                 <input type="date" class="form-control ps-5 dateselect" id="start_date" value="{{ old('start_date') }}" name="start_date" placeholder="dd-mm-yyyy" min="1950-01-01" max="2030-12-31">
-                <p class="text-info"></p>
+                <p class="text-info">This is the date from which your campaign will start raising fund</p>
                 {!! $errors->has('start_date')? '<p class="help-block text-bold text-danger">'.$errors->first('start_date').'</p>' : '' !!}
             </div>
             <script>
@@ -177,11 +186,11 @@
         </div>
         
         <div class="form-group form-row {{ $errors->has('end_date')? 'has-error' : '' }}">
-            <label for="end_date" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.end_date') <span class="text-danger">*</span> <span> :</span></label>
+            <label for="end_date" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">End Date<span class="text-danger">*</span> <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="calendar" class="fea icon-sm icons"></i>
                 <input type="date" class="form-control ps-5 dateselect" id="end_date" value="{{ old('end_date') }}" name="end_date" placeholder="dd-mm-yyyy" min="1950-01-01" max="2030-12-31">
-                <p class="text-info"></p>
+                <p class="text-info">This is the date by which your campaign will stop raising fund (if your end method is 'After end date')</p>
                 {!! $errors->has('end_date')? '<p class="help-block text-bold text-danger">'.$errors->first('end_date').'</p>' : '' !!}
             </div>
         </div>
@@ -189,9 +198,10 @@
         <div class="form-group form-row {{ $errors->has('min_amount')? 'has-error' : '' }}">
             <label for="min_amount" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.min_amount') <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
-                <i data-feather="dollar-sign" class="fea icon-sm icons"></i>
+                <!--<i data-feather="dollar-sign" class="fea icon-sm icons"></i>-->
+                <span class="icon-sm icons" style="top:7px;"><strong>Tk</strong></span>
                 <input type="text" class="form-control ps-5" id="min_amount" value="{{ old('min_amount') }}" name="min_amount">
-                <p class="text-info"></p>
+                <p class="text-info">This is the amount a donor can donate minimum. By default this amount is set to the BDT 10.00</p>
                 {!! $errors->has('min_amount')? '<p class="help-block text-bold text-danger">'.$errors->first('min_amount').'</p>' : '' !!}
             </div>
             <script> if( !$('#min_amount').val() ){ $('#min_amount').val('10'); } </script>
@@ -200,9 +210,10 @@
         <div class="form-group form-row {{ $errors->has('max_amount')? 'has-error' : '' }}">
             <label for="max_amount" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.max_amount') <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
-                <i data-feather="dollar-sign" class="fea icon-sm icons"></i>
+                <!--<i data-feather="dollar-sign" class="fea icon-sm icons"></i>-->
+                <span class="icon-sm icons" style="top:7px;"><strong>Tk</strong></span>
                 <input type="text" class="form-control ps-5" id="max_amount" value="{{ old('max_amount') }}" name="max_amount">
-                <p class="text-info"></p>
+                <p class="text-info">This is the amount a donor can donate maximum. By default this amount is set to the goal amount</p>
                 {!! $errors->has('max_amount')? '<p class="help-block text-bold text-danger">'.$errors->first('max_amount').'</p>' : '' !!}
             </div>
             <script>
@@ -219,20 +230,22 @@
         <div class="form-group form-row {{ $errors->has('recommended_amount')? 'has-error' : '' }}">
             <label for="recommended_amount" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.recommended_amount') <span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
-                <i data-feather="dollar-sign" class="fea icon-sm icons"></i>
+                <!--<i data-feather="dollar-sign" class="fea icon-sm icons"></i>-->
+                <span class="icon-sm icons" style="top:7px;"><strong>Tk</strong></span>
                 <input type="number" class="form-control ps-5" id="recommended_amount" value="{{ old('recommended_amount') }}" name="recommended_amount">
-                <p class="text-info"></p>
+                <p class="text-info">This amount will be used to recommend people to donate and used in other necessary case</p>
                 {!! $errors->has('recommended_amount')? '<p class="help-block text-bold text-danger">'.$errors->first('recommended_amount').'</p>' : '' !!}
             </div>
             <script> if( !$('#recommended_amount').val() ){ $('#recommended_amount').val('500'); } </script>
         </div>
 
         <div class="form-group form-row {{ $errors->has('amount_prefilled')? 'has-error' : '' }}">
-            <label for="amount_prefilled" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.amount_prefilled') <span> :</span></label>
+            <label for="amount_prefilled" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Quick Amount<span> :</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
-                <i data-feather="dollar-sign" class="fea icon-sm icons"></i>
+                <!--<i data-feather="dollar-sign" class="fea icon-sm icons"></i>-->
+                <span class="icon-sm icons" style="top:7px;"><strong>Tk</strong></span>
                 <input type="text" class="form-control ps-5" id="amount_prefilled" value="{{ old('amount_prefilled') }}" name="amount_prefilled">
-                <p class="text-info"></p>
+                <p class="text-info">These amount will be used as quick amount, from which donor can input donation amount just by clicking on them instead of typing</p>
                 {!! $errors->has('amount_prefilled')? '<p class="help-block text-bold text-danger">'.$errors->first('amount_prefilled').'</p>' : '' !!}
             </div>
             <script> if( !$('#amount_prefilled').val() ){ $('#amount_prefilled').val('10, 50, 100, 500, 1000'); } </script>
@@ -247,10 +260,6 @@
 @endsection
 
 
-
-@section('page-style')
-    <link href="{{ asset('css/bootstrap-datepicker.css') }}" rel="stylesheet">
-@endsection
 
 @section('page-script-bottom')
 <script>
@@ -267,28 +276,4 @@
     }
 </script>
 <script src="{{ asset('js/ckeditor-5-classic.js') }}" onload="initCkeditor();"></script>
-
-<!--
-<script>
-    function initDatePicker(){
-        $('.dateselect').datepicker({
-            // format: 'mm/dd/yyyy',
-            format: 'yyyy-mm-dd',
-            todayHighlidht: true,
-            autoclose: true,
-            startDate: '0d'
-        });
-        
-        // $('.dateselect2').datepicker({
-        //     format: 'mm/dd/yyyy',
-        //     autoclose:true,
-        //     todayHighlidht: true,
-        // }).on("hide", function(){
-        //   if ($)
-        // }
-
-    }
-</script>
-<script src="{{ asset('js/bootstrap-datepicker.js') }}" onload="initDatePicker();"></script>
--->
 @endsection

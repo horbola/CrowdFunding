@@ -4,48 +4,26 @@
             <div class="container main-nav">
                 <a class="navbar-brand" href="{{ route('home') }}"><img src="/images/logo-b.png" alt=""></a>
                 
-                <form class="d-flex search-fields"  method="get">
-                    <input type="text" id="search-campaign-main" name="q" class="form-control me-2 search-input" placeholder="Search...">
-                    <input type="image" class="search-icon" id="searchsubmit" src="/images/icons/search-icon-dark.png" alt="Submit Form"></input>
+                <form class="d-flex search-fields">
+                    <input id="search-campaign-main" name="q" type="text" class="form-control me-2 search-input" placeholder="Search...">
+                    <!--<input type="image" class="search-icon" id="searchsubmit" src="/images/icons/search-icon-dark.png" alt="Submit Form"></input>-->
+                    <div class="search-icon" id="searchsubmit"><img src="/images/icons/search-icon-dark.png" alt="Submit Form"/></div>
                 </form>
                 <style>
                     .search-input:focus {
                         color: #333 !important;
                     }
-                    
                     .search-input {
                         color: #333 !important;
                     }
+                    #searchsubmit {
+                        order: 0;
+                        padding: 10px 20px;
+                        position: absolute;
+                        right: 10px;
+                        top: 5px;
+                    }
                 </style>
-                <script>
-//                    $('#search-campaign-main').keyup(delay(function (e) {
-//                        exeAjax("{{ route('campaign.search') }}");
-//                    }, 1000));
-                    
-                    // this function doesn't work for global keyupp proroperty.
-                    function delay(fn, ms) {
-                        let timer = 0;
-                        return function(...args) {
-                            clearTimeout(timer);
-                            timer = setTimeout(fn.bind(this, ...args), ms || 0);
-                        };
-                    }
-                    
-                    function exeAjax(uri){
-                        $.ajax({
-                            type : 'get',
-                            url : uri,
-                            data : {
-                                'q' : $('#search-campaign-main').val()
-                            },
-                            success : function(data) {
-                                $('#search-panel .search-content').removeClass('d-none').addClass('d-block');
-                                $('#search-panel .search-content').empty();
-                                $('#search-panel .search-content').append(data);
-                            }
-                        });
-                    }
-                </script>
 
                 <button class="mobile-toggle navbar-dark primary-bar collapsed" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false"

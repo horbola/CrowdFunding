@@ -85,8 +85,8 @@ class Donation extends Model
     public function totalPayableAmount() {
         # only those payament entry will be counted which atatus is processing or complete.
         return $this->payments->sum(function ($aPayment) {
-//            return $aPayment->amount - (($aPayment->amount/100)*5);
-            return $aPayment->amount;
+            return $aPayment->amount - (($aPayment->amount/100)*5);
+//            return $aPayment->amount;
         });
     }
     

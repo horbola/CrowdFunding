@@ -9,8 +9,13 @@
                 <img src="{{$campaign->investigation->investigator->avatar()}}" class="img-fluid avatar avatar-md-sm rounded-circle shadow" alt="img">
             </div>
             <div class="person-info">
-                <p class="name">{{$campaign->investigation->investigator->name}}</p>
-                <p class="date"><i class="fas fa-clock"></i>{{App\Library\Helper::formattedTime($campaign->investigation->created_at)}}</p>
+                <p class="name">
+                    {{$campaign->investigation->investigator->name}}
+                    @if( $campaign->investigation->investigator->isVolunteer() )
+                        <img class="verimg" src="/images/verify.png" alt="">
+                    @endif
+                </p>
+                <p class="date"><i class="fas fa-clock"></i> {{App\Library\Helper::formattedTime($campaign->investigation->created_at)}}</p>
             </div>
         </div>
         <div class="invComment">

@@ -22,7 +22,7 @@
 <main>
     <section>
         <div>
-            {{$payment->donation->donor->name}} has donated to <a href="{{ route('campaign.showGuestCampaign', $payment->donation->campaign->id) }}">'{{$payment->donation->campaign->title}}'</a>, which you are campaigning on, {{ $payment->donation->totalPayableAmount() }} taka just now.
+            {{$payment->donation->donor->name}} has donated to <a href="{{ route('campaign.showGuestCampaign', $payment->donation->campaign->slug) }}">'{{$payment->donation->campaign->title}}'</a>, which you are campaigning on, {{ $payment->donation->totalPayableAmount() }} taka just now.
         </div>
     </section>
 </main>

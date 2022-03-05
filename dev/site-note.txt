@@ -1,0 +1,7 @@
+
+
+1. on line 26 (<a href="{{route('donation.createPaymentInfoFromLogin', [) of 'donor-info-dialogue.blade.php' file we've set up our intended route in a login link
+instead of login route. here we take advantage of laravel's redirecting to intended route in case of interruption for session expiration. that means if actully
+we want to login first and then go to the intneded page. but laravel redirects to the intended route automaticlly. we didn't mention login route.
+
+2. remove the comment from the two lines in login controller (two step verification code generation)

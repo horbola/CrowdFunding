@@ -1,0 +1,91 @@
+[2022-01-31 05:19:52] local.DEBUG: index entered  
+[2022-01-31 05:19:52] local.DEBUG: array (
+  'total_amount' => '10',
+  'currency' => 'BDT',
+  'tran_id' => '61f771789b5b2',
+  'cus_name' => 'saif khan donor',
+  'cus_email' => 'saifdonor@gmail.com',
+  'cus_add1' => 'Holding: House 24/ Road: 10/ Upazilla: Dhaka North City Corporation/ District: Noakhali/ Country: Bangladesh',
+  'cus_add2' => '',
+  'cus_city' => 'Dhaka North City Corporation',
+  'cus_state' => NULL,
+  'cus_postcode' => '',
+  'cus_country' => 'Bangladesh',
+  'cus_phone' => 8801873334000,
+  'cus_fax' => '',
+  'ship_name' => 'Not Applicable',
+  'ship_add1' => 'Not Applicable',
+  'ship_add2' => 'Not Applicable',
+  'ship_city' => 'Not Applicable',
+  'ship_state' => 'Not Applicable',
+  'ship_postcode' => 'Not Applicable',
+  'ship_phone' => '',
+  'ship_country' => 'Not Applicable',
+  'shipping_method' => 'NO',
+  'num_of_item' => '0',
+  'product_name' => 'donation',
+  'product_category' => 'donation',
+  'product_profile' => 'physical-goods',
+  'value_a' => '7',
+  'value_b' => 'ref002',
+  'value_c' => 'ref003',
+  'value_d' => 'ref004',
+)  
+[2022-01-31 05:19:52] local.DEBUG: before make payment  
+[2022-01-31 05:19:52] local.DEBUG: makePayment entered  
+[2022-01-31 05:19:53] local.DEBUG: reidrected from makePayment  
+[2022-01-31 05:20:07] local.DEBUG: success entered  
+[2022-01-31 05:20:07] local.DEBUG: request data below  
+[2022-01-31 05:20:07] local.DEBUG: array (
+  'tran_id' => '61f771789b5b2',
+  'val_id' => '22013111200409ayPg7o6wW1WgN',
+  'amount' => '10.00',
+  'card_type' => 'NAGAD-Nagad',
+  'store_amount' => '9.75',
+  'card_no' => NULL,
+  'bank_tran_id' => '2201311120041tf96TvG7PDnEu7',
+  'status' => 'VALID',
+  'tran_date' => '2022-01-31 11:19:52',
+  'error' => NULL,
+  'currency' => 'BDT',
+  'card_issuer' => 'Nagad',
+  'card_brand' => 'MOBILEBANKING',
+  'card_sub_brand' => 'Classic',
+  'card_issuer_country' => 'Bangladesh',
+  'card_issuer_country_code' => 'BD',
+  'store_id' => 'urdho61627a26200bc',
+  'verify_sign' => 'a98ec0e1c0fdbe65d10a6f10e15a2ad1',
+  'verify_key' => 'amount,bank_tran_id,base_fair,card_brand,card_issuer,card_issuer_country,card_issuer_country_code,card_no,card_sub_brand,card_type,currency,currency_amount,currency_rate,currency_type,error,risk_level,risk_title,status,store_amount,store_id,tran_date,tran_id,val_id,value_a,value_b,value_c,value_d',
+  'verify_sign_sha2' => '4c726c4c580f6fd5be565ccf89920999cf82ecab80f6f3e439c24a91008376b7',
+  'currency_type' => 'BDT',
+  'currency_amount' => '10.00',
+  'currency_rate' => '1.0000',
+  'base_fair' => '0.00',
+  'value_a' => '7',
+  'value_b' => 'ref002',
+  'value_c' => 'ref003',
+  'value_d' => 'ref004',
+  'subscription_id' => NULL,
+  'risk_level' => '0',
+  'risk_title' => 'Safe',
+)  
+[2022-01-31 05:20:07] local.DEBUG: orderValidate entered  
+[2022-01-31 05:20:07] local.DEBUG: validate entered  
+[2022-01-31 05:20:08] local.DEBUG: result from curl  
+[2022-01-31 05:20:08] local.DEBUG: {"status":"VALID","tran_date":"2022-01-31 11:19:52","tran_id":"61f771789b5b2","val_id":"22013111200409ayPg7o6wW1WgN","amount":"10.00","store_amount":"9.75","currency":"BDT","bank_tran_id":"2201311120041tf96TvG7PDnEu7","card_type":"NAGAD-Nagad","card_no":"","card_issuer":"Nagad","card_brand":"MOBILEBANKING","card_issuer_country":"Bangladesh","card_issuer_country_code":"BD","currency_type":"BDT","currency_amount":"10.00","currency_rate":"1.0000","base_fair":"0.00","value_a":"7","value_b":"ref002","value_c":"ref003","value_d":"ref004","emi_instalment":"0","emi_amount":"0.00","emi_description":"","emi_issuer":"Nagad","account_details":"","risk_title":"Safe","risk_level":"0","APIConnect":"DONE","validated_on":"2022-01-31 11:20:07","gw_version":"","offer_avail":1,"card_ref_id":"dc1da4f52669828139e81ef5eb0f48a5a99ea054a131e00a562887d455417dd911","isTokeizeSuccess":0,"campaign_code":""}  
+[2022-01-31 05:20:08] local.DEBUG: currency bdt if block  
+[2022-01-31 05:20:08] local.DEBUG: validation in orderValidate: 1  
+[2022-01-31 05:20:08] local.DEBUG: orderValidate exited from true block  
+[2022-01-31 05:20:08] local.DEBUG: pending in success  
+[2022-01-31 05:20:08] local.DEBUG: validation: 1  
+[2022-01-31 05:20:08] local.DEBUG: validation is true  
+
+
+
+
+--------------------------------------------------------------------------------------
+#ssl commerce configuration (sandbox: urdhok)
+API_DOMAIN_URL=https://sandbox.sslcommerz.com
+STORE_ID=urdho61627a26200bc
+STORE_PASSWORD=urdho61627a26200bc@ssl
+IS_LOCALHOST=true

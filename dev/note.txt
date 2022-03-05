@@ -1,0 +1,21 @@
+
+platform version:
+Apache/2.4.46 (Win64) OpenSSL/1.1.1j PHP/8.0.3
+Database client version: libmysql - mysqlnd 8.0.3
+Laravel Framework 8.40.0
+
+
+watch this out to solve htaccess file:
+https://laracasts.com/discuss/channels/laravel/laravel-5-only-home-page-route-working-on-live-server?page=1
+
+
+
+
+
+
+user info:
+19907511057000003
+8801873334000   
+www.facebook.com/saif.khan.faysall
+www.twitter.com/saif.khan.faysall
+Dhaka North City Corporation

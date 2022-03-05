@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 use Intervention\Image\Facades\Image;
 
@@ -14,15 +15,21 @@ use App\Models\Campaign;
 class UpdateController extends Controller
 {
     public function store(Request $request, $campaignId) {
+        Log::debug('UpdateController@store entered');
+        Log::debug($request);
         $rules = [
-            'update_descrip' => 'string',
-            'updates' => 'array',
+            'update_descrip' => 'required|string:1000',
+//            'updates' => 'array',
+//            'updates' => 'nullable|mimes:jpeg,jpg,png',
         ];
+        Log::debug('reached befote validation');
         $validated = $this->validate($request, $rules);
+        Log::debug('reached after validation');
         
         $campaign = Campaign::find($campaignId);
         $created = Update::create([
             'campaign_id' => $campaign->id,
+//            'descrip' => 'update_descrip',
             'descrip' => $validated['update_descrip'],
         ]);
         if($request->hasFile('updates')){

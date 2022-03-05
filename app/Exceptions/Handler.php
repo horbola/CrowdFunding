@@ -37,5 +37,16 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+        
+        $this->renderable(function(Exception $e, $request) { 
+            return $this->handleException($request, $e);
+        });
     }
+    
+    public function handleException($request, Exception $exception) {
+        if ($exception instanceof Swift_TransportException) {
+            return response('The specified URL cannot be  found.', 404);
+        }
+    }
+
 }

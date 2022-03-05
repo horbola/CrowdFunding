@@ -28,10 +28,13 @@
         </div>
     </div>
     @endforeach
+    
+    @if($replies->count() > 3)
     <div class="l-moreBtn text-center">
         <a class="btn-dark-p" href="javascript:void(0)">Load More</a>
         <span>
             ({{ $replies->count() }} of {{ $comment->repliesTotal() }} replies)
         </span>
     </div>
+    @endif
 </div>

@@ -15,7 +15,7 @@
     <div class="row mb-5 text-right">
         <div class="col">
             <span><a class="btn btn-primary {{$campaign->status !== 0 ? 'disabled' : ''}}" href="{{route('campaign.edit', [$campaign->id])}}">Edit</a></span>
-            <span><button type="button" class="btn btn-primary {{$campaign->isCompleted() ? 'disabled' : ''}}" data-toggle="modal" data-target="#campaignUpdateModel">Update</button></span>
+            <span><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#campaignUpdateModel" {{$campaign->isCompleted() ? 'disabled' : ''}}>Update</button></span>
             <!-- cancel button will appear only before a campaign been active -->
             @if($campaign->status === 0)
             <span>

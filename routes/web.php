@@ -8,7 +8,7 @@ Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('ho
 Route::get('guest-campaign-list', 'CampaignController@indexGuestCampaign')->name('campaign.indexGuestCampaign');
 Route::get('guest-campaign-search', 'CampaignController@indexSearchedCampaign')->name('campaign.indexSearchedCampaign');
 Route::post('guest-campaign-filter', 'CampaignController@indexFilteredCampaign')->middleware('auth')->name('campaign.indexFilteredCampaign');
-Route::get('guest-campaign/{campaignId}', 'CampaignController@showGuestCampaign')->name('campaign.showGuestCampaign');
+Route::get('guest-campaign/{campaignSlug}', 'CampaignController@showGuestCampaign')->name('campaign.showGuestCampaign');
 // this route is for short link purpose
 Route::get('c/{campaignId}', 'CampaignController@showGuestCampaign')->name('campaign.shortLink');
 Route::get('searchCamp', 'HomeController@searchCamp')->name('campaign.search');
@@ -20,6 +20,7 @@ Route::get('searchCamp', 'HomeController@searchCamp')->name('campaign.search');
 //    'uses' => 'DonationController@createDialogues',
 //    'as'   => 'donation.createDialogues',
 //]);
+Route::get('donation-create-payment-info-from-address', 'DonationController@createPaymentInfoFromAddress')->name('donation.createPaymentInfoFromAddress');
 Route::get('donation-create', 'DonationController@createDialogues')->name('donation.createDialogues');
 Route::get('donation-create-payment-info', 'DonationController@createPaymentInfo')->name('donation.createPaymentInfo'); 
 Route::get('donation-create-payment-info-from-login', 'DonationController@createPaymentInfoFromLogin')->name('donation.createPaymentInfoFromLogin')->middleware('auth');
@@ -59,7 +60,7 @@ Route::get('verify/resend', [App\Http\Controllers\Auth\TwoFactorController::clas
 Route::get('verify', [App\Http\Controllers\Auth\TwoFactorController::class, 'index'])->name('verify.index');
 Route::post('verify/store', [App\Http\Controllers\Auth\TwoFactorController::class, 'store'])->name('verify.store');
 
-Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'nullAuth', 'twofactor']], function(){
+Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'nullAuth', 'twofactor', 'verified']], function(){
     // profile routes
     // this route serves two purpose. one is for admin user related operation
     // another is for client profile operation. id portion is used for admin.
@@ -100,7 +101,10 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'nullAuth', 'two
         // Route::get('preview-campaign', 'CampaignController@preview')->name('campaign.preview');
         Route::post('campaign', 'CampaignController@store')->name('campaign.store');
         Route::get('campaign/{id}/edit', 'CampaignController@edit')->name('campaign.edit');
+        Route::post('store-des-img/{campId}', 'DesImgController@store')->name('desImg.store');
+        Route::post('delete-des-img/{imgId}', 'DesImgController@destroy')->name('desImg.delete');
         Route::put('campaign/{id}', 'CampaignController@update')->name('campaign.update');
+        Route::post('campaign/{id}/update-des', 'CampaignController@updateDes')->name('campaign.updateDes');
         Route::delete('campaign/{id}/delete', 'CampaignController@destroy')->name('campaign.delete');
         
         Route::delete('album/{id}/delete', 'AlbumController@destroy')->name('album.delete');
@@ -206,3 +210,123 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'nullAuth', 'two
         });
     });
 });
+
+
+
+// accessories
+Route::get('acces/team', function(){
+    $title = 'Team - Oporajoy Crowd Fudning';
+    return view('accessories/team', compact('title'));
+})->name('a.team');
+
+Route::get('acces/partners', function(){
+    $title = 'Partners - Oporajoy Crowd Fudning';
+    return view('accessories/partners', compact('title'));
+})->name('a.partners');
+
+Route::get('acces/careers', function(){
+    $title = 'Careers - Oporajoy Crowd Fudning';
+    return view('accessories/careers', compact('title'));
+})->name('a.careers');
+
+Route::get('acces/volunteer', function(){
+    $title = 'Volunteer - Oporajoy Crowd Fudning';
+    return view('accessories/volunteer', compact('title'));
+})->name('a.volunteer');
+
+Route::get('acces/privacy-policy', function(){
+    $title = 'Privacy Policy - Oporajoy Crowd Fudning';
+    return view('accessories/privacy-policy', compact('title'));
+})->name('a.privacy-policy');
+
+Route::get('acces/fund', function(){
+    $title = 'Fund - Oporajoy Crowd Fudning';
+    return view('accessories/fund', compact('title'));
+})->name('a.fund');
+
+Route::get('acces/terms-of-use', function(){
+    $title = 'Terms Of Use - Oporajoy Crowd Fudning';
+    return view('accessories/terms-of-use', compact('title'));
+})->name('a.terms-of-use');
+
+Route::get('acces/trust-n-safety', function(){
+    $title = 'Trust And Safety - Oporajoy Crowd Fudning';
+    return view('accessories/trust-n-safety', compact('title'));
+})->name('a.trust-n-safety');
+
+Route::get('acces/service-greement', function(){
+    $title = 'Service Agreement - Oporajoy Crowd Fudning';
+    return view('accessories/service-agreement', compact('title'));
+})->name('a.service-agreement');
+
+Route::get('acces/fund-for-a-person', function(){
+    $title = 'Fund For A Person - Oporajoy Crowd Fudning';
+    return view('accessories/fund-for-a-person', compact('title'));
+})->name('a.fund-for-a-person');
+
+Route::get('acces/music-projects', function(){
+    $title = 'Music Projects - Oporajoy Crowd Fudning';
+    return view('accessories/music-projects', compact('title'));
+})->name('a.music-projects');
+
+Route::get('acces/fund-raising-deas', function(){
+    $title = 'Fund Raising Ideas - Oporajoy Crowd Fudning';
+    return view('accessories/fund-raising-ideas', compact('title'));
+})->name('a.fund-raising-ideas');
+
+Route::get('acces/gift-cards', function(){
+    $title = 'Gift Cards - Oporajoy Crowd Fudning';
+    return view('accessories/gift-cards', compact('title'));
+})->name('a.gift-cards');
+
+Route::get('acces/personal-causes', function(){
+    $title = 'Personal Causes - Oporajoy Crowd Fudning';
+    return view('accessories/personal-causes', compact('title'));
+})->name('a.personal-causes');
+
+Route::get('acces/funding-for-education', function(){
+    $title = 'Funding For Education - Oporajoy Crowd Fudning';
+    return view('accessories/funding-for-education', compact('title'));
+})->name('a.funding-for-education');
+
+Route::get('acces/contact', function(){
+    $title = 'Contact - Oporajoy Crowd Fudning';
+    return view('accessories/contact', compact('title'));
+})->name('a.contact');
+
+Route::get('acces/faq', function(){
+    $title = 'FAQ - Oporajoy Crowd Fudning';
+    return view('accessories/faq', compact('title'));
+})->name('a.faq');
+
+Route::get('acces/payment-system', function(){
+    $title = 'Payment System - Oporajoy Crowd Fudning';
+    return view('accessories/payment-system', compact('title'));
+})->name('a.payment-system');
+
+Route::get('acces/fund-raising-tips', function(){
+    $title = 'Fund Raising Tips - Oporajoy Crowd Fudning';
+    return view('accessories/fund-raising-tips', compact('title'));
+})->name('a.fund-raising-tips');
+
+Route::get('acces/fund-raising-video', function(){
+    $title = 'Fund Raising Video - Oporajoy Crowd Fudning';
+    return view('accessories/fund-raising-video', compact('title'));
+})->name('a.fund-raising-video');
+
+Route::get('acces/project-handbook', function(){
+    $title = 'Project Handbook - Oporajoy Crowd Fudning';
+    return view('accessories/project-handbook', compact('title'));
+})->name('a.project-handbook');
+
+
+
+
+// errors
+Route::get('errors/404', function(){
+    $title = 'Project Handbook - Oporajoy Crowd Fudning';
+    return view('accessories/project-handbook', compact('title'));
+})->name('e.404');
+
+
+

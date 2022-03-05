@@ -17,45 +17,45 @@
             <div class="xm-b-2 col-sm-3 col-lg-2">
                 <h4>About Us</h4>
                 <ul>
-                    <li><a href="#">Team Oporajoy</a></li>
-                    <li><a href="#">Our Partners</a></li>
-                    <li><a href="#">Careers</a></li>
-                    <li><a href="#">Valunteer</a></li>
+                    <li><a href="{{ route('a.team') }}">Team Oporajoy</a></li>
+                    <li><a href="{{ route('a.partners') }}">Our Partners</a></li>
+                    <li><a href="{{ route('a.careers') }}">Careers</a></li>
+                    <li><a href="{{ route('a.volunteer') }}">Valunteer</a></li>
                     <li><a href="#">Blog</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="{{ route('a.privacy-policy') }}">Privacy Policy</a></li>
                 </ul>
             </div>
             <div class="xm-b-2 col-sm-3 col-lg-2">
                 <h4>How it Works</h4>
                 <ul>
-                    <li><a href="#">Create</a></li>
+                    <li><a href="{{ route('campaign.create') }}">Create</a></li>
                     <li><a href="#">Share</a></li>
-                    <li><a href="#">Fund</a></li>
-                    <li><a href="#">Term of Use</a></li>
-                    <li><a href="#">Trust & Safety</a></li>
-                    <li><a href="#">Service Agreement</a></li>
+                    <li><a href="{{ route('a.fund') }}">Fund</a></li>
+                    <li><a href="{{ route('a.terms-of-use') }}">Term of Use</a></li>
+                    <li><a href="{{ route('a.trust-n-safety') }}">Trust & Safety</a></li>
+                    <li><a href="{{ route('a.service-agreement') }}">Service Agreement</a></li>
                 </ul>
             </div>
             <div class="xm-b-2 col-sm-3 col-lg-3">
                 <h4>Fundrais</h4>
                 <ul>
-                    <li><a href="#">Crowdfund for a person</a></li>
-                    <li><a href="#">Music Projects</a></li>
-                    <li><a href="#">Fundraising Ideas</a></li>
-                    <li><a href="#">Gift Cards</a></li>
-                    <li><a href="#">Personal Causes</a></li>
-                    <li><a href="#">Crowdfunding for Education</a></li>
+                    <li><a href="{{ route('a.fund-for-a-person') }}">Crowdfund for a person</a></li>
+                    <li><a href="{{ route('a.music-projects') }}">Music Projects</a></li>
+                    <li><a href="{{ route('a.fund-raising-ideas') }}">Fundraising Ideas</a></li>
+                    <li><a href="{{ route('a.gift-cards') }}">Gift Cards</a></li>
+                    <li><a href="{{ route('a.personal-causes') }}">Personal Causes</a></li>
+                    <li><a href="{{ route('a.funding-for-education') }}">Crowdfunding for Education</a></li>
                 </ul>
             </div>
             <div class="xm-b-2 col-sm-3 col-lg-2">
                 <h4>Support</h4>
                 <ul>
-                    <li><a href="#">Contact Us</a></li>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Payment System</a></li>
-                    <li><a href="#">Fundraising Tips</a></li>
-                    <li><a href="#">Fundraiser Video</a></li>
-                    <li><a href="#">Project Handbook</a></li>
+                    <li><a href="{{ route('a.contact') }}">Contact Us</a></li>
+                    <li><a href="{{ route('a.faq') }}">FAQ</a></li>
+                    <li><a href="{{ route('a.payment-system') }}">Payment System</a></li>
+                    <li><a href="{{ route('a.fund-raising-tips') }}">Fundraising Tips</a></li>
+                    <li><a href="{{ route('a.fund-raising-video') }}">Fundraiser Video</a></li>
+                    <li><a href="{{ route('a.project-handbook') }}">Project Handbook</a></li>
                 </ul>
             </div>
         </div>
