@@ -1,7 +1,0 @@
-﻿https://clickup.com/	[Home Section]
-https://www.ketto.org/	[Trending Fundraisers Section]
-https://asana.com/		[Animation Section]
-https://monday.com/blog/	[Blog Section]
-https://monday.com/blog/product/our-latest-features-to-help-optimize-your-marketing-workflow/	[Single Post Section]
-https://oporajoy.org/	[Footer Section]
-

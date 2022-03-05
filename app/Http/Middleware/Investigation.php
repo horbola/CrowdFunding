@@ -17,11 +17,11 @@ class Investigation
      */
     public function handle(Request $request, Closure $next) {
         $menuName = 'investigate';
-        if(Auth::user()->is_volunteer === 1){
+        if( (int)Auth::user()->is_volunteer === 1 ){
             $title = 'Requested To Be A Volunteer';
             return response()->view('investigation.requested-for-volunteer', compact('title', 'menuName'));
         }
-        else if(Auth::user()->is_volunteer !== 2){
+        else if( (int)Auth::user()->is_volunteer !== 2 ){
             $title = 'Not Volunteer';
             return response()->view('investigation.already-a-volunteer', compact('title', 'menuName'));
         }

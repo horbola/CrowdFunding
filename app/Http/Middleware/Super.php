@@ -16,7 +16,7 @@ class Super
      * @return mixed
      */
     public function handle(Request $request, Closure $next){
-        if(Auth::user()->is_super !== 1){
+        if( (int)Auth::user()->is_super !== 1 ){
             return response()->view('platform.super-check');
         }
         return $next($request);
