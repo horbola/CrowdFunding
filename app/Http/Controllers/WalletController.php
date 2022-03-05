@@ -19,14 +19,14 @@ class WalletController extends Controller {
      * indexes wallets of all users to admin panel
      */
     public function index() {
-        return view('admin.partial.dashboard.wallets');
+        return view('fund.wallets');
     }
     
     /**
      * shows a campaigner's wallet
      */
     public function showCampaignerWallet() {
-        return view('dashboard.wallet');
+        return view('fund.wallet');
     }
     
     

@@ -23,34 +23,35 @@ class UserController extends Controller {
      * shows users panel from which different types of users will viewed.
      */
     public function indexUsersPanel(Request $request) {
-        return view('admin.users-panel')->with(compact('request'));
+        return view('user.users-panel')->with(compact('request'));
     }
     
     public function indexAllUsers() {
-        $users = User::all();
-        return view('admin.users', compact('users'));
+        // User::all() returns a collection instance on which there is no pagination.
+        $users = User::paginate(4);
+        return view('user.users', compact('users'));
     }
     
     public function indexBlockedUsers() {
         // 0:pending, 1:active, 2:malicous, 3:blocked, 4:left
         $users = User::whereActiveStatus(3)->get();
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     public function indexActiveUsers() {
         // 0:pending, 1:active, 2:malicous, 3:blocked, 4:left
         $users = User::whereActiveStatus(1)->get();
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     public function indexMalicousUsers() {
         $users = User::whereActiveStatus(2)->get();
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     public function indexLeftUsers() {
         $users = User::whereActiveStatus(4)->get();
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     
@@ -62,47 +63,47 @@ class UserController extends Controller {
         $users = User::all()->filter(function($user, $key){
             return $user->hasRole('guest');
         });
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     public function indexDonors() {
         $users = User::all()->filter(function($user, $key){
             return $user->hasRole('donor');
         });
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     public function indexCampaigners() {
         $users = User::all()->filter(function($user, $key){
             return $user->hasRole('campaigner');
         });
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     public function indexVolunteerRequests() {
         $users = User::whereIsVolunteer(1)->get();
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     public function indexVolunteers() {
         $users = User::all()->filter(function($user, $key){
             return $user->hasRole('volunteer');
         });
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     public function indexStaffs() {
         $users = User::all()->filter(function($user, $key){
             return $user->hasRole('staff');
         });
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     public function indexSuper() {
         $users = User::all()->filter(function($user, $key){
             return $user->hasRole('super');
         });
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     
@@ -111,19 +112,19 @@ class UserController extends Controller {
     
     
     public function indexTopDonors() {
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     public function indexTopActives() {
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     public function indexTopSupporters() {
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
     public function indexTopVisiters() {
-        return view('admin.users', compact('users'));
+        return view('user.users', compact('users'));
     }
     
 
@@ -135,8 +136,13 @@ class UserController extends Controller {
      * 
      * shows a single user's details
      */
-    public function show(Request $request) {
+    public function show(Request $request, $id=0) {
         $user = Auth::user();
+        // if there's an id means this request is coming from admin
+        // else is coming from client.
+        if($id){
+            $user = User::find($id);
+        }
         //$address = Address::where('user_id', $user->id)->get();
         $user->user_type = $user->roleDesc('super', 'staff', 'voluntier', 'campaigner', 'donor', 'guest');
 
@@ -158,7 +164,8 @@ class UserController extends Controller {
         else {
             $user->countryNiceName = 'Not Provided';
         }
-        return view('dashboard.profile')->with(compact('request', 'user'));
+        
+        return view('user.profile')->with(compact('request', 'user'));
     }
     
     public function showAdmin() {
@@ -182,8 +189,13 @@ class UserController extends Controller {
     /**
      * admin gets edit user form
      */
-    public function edit() {
+    public function edit(Request $request, $id=0) {
         $user = Auth::user();
+        // if there's an id means this request is coming from admin
+        // else is coming from client.
+        if($id){
+            $user = User::find($id);
+        }
         $user->user_type = $user->roleDesc('super', 'staff', 'voluntier', 'campaigner', 'donor', 'guest');
 
         if (!$user->gender){
@@ -207,12 +219,17 @@ class UserController extends Controller {
             $user->countryNiceName = 'Not Provided';
         }
         // return view('dashboard.profile-edit')->with('user', $user);
-        return view('dashboard.profile-edit')->with(compact('user', 'countries'));
+        return view('user.profile-edit')->with(compact('request', 'user', 'countries'));
     }
     
     
-    public function update(Request $req) {
+    public function update(Request $req, $id=0) {
         $user = Auth::user();
+        // if there's an id means this request is coming from admin
+        // else is coming from client.
+        if($id){
+            $user = User::find($id);
+        }
         $inputs = Arr::except($req->input(), ['_token', 'photo']);
         $user->name = $inputs['name'];
         $user->gender = $inputs['gender'];
@@ -220,15 +237,30 @@ class UserController extends Controller {
         $user->address->website = $inputs['website'];
         $user->address->country_id = $inputs['country_id'];
         $saved = $user->push();
-        
-        if($saved){
+
+        // $req->user_panel_fraction = 'alls';
+        if($saved && $id){
+            // returns to users table in admin panel from this 'if block'
+            // the 'user_panel_fraction' is uploaded from user-panel blade
+            // so that after updating user information the admin can go to 
+            // the appropriate original section of user-panel.
+            return redirect('/dashboard/admin/users-panel/'.$req->user_panel_fraction)->with('success', $req->profileItem.' has been updated');
+        }
+        else if($saved){
+            // returns to client profile from this else block
             return redirect(route('user.show'))->with('success', $req->profileItem.' has been updated');
         }
+        
         return back()->with('error', 'sorry the changes you are trying to make couldn\'t be possible');
     }
     
-    public function updatePhoto(Request $req) {
+    public function updatePhoto(Request $req, $id=0) {
         $user = Auth::user();
+        // if there's an id means this request is coming from admin
+        // else is coming from client.
+        if($id){
+            $user = User::find($id);
+        }
         $rules = ['avatar' => 'mimes:jpeg,jpg,png'];
         $this->validate($req, $rules);
         

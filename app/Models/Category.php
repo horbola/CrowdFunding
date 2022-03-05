@@ -10,4 +10,5 @@ class Category extends Model
     use HasFactory;
     
     protected $guarded = [];
+    protected $fillable = ['category_name', 'category_slug', 'category_image', 'show_in_home',];
 }

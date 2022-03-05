@@ -18,7 +18,6 @@ class CreateDonationsTable extends Migration
             $table->foreignId('user_id')->nullable();
             $table->tinyInteger('anonymous')->nullable();
             $table->foreignId('campaign_id');
-            $table->string('amount');
             $table->timestamps();
         });
     }

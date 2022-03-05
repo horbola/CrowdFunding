@@ -9,10 +9,10 @@ use App\Http\Controllers\CampaignController;
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('guest-campaign-list/{categoryId?}', 'CampaignController@indexGuestCampaign')->name('campaign.indexGuestCampaign');
-Route::get('guest-campaign/{campaignId}', 'CampaignController@showGuestCampaign')->name('campaign.showGuestCampaign');
+Route::get('guest-campaign-search', 'CampaignController@indexSearchedCampaign')->name('campaign.indexSearchedCampaign');
+Route::post('guest-campaign-filter', 'CampaignController@indexFilteredCampaign')->name('campaign.indexFilteredCampaign');
+Route::get('guest-campaign/{campaignId}', 'CampaignController@showGuestCampaign')->name('campaign.showGuestCampaign'); //return view('face.campaign-detail', compact('campaign'));
 
-Route::get('donation-create', 'DonationController@createModel')->name('donation.createModel'); //return ['success' => 1, 'msg' => trans('app.settings_saved_msg')];
-Route::post('donation/{campaignId}', 'DonationController@store')->name('donation.store');
 Route::get('test', function(){
     return view('test.sticky-form');
 });
@@ -25,12 +25,15 @@ Route::post('store-comment', 'CommentController@store')->name('comment.store');
 
 
 Auth::routes(['verify' => true]);
-Route::group(['prefix' => 'dashboard'], function(){
+
+Route::group(['prefix' => 'dashboard', 'middleware'=>'auth'], function(){
     // profile routes
-    Route::get('profile/show', 'UserController@show')->name('user.show'); //return view('dashboard.profile')->with(['user' => $user]);
-    Route::get('profile/edit', 'UserController@edit')->name('user.edit'); //return view('dashboard.profile-edit')->with(compact('user', 'countries'));
-    Route::put('profile/update', 'UserController@update')->name('user.update'); //return redirect(route('user.show', $user->id))->with('success', $req->profileItem.' has been updated');
-    Route::put('profile/photo', 'UserController@updatePhoto')->name('user.updatePhoto'); //return redirect(route('user.showProfile', $user->id))->with(['success' => $req->profileItem.' has been updated', 'user' => $user]);
+    // this route serves two purpose. one is for admin user related operation
+    // another is for client profile operation. id portion is used for admin.
+    Route::get('profile/show/{id?}', 'UserController@show')->name('user.show'); //return view('dashboard.profile')->with(['user' => $user]);
+    Route::get('profile/edit/{id?}', 'UserController@edit')->name('user.edit'); //return view('dashboard.profile-edit')->with(compact('user', 'countries'));
+    Route::put('profile/update/{id?}', 'UserController@update')->name('user.update'); //return redirect(route('user.show', $user->id))->with('success', $req->profileItem.' has been updated');
+    Route::put('profile/photo/{id?}', 'UserController@updatePhoto')->name('user.updatePhoto'); //return redirect(route('user.showProfile', $user->id))->with(['success' => $req->profileItem.' has been updated', 'user' => $user]);
 
     Route::get('campaign/donated', 'CampaignController@indexDonatedCampaign')->name('campaign.indexDonatedCampaign'); 
     Route::get('campaign/supported', 'CampaignController@indexSupportedCampaign')->name('campaign.indexSupportedCampaign'); 
@@ -57,6 +60,8 @@ Route::group(['prefix' => 'dashboard'], function(){
         Route::post('campaign', 'CampaignController@store')->name('campaign.store');
         Route::get('campaign/{id}/edit', 'CampaignController@edit')->name('campaign.edit');
         Route::put('campaign/{id}', 'CampaignController@update')->name('campaign.update');
+        
+        Route::put('campaign/{id}/updates/store', 'UpdateController@store')->name('campaign.updates.store');
         
         Route::get('wallet', 'WalletController@showCampaignerWallet')->name('wallet.showCampaignerWallet');
     });
@@ -107,8 +112,8 @@ Route::group(['prefix' => 'dashboard'], function(){
 
         Route::get('fund-panel', 'FundController@indexFundPanel')->name('fund.indexFundPanel'); //return view('admin.platform');
         
-        Route::get('platform-panel', 'PlatformController@indexPlatformPanel')->name('platform.indexPlatformPanel'); //return view('admin.platform');
-        Route::get('platform-panel/settings', 'SettingsController@index')->name('settings.index'); //return view('admin.settings')->with('page', 'admin settings');
+        Route::get('platform-panel', 'PlatformController@indexPlatformPanel')->name('platform.indexPlatformPanel');
+        Route::get('platform-panel/settings', 'PlatformController@indexPlatformSettings')->name('platform.indexPlatformSettings');
         Route::get('platform-panel/category', 'CategoryController@index')->name('category.index');
         Route::post('platform-panel/category', 'CategoryController@store')->name('category.store');
         Route::put('platform-panel/category/{id}', 'CategoryController@update')->name('category.update');

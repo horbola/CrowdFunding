@@ -13,6 +13,8 @@ use App\Models\View;
 use App\Models\Category;
 use App\Models\Comment;
 
+use App\Lib\Helper;
+
 
 
 
@@ -27,30 +29,111 @@ class Campaign extends Model
     }
     
     public function country() {
-        return $this->belongsTo(Country::class);
+         return $this->belongsTo(Country::class);
     }
     
     public function category() {
+        // this method finds the category model in this way
+        // $category = Category::find($this->category_id);
         return $this->belongsTo(Category::class);
     }
     
+    public function related() {
+        $collection = Campaign::where('category_id', $this->category->id)->paginate(27)->collect();
+        $filtered = $collection->reject(function ($value, $key) {
+            return $value->id === $this->id;
+        });
+        return $filtered;
+    }
+    
+    /*
+     * finds all the donations for this campaign
+     */
     public function donations() {
         return $this->hasMany(Donation::class);
+    }
+    
+    /*
+     * finds all the donations of a single user for this campaign
+     */
+    public function donationsSingleUser($donorId) {
+        return $this->hasMany(Donation::class)->where('user_id', $donorId);
     }
     
     public function views() {
         return $this->hasMany(View::class);
     }
     
-    public function hasLiked() {
-        return Like::whereUserId(Auth::user()->id)->whereCampaignId($this->id)->count();
+    public function viewsCount() {
+        $views = $this->views->count();
+        if($views === 0 || $views === 1){
+            $views = $views.' View';
+        }
+        else {
+            $views = $views.' Views';
+        }
+        return $views;
     }
     
-    public function comments() {
-        return $this->hasMany(Comment::class)->whereNull('parent_id')->orWhere('parent_id', 0);
+    public function likes() {
+        return $this->hasMany(Like::class);
     }
+    
+    public function likesCount() {
+        $likes = $this->likes->count();
+        if($likes === 0 || $likes === 1){
+            $likes = $likes.' Supports';
+        }
+        else {
+            $likes = $likes.' Support';
+        }
+        return $likes;
+    }
+    
+    public function hasLiked() {
+        if(Auth::check()){
+            return Like::whereUserId(Auth::user()->id)->whereCampaignId($this->id)->count();
+        }
+        else return 0;
+        
+    }
+    
+    /*
+     * gets only the main (parent) comments. replies are retrieved from comment model by 'replies' method.
+     */
+    public function comments() {
+        // return $this->hasMany(Comment::class)->whereNull('parent_id')->orWhere('parent_id', 0)->orderBy('created_at', 'desc');
+        return $this->hasMany(Comment::class)->whereNull('parent_id')->orWhere('parent_id', 0)->latest();
+    }
+    
+    public function album() {
+        return $this->hasMany(Album::class);
+    }
+    
+    public function documents() {
+        return $this->hasMany(Document::class);
+    }
+    
+    public function updates() {
+        return $this->hasMany(Update::class);
+    }
+    
+    public function thumbImagePath() {
+        $thumbImagePath = str_replace('full', 'thumb', $this->feature_image);
+        return $thumbImagePath;
+    }
+    
+    public function donorsCount() {
+        $donations = Donation::where('campaign_id', $this->id)->get();
+        $count = $donations->unique()->count();
+        return $count;
+    }
+
+    
+    
     
     public function investigation() {
+        // Investigation::find($this->campaign_id);
         return $this->hasOne(Investigation::class);
     }
     
@@ -63,7 +146,17 @@ class Campaign extends Model
      * for a campaign.
      */
     public function totalSuccessfulDonation() {
-        return $this->donation->sum(function($aDonation){
+        return $this->donations->sum(function($aDonation){
+            return $aDonation->totalPayableAmount();
+        });
+    }
+    
+    /*
+     * this method counts total succesful payment of all donations
+     * of a single user for a campaign.
+     */
+    public function totalSuccessfulDonationOfSingleUser($donorId) {
+        return $this->donationsSingleUser($donorId)->sum(function($aDonation){
             return $aDonation->totalPayableAmount();
         });
     }
@@ -72,7 +165,28 @@ class Campaign extends Model
         // time returns current time in seconds
         $diff = strtotime($this->end_date)-time();
         // seconds/minute*minutes/hour*hours/day)
-        return floor($diff/(60*60*24));
+        $days = floor($diff/(60*60*24));
+        
+        if($this->status === 1){
+            if($days >= 0) {
+                switch ($days) {
+                    case 0:
+                    case 1:
+                        $days = $days.' day left';
+                        break;
+                    default:
+                        $days = $days.' days left';
+                }
+            }
+            else {
+                $days = 'Completed';
+            }
+        }
+        else {
+            $days = Helper::decodeStatus($this->status);
+        }
+        
+        return $days;
     }
     
     public function isActive() {

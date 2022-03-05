@@ -12,7 +12,7 @@ class CategoryController extends Controller {
     public function index(Request $request) {
         $categories = Category::all();
         $title = 'Category';
-        return view('admin.category-index', compact('categories', 'title', 'request'));
+        return view('campaign.campaigns-category', compact('categories', 'title', 'request'));
     }
     
     public function store(Request $request) {

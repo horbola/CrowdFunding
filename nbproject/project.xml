@@ -9,6 +9,7 @@
             <word>csrf</word>
             <word>php</word>
             <word>textv</word>
+            <word>ths</word>
         </spellchecker-wordlist>
     </configuration>
 </project>

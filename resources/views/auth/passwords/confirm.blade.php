@@ -1,4 +1,4 @@
-@extends('layouts.app.skel')
+@extends('layout.app.skel')
 
 @section('content')
 <div class="container">

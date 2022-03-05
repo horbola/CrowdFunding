@@ -8,6 +8,6 @@ class FundController extends Controller
 {
     
     public function indexFundPanel() {
-        return view('admin.fund-panel');
+        return view('fund.fund-panel');
     }
 }

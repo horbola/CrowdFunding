@@ -17,10 +17,12 @@ class PlatformController extends Controller {
     
     
     public function indexPlatformPanel(){
-        return view('admin.platform-panel');
+        return view('platform.platform-panel');
     }
     
-    
+    public function indexPlatformSettings(){
+        return view('platform.platform-settings');
+    }
     
     
     

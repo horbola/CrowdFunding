@@ -1,4 +1,4 @@
-@extends('layouts.form.skel')
+@extends('layout.form.skel')
 
 @section('content')
 <div class="back-to-home rounded d-none d-sm-block">

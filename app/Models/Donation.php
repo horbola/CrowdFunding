@@ -10,12 +10,13 @@ class Donation extends Model
     use HasFactory;
     
     protected $guarded = [];
+    protected $fillable = ['user_id', 'anonymous', 'campaign_id'];
     
     public function campaign() {
         return $this->belongsTo(Campaign::class);
     }
     
-    public function payment() {
+    public function payments() {
         return $this->hasMany(Payment::class);
     }
     
@@ -32,8 +33,20 @@ class Donation extends Model
      * within a donation
      */
     public function totalPayableAmount() {
-        return $this->payment->sum(function ($aPayment) {
+        return $this->payments->sum(function ($aPayment) {
             return $aPayment->amount - (($aPayment->amount/100)*20);
+        });
+    }
+    
+    /*
+     * this method counts sum of payed abount by a user of all
+     * payment within a donation.
+     * payed amount is the original amount of a donor without
+     * any reduction of platform cost.
+     */
+    public function totalPayedAmount() {
+        return $this->payments->sum(function ($aPayment) {
+            return $aPayment->amount;
         });
     }
 }

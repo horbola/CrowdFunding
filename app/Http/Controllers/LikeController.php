@@ -26,7 +26,7 @@ class LikeController extends Controller
             }
             
             //check if request comes via ajax?
-            if ($request->ajax()) {
+            if ($reque1st->ajax()) {
                 return ['campaignId' => $campaignId, 'created' => $created];
             }
         }

@@ -68,6 +68,35 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Campaign::class);
     }
     
+    /*
+     * returns avatar of the user if it exists. but not exists
+     * returns a placeholder based on gender setup. but there's
+     * no gender is setup or gender setup is 'others' then returns
+     * a common placeholder avatar.
+     */
+    public function avatar() {
+        $avatarPath = public_path().$this->photo;
+        if(file_exists($avatarPath)){
+            return $this->photo;
+        }
+        else {
+            switch ($this->gender) {
+                case 'male' : return '/uploads/placeholder/avatar/boy.jpg';
+                case 'female' : return '/uploads/placeholder/avatar/girl.jpg';
+                default : return '/uploads/placeholder/avatar/common.png';
+            }
+        }
+    }
+    
+    /*
+     * builds the location of the campaigner based on his address
+     */
+    public function location() {
+        $address = $this->address;
+        $location = $address->division.', '.$address->country->nicename;
+        return $location;
+    }
+    
     
     /*
      * a campaigner may have created multiple campaigns. and
@@ -99,9 +128,4 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->two_factor_expires_at = null;
         $this->save();
     }
-    
-    
-    
-    
-
 }

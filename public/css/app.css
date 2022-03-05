@@ -10028,7 +10028,7 @@ h3 {
   }
 }
 
-.sticki {
+.sticky-status {
   position: sticky;
   top: 70px;
 }
@@ -10047,17 +10047,17 @@ h3 {
 .two-column-table .row:hover {
   background-color: #f3f3f3;
 }
-#profile-content .field .info {
+#profile .field .info {
   border: 1px solid transparent;
 }
-#profile-content .field .info .iconn {
+#profile .field .info .iconn {
   visibility: hidden;
 }
-#profile-content .field .info:hover {
+#profile .field .info:hover {
   border: 1px solid #dee2e6;
   border-radius: 3px;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
-#profile-content .field .info:hover .iconn {
+#profile .field .info:hover .iconn {
   visibility: visible;
 }

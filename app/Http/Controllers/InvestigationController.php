@@ -15,7 +15,7 @@ class InvestigationController extends Controller
 {
     // reners the licence agrement form
     public function createVolunteer() {
-        return view('dashboard.create-volunteer');
+        return view('investigation.volunteer-create');
     }
     
     // from the lincence agrement form user
@@ -48,7 +48,7 @@ class InvestigationController extends Controller
             $campaigns = $investigations->map(function($investigation, $key){
                 return $investigation->campaign;
             });
-            return view('dashboard.donor-camp', compact('user', 'campaigns'));
+            return view('campaign.campaigns-list', compact('user', 'campaigns'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
@@ -59,13 +59,13 @@ class InvestigationController extends Controller
         $active = $categoryId;
         $campaigns = Campaign::where('category_id', $categoryId)->get();
         // this variable is difined to detect that the campaign detali page has come from 'investigate' button.
-        // this variable is passed to the 'campaign-single' page through the 'campaign-list' page.
+        // this variable is passed to the 'campaign-detail' page through the 'campaign-master' page.
         $request->request->add(['indexInvestigation' => true]);
-        return view('campaign-list')->with(compact('categories', 'active', 'campaigns'));
+        return view('face.campaign-master')->with(compact('categories', 'active', 'campaigns'));
     }
     
     public function createInvestigationForm() {
-        return view('dashboard.create-investigation-form');
+        return view('investigation.investigation-create');
     }
     
     public function storeInvestigation(Request $request, $campaignId) {
@@ -96,7 +96,7 @@ class InvestigationController extends Controller
     
     // renders the form from wchich user can resign volunteer
     public function destroyVolunteer() {
-        return view('dashboard.resign-volunteer');
+        return view('investigation.volunteer-resign');
     }
     
     // ultimately resigns from volunteer
