@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\Notifications\TwoFactorCode;
+use App\Http\Controllers\DonationController;
 
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
@@ -43,14 +44,15 @@ class LoginController extends Controller
     
     
     
-    protected function authenticated(Request $request, $user) {
-//        $user->generateTwoFactorCode();
-//        $user->notify(new TwoFactorCode());
+    protected function authenticated(Request $request, $user){
+        // 0:pending, 1:active, 2:malicous, 3:blocked, 4:left, 5:paused
+        if($user->active_status === 4){
+            return view('auth.deleted-account');
+        }
         
-//        return $this->authenticated($request, $this->guard()->user())
-//                ?: redirect()->intended($this->redirectPath());
-//        return redirect()->intended(route('campaign.indexGuestCampaign'));
-        return false;
+        if($user->active_status === 5){
+            return view('auth.paused-account');
+        }
     }
 
 }

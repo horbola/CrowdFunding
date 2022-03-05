@@ -6,7 +6,7 @@
     <form action="{{ route('user.update', ['id' => $user->id, 'user_panel_fraction' => $request->user_panel_fraction]) }}" method="post" enctype="multipart/form-data">
         @csrf
         @method('put')
-        <div class="row">
+        <div class="row {{ $errors->has('name')? 'has-error' : '' }}">
             <div class="col-sm-12 col-md-3 tag">
                 <div class="py-2">
                     <i data-feather="mail" class="fea icon-ex-md text-muted me-3"></i>
@@ -17,6 +17,7 @@
                 <div class="p-2">
                     <input type="text" name="name" class="form-control" value="{{ $user->name }}" style="">
                 </div>
+                {!! $errors->has('name')? '<p class="help-block">'.$errors->first('name').'</p>' : '' !!}
             </div>
         </div>
 
@@ -68,7 +69,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row {{ $errors->has('phone')? 'has-error' : '' }}">
             <div class="col-sm-12 col-md-3 tag">
                 <div class="py-2">
                     <i data-feather="mail" class="fea icon-ex-md text-muted me-3"></i>
@@ -79,10 +80,11 @@
                 <div class="p-2">
                     <input type="text" name="phone" class="form-control" value="{{ $user->phone }}" style="">
                 </div>
+                {!! $errors->has('phone')? '<p class="help-block">'.$errors->first('phone').'</p>' : '' !!}
             </div>
         </div>
 
-        <div class="row">
+        <div class="row {{ $errors->has('website')? 'has-error' : '' }}">
             <div class="col-sm-12 col-md-3 tag">
                 <div class="py-2">
                     <i data-feather="mail" class="fea icon-ex-md text-muted me-3"></i>
@@ -93,6 +95,7 @@
                 <div class="p-2">
                     <input type="text" name="website" class="form-control" value="{{ $user->website }}" style="">
                 </div>
+                {!! $errors->has('website')? '<p class="help-block">'.$errors->first('website').'</p>' : '' !!}
             </div>
         </div>
 

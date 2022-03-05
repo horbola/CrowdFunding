@@ -32,9 +32,15 @@ class CampaignController extends Controller {
     }
     
     public function indexSearchedCampaign(Request $request) {
+        $rules = [
+            'q' => 'string:500',
+            'category_id' => 'numeric',
+        ];
+        $validated = $this->validate($request, $rules);
+        
         $categories = Category::all();
         $active = $request->category_id;
-        $campaigns = Campaign::where('category_id', $request->category_id)->orWhere('short_description', 'like', "%{$request->q}%")->orWhere('description', 'like', "%{$request->q}%")->paginate(4);
+        $campaigns = Campaign::where('category_id', $validated['category_id'])->orWhere('short_description', 'like', "%{$validated['q']}%")->orWhere('description', 'like', "%{$validated['q']}%")->paginate(4);
         return view('face.campaign-master', compact('request', 'categories', 'active', 'campaigns'));
     }
     
@@ -355,14 +361,23 @@ class CampaignController extends Controller {
     
     public function store(Request $request) {
         $rules = [
-            'country_id' => 'required',
-            'category' => 'required',
-            'title' => 'required',
-            'description' => 'required',
-            'goal' => 'required',
-            'end_method' => 'required',
-            // 'album' => '',
-            // 'documents' => '',
+            'address' => 'required|string',
+            'category' => 'required|numeric',
+            'title' => 'required|string',
+            'short_description' => 'required|string',
+            'description' => 'required|string',
+            'feature_image' => 'required|file',
+            'album' => 'required|array',
+            'documents' => 'required|array',
+            // 'feature_video' => 'required|file',
+            'goal' => 'required|numeric',
+            'end_method' => 'required|numeric',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'min_amount' => 'required|numeric',
+            'max_amount' => 'required|numeric',
+            'recommended_amount' => 'required|numeric',
+            'amount_prefilled' => 'required|string',
         ];
         $this->validate($request, $rules);
 
@@ -372,7 +387,7 @@ class CampaignController extends Controller {
         $data = [
             'user_id' => $user_id,
             'category_id' => $request->category,
-            'country_id' => $request->country_id,
+            'country_id' => 18,
             'address' => $request->address,
             
             'slug' => $slug,
@@ -468,22 +483,32 @@ class CampaignController extends Controller {
     
     public function update(Request $request, $campaignId) {
         $rules = [
-            'country_id' => 'required',
-            'category' => 'required',
-            'title' => 'required',
-            'description' => 'required',
-            'goal' => 'required',
-            'end_method' => 'required',
-            'feature_image' => 'required|mimes:jpeg,jpg,png',
+            'address' => 'string',
+            'category' => 'numeric',
+            'title' => 'string',
+            'short_description' => 'string',
+            'description' => 'string',
+            'feature_image' => 'file',
+            'album' => 'array',
+            'documents' => 'array',
+            // 'feature_video' => 'required|file',
+            'goal' => 'numeric',
+            'end_method' => 'numeric',
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'min_amount' => 'numeric',
+            'max_amount' => 'numeric',
+            'recommended_amount' => 'numeric',
+            'amount_prefilled' => 'string',
         ];
-//        $this->validate($request, $rules);
+        $this->validate($request, $rules);
         
         $campaign = Campaign::find($campaignId);
         
         $slug = Helper::unique_slug($request->title);
         
         $campaign->category_id = $request->category;
-        $campaign->country_id = $request->country_id;
+        // $campaign->country_id = $request->country_id;
         $campaign->address = $request->address;
         
         $campaign->slug = $slug;

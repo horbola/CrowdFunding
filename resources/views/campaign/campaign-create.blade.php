@@ -6,7 +6,8 @@
     <form action="{{ route('campaign.store') }}" method="post" enctype="multipart/form-data">
         @csrf
         <legend class="text-center mb-5">@lang('app.campaign_info')</legend>
-
+        
+        <!--
         <div class="form-group form-row {{ $errors->has('country_id')? 'has-error':'' }}">
             <label for="country_id" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.country')<span class="text-danger">*</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
@@ -21,16 +22,19 @@
                 {!! $errors->has('country_id')? '<p class="help-block">'.$errors->first('country_id').'</p>':'' !!}
             </div>
         </div>
-        <div class="form-group form-row {{ $errors->has('address')? 'has-error':'' }}">
+        -->
+        
+        <div class="form-group form-row {{ $errors->has('address')? 'has-error' : '' }}">
             <label for="address" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.address')</label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="user" class="fea icon-sm icons"></i>
                 <input type="text" class="form-control ps-5" id="address" value="{{ old('address') }}" name="address" placeholder="@lang('app.address')" maxlength="255">
-                {!! $errors->has('address')? '<p class="help-block">'.$errors->first('address').'</p>':'' !!}
+                <p class="text-info"> @lang('app.address_info_text')</p>
+                {!! $errors->has('address')? '<p class="help-block">'.$errors->first('address').'</p>' : '' !!}
             </div>
         </div>
 
-        <div class="form-group form-row {{ $errors->has('category')? 'has-error':'' }}">
+        <div class="form-group form-row {{ $errors->has('category')? 'has-error' : '' }}">
             <label for="category" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.category') <span class="text-danger">*</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="user" class="fea icon-sm icons"></i>
@@ -40,30 +44,32 @@
                     <option value="{{ $category->id }}">{{ $category->category_name }}</option>
                     @endforeach
                 </select>
-                {!! $errors->has('category')? '<p class="help-block">'.$errors->first('category').'</p>':'' !!}
+                <p class="text-info"> @lang('app.category_info_text')</p>
+                {!! $errors->has('category')? '<p class="help-block">'.$errors->first('category').'</p>' : '' !!}
             </div>
         </div>
 
-        <div class="form-group form-row {{ $errors->has('title')? 'has-error':'' }}">
+        <div class="form-group form-row {{ $errors->has('title')? 'has-error' : '' }}">
             <label for="title" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.title') <span class="text-danger">*</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="user" class="fea icon-sm icons"></i>
                 <input type="text" class="form-control ps-5" id="title" value="{{ old('title') }}" name="title" placeholder="@lang('app.title')" maxlength="255">
-                {!! $errors->has('title')? '<p class="help-block">'.$errors->first('title').'</p>':'' !!}
                 <p class="text-info"> @lang('app.great_title_info')</p>
+                {!! $errors->has('title')? '<p class="help-block">'.$errors->first('title').'</p>' : '' !!}
             </div>
         </div>
 
-        <div class="form-group form-row {{ $errors->has('short_description')? 'has-error':'' }}">
+        <div class="form-group form-row {{ $errors->has('short_description')? 'has-error' :  '' }}">
             <label for="short_description" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.short_description')</label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="user" class="fea icon-sm icons"></i>
                 <textarea name="short_description" class="form-control ps-5" rows="2" maxlength="300">{{ old('short_description') }}</textarea>
-                {!! $errors->has('short_description')? '<p class="help-block">'.$errors->first('short_description').'</p>':'' !!}
+                <p class="text-info"> @lang('app.short-description_info')</p>
+                {!! $errors->has('short_description')? '<p class="help-block">'.$errors->first('short_description').'</p>' : '' !!}
             </div>
         </div>
 
-        <div class="form-group form-row {{ $errors->has('description')? 'has-error':'' }}">
+        <div class="form-group form-row {{ $errors->has('description')? 'has-error' : '' }}">
             <label for="description" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.description') <span class="text-danger">*</span></label>
             <div class="col-sm-12 col-md-9">
                 <!--<div class="alert alert-info"> @lang('app.image_insert_limitation') </div>-->
@@ -72,8 +78,8 @@
                     <textarea id="description" name="description" class="form-control description ps-5"></textarea>
                     <!--<div id="description"></div> this is for ckeditor-->
                 </div>
-                {!! $errors->has('description')? '<p class="help-block">'.$errors->first('description').'</p>':'' !!}
                 <p class="text-info"> @lang('app.description_info_text')</p>
+                {!! $errors->has('description')? '<p class="help-block">'.$errors->first('description').'</p>' : '' !!}
             </div>
         </div>
 
@@ -82,8 +88,8 @@
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="user" class="fea icon-sm icons"></i>
                 <input type="file" class="form-control ps-5" id="feature_image" value="" name="feature_image" placeholder="@lang('app.feature_image')">
-                {!! $errors->has('feature_image')? '<p class="help-block">'.$errors->first('feature_image').'</p>':'' !!}
                 <p class="text-info"> @lang('app.video_info_text')</p>
+                {!! $errors->has('feature_image')? '<p class="help-block">'.$errors->first('feature_image').'</p>' : '' !!}
             </div>
         </div>
         
@@ -92,8 +98,8 @@
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="user" class="fea icon-sm icons"></i>
                 <input type="file" class="form-control ps-5" id="album" value="" name="album[]" multiple placeholder="Album">
+                <p class="text-info">@lang('app.album_info')</p>
                 {!! $errors->has('album')? '<p class="help-block">'.$errors->first('album').'</p>':'' !!}
-                <p class="text-info">Upload image in jpg, png, gif format. These images supplement the feature image</p>
             </div>
         </div>
         
@@ -109,17 +115,17 @@
         </div>
         -->
         
-        <div class="form-group form-row {{ $errors->has('documents')? 'has-error':'' }}">
+        <div class="form-group form-row {{ $errors->has('documents')? 'has-error' : '' }}">
             <label for="documents" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">Documents</label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="user" class="fea icon-sm icons"></i>
                 <input type="file" class="form-control ps-5" id="documents" value="" name="documents[]" multiple placeholder="Documents">
-                {!! $errors->has('documents')? '<p class="help-block">'.$errors->first('documents').'</p>':'' !!}
-                <p class="text-info">You can select more than one file of type jpg, png, gif, pdf</p>
+                <p class="text-info">@lang('app.documents_info')</p>
+                {!! $errors->has('documents')? '<p class="help-block">'.$errors->first('documents').'</p>' : '' !!}
             </div>
         </div>
 
-        <div class="form-group form-row {{ $errors->has('goal')? 'has-error':'' }}">
+        <div class="form-group form-row {{ $errors->has('goal')? 'has-error' : '' }}">
             <label for="goal" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.goal') <span class="text-danger">*</span></label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <div class=" form-icon position-relative">
@@ -129,84 +135,88 @@
                 <div class="alert alert-info mt-2">
                     <i class="fa fa-money"></i> @lang('app.you_will_get') {{ 'put the amount' }}% @lang('app.of_total_raised')
                 </div>
-                {!! $errors->has('goal')? '<p class="help-block">'.$errors->first('goal').'</p>':'' !!}
+                <p class="text-info">@lang('app.goal_info')</p>
+                {!! $errors->has('goal')? '<p class="help-block">'.$errors->first('goal').'</p>' : '' !!}
             </div>
         </div>
 
-        <div class="form-group form-row {{ $errors->has('end_method')? 'has-error':'' }}">
+        <div class="form-group form-row {{ $errors->has('end_method')? 'has-error' : '' }}">
             <label for="end_method" class="col-sm-12 col-md-3 form-label text-left text-md-right">@lang('app.campaign_end_method')</label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
+                <label>
+                    <input type="radio" name="end_method"  value="1" @if(old('end_method') == 1) checked="checked" @endif > @lang('app.after_goal_achieve')
+                </label> <br />
                 
                 <label>
                     <input type="radio" name="end_method" value="0"  @if(old('end_method') == 0) checked="checked" @endif > @lang('app.after_end_date')
                 </label> <br />
 
+                {{--
                 <label>
-                    <input type="radio" name="end_method"  value="1" @if(old('end_method') == 1) checked="checked" @endif > @lang('app.after_goal_achieve')
-                </label> <br />
-                
-                {{--<label>
-                <input type="radio" name="end_method" value="both"  @if(old('end_method') == 'both') checked="checked" @endif > @lang('app.both_nee                                                            d')
-                                </label>--}}
-
-                {!! $errors->has('end_method')? '<p class="help-block">'.$errors->first('end_method').'</p>':'' !!}
-
-                <p class="text-info"> @lang('app.end_method_info_text')</p>
+                    <input type="radio" name="end_method" value="both"  @if(old('end_method') == 'both') checked="checked" @endif > @lang('app.both_need')
+                </label>
+                --}}
+                <p class="text-info"> @lang('app.end_method_info')</p>
+                {!! $errors->has('end_method')? '<p class="help-block">'.$errors->first('end_method').'</p>' : '' !!}
             </div>
         </div>
 
-        <div class="form-group form-row {{ $errors->has('start_date')? 'has-error':'' }}">
+        <div class="form-group form-row {{ $errors->has('start_date')? 'has-error' : '' }}">
             <label for="start_date" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.start_date')</label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="user" class="fea icon-sm icons"></i>
                 <input type="text" class="form-control ps-5" id="start_date" value="{{ old('start_date') }}" name="start_date" placeholder="@lang('app.start_date')">
-                {!! $errors->has('start_date')? '<p class="help-block">'.$errors->first('start_date').'</p>':'' !!}
+                <p class="text-info">@lang('app.start_date_info')</p>
+                {!! $errors->has('start_date')? '<p class="help-block">'.$errors->first('start_date').'</p>' : '' !!}
             </div>
         </div>
-        <div class="form-group form-row {{ $errors->has('end_date')? 'has-error':'' }}">
+        <div class="form-group form-row {{ $errors->has('end_date')? 'has-error' : '' }}">
             <label for="end_date" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.end_date')</label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="user" class="fea icon-sm icons"></i>
                 <input type="text" class="form-control ps-5" id="end_date" value="{{ old('end_date') }}" name="end_date" placeholder="@lang('app.end_date')">
-                {!! $errors->has('end_date')? '<p class="help-block">'.$errors->first('end_date').'</p>':'' !!}
+                <p class="text-info">@lang('app.end_date_info')</p>
+                {!! $errors->has('end_date')? '<p class="help-block">'.$errors->first('end_date').'</p>' : '' !!}
             </div>
         </div>
 
-        <div class="form-group form-row {{ $errors->has('min_amount')? 'has-error':'' }}">
+        <div class="form-group form-row {{ $errors->has('min_amount')? 'has-error' : '' }}">
             <label for="min_amount" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.min_amount')</label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="user" class="fea icon-sm icons"></i>
                 <input type="text" class="form-control ps-5" id="min_amount" value="{{ old('min_amount') }}" name="min_amount" placeholder="@lang('app.min_amount')">
-                {!! $errors->has('min_amount')? '<p class="help-block">'.$errors->first('min_amount').'</p>':'' !!}
+                <p class="text-info">@lang('app.min_amount_info')</p>
+                {!! $errors->has('min_amount')? '<p class="help-block">'.$errors->first('min_amount').'</p>' : '' !!}
             </div>
         </div>
 
-        <div class="form-group form-row {{ $errors->has('max_amount')? 'has-error':'' }}">
+        <div class="form-group form-row {{ $errors->has('max_amount')? 'has-error' : '' }}">
             <label for="max_amount" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.max_amount')</label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="user" class="fea icon-sm icons"></i>
                 <input type="text" class="form-control ps-5" id="max_amount" value="{{ old('max_amount') }}" name="max_amount" placeholder="@lang('app.max_amount')">
-                {!! $errors->has('max_amount')? '<p class="help-block">'.$errors->first('max_amount').'</p>':'' !!}
+                <p class="text-info">@lang('app.max_amount_info')</p>
+                {!! $errors->has('max_amount')? '<p class="help-block">'.$errors->first('max_amount').'</p>' : '' !!}
             </div>
         </div>
 
-        <div class="form-group form-row {{ $errors->has('recommended_amount')? 'has-error':'' }}">
+        <div class="form-group form-row {{ $errors->has('recommended_amount')? 'has-error' : '' }}">
             <label for="recommended_amount" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.recommended_amount')</label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="user" class="fea icon-sm icons"></i>
                 <input type="number" class="form-control ps-5" id="recommended_amount" value="{{ old('recommended_amount') }}" name="recommended_amount" placeholder="@lang('app.recommended_amount')">
-                {!! $errors->has('recommended_amount')? '<p class="help-block">'.$errors->first('recommended_amount').'</p>':'' !!}
+                <p class="text-info">@lang('app.recommended_amount_info')</p>
+                {!! $errors->has('recommended_amount')? '<p class="help-block">'.$errors->first('recommended_amount').'</p>' : '' !!}
             </div>
         </div>
 
-        <div class="form-group form-row {{ $errors->has('amount_prefilled')? 'has-error':'' }}">
+        <div class="form-group form-row {{ $errors->has('amount_prefilled')? 'has-error' : '' }}">
             <label for="amount_prefilled" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.amount_prefilled')</label>
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="user" class="fea icon-sm icons"></i>
-                <input type="text" class="form-control ps-5" id="amount_prefilled" value="{{ old('amount_prefilled') }}" name="amount_prefilled" placeholder="@lang('app.amount_prefilled')">
-                {!! $errors->has('amount_prefilled')? '<p class="help-block">'.$errors->first('amount_prefilled').'</p>':'' !!}
-                <p class="text-info"> @lang('app.amount_prefilled_info_text')</p>
-
+                <input type="text" class="form-control ps-5" id="amount_prefilled" value="@lang('app.amount_prefilled')" name="amount_prefilled" placeholder="@lang('app.amount_prefilled')">
+                <p class="text-info"> @lang('app.amount_prefilled_info')</p>
+                {!! $errors->has('amount_prefilled')? '<p class="help-block">'.$errors->first('amount_prefilled').'</p>' : '' !!}
             </div>
         </div>
 

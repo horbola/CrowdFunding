@@ -18,11 +18,13 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('fb_id')->nullable();
+            $table->string('google_id')->nullable();
             $table->string('password');
             $table->string('two_factor_code')->nullable();
             $table->dateTime('two_factor_expires_at')->nullable();
             
-            // 0:pending, 1:active, 2:malicous, 3:blocked, 4:left
+            // 0:pending, 1:active, 2:malicous, 3:blocked, 4:left, 5:paused
             $table->tinyInteger('active_status')->default('1');
             // 0:not, 1:requested, 2:volunteer, 3:removed, 4:resigned,
             $table->tinyInteger('is_volunteer')->default('0');

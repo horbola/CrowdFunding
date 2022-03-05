@@ -2,6 +2,7 @@
 
 
 @section('dashboard-content')
+@include('partial.profile-action-btns')
 <div id="profile">
     <div class="row">
         <div class="col-sm-12 col-md-3 tag">
@@ -123,7 +124,11 @@
     </div>
     
     <div class="text-center mt-5 ">
-       <a href="{{ route('user.edit', ['id' => $user->id, 'user_panel_fraction' => $request->user_panel_fraction]) }}" class="btn btn-primary btn-md px-5" tabindex="-1" role="button" aria-disabled="true">Edit Profile</a>
+       <a href="{{ route('user.edit', ['id' => $user->id, 'user_panel_fraction' => $request->user_panel_fraction]) }}"
+          class="btn btn-primary btn-md px-5"
+          tabindex="-1"
+          role="button"
+          aria-disabled="true">Edit Profile</a>
     </div>
 </div><!--end col-->
 @endsection

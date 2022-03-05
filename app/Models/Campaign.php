@@ -230,5 +230,10 @@ class Campaign extends Model
 
         return false;
     }
+    
+    public function parseAmountPrefilled() {
+        $amounts = explode(',', $this->amount_prefilled);
+        return $amounts;
+    }
 }   
 

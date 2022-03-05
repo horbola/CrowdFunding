@@ -15,15 +15,15 @@ class UpdateController extends Controller
 {
     public function store(Request $request, $campaignId) {
         $rules = [
-            'update_descrip' => 'text',
-            'updates' => 'mimes|jpg,png,gif,pdf',
+            'update_descrip' => 'string',
+            'updates' => 'array',
         ];
-        //$this->validate($request, $rules);
+        $validated = $this->validate($request, $rules);
         
         $campaign = Campaign::find($campaignId);
         $created = Update::create([
             'campaign_id' => $campaign->id,
-            'descrip' => $request->update_descrip,
+            'descrip' => $validated['update_descrip'],
         ]);
         if($request->hasFile('updates')){
             foreach ($request->file('updates') as $aFile) {

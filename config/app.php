@@ -163,6 +163,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         
         App\Providers\PermissionsServiceProvider::class,
+        Laravel\Socialite\SocialiteServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -232,7 +233,9 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         
         'Image' => Intervention\Image\Facades\Image::class,
+        'Socialite' => Laravel\Socialite\Facades\Socialite::class,
         'Helper' => App\Lib\Helper::class,
     ],
 
 ];
+

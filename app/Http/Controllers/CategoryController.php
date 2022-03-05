@@ -17,8 +17,8 @@ class CategoryController extends Controller {
     
     public function store(Request $request) {
         $rules = [
-            'category_name' => 'required',
-            'category_image' => 'mimes:jpeg,jpg,png'
+            'category_name' => 'required|string:100',
+            'category_image' => 'required|mimes:jpeg,jpg,png'
         ];
         $this->validate($request, $rules);
 
@@ -58,6 +58,7 @@ class CategoryController extends Controller {
             'category_name' => $request->category_name,
             'category_slug' => $slug,
             'category_image' => $dbPath,
+            'show_in_home' => true,
         ];
         $create = Category::create($data);
         if($create){
@@ -69,7 +70,7 @@ class CategoryController extends Controller {
     
     public function update(Request $request, $categoryId) {
         $rules = [
-            'category_image_edit' => 'mimes:jpeg,jpg,png'
+            'category_image_edit' => 'required|mimes:jpeg,jpg,png'
         ];
         $this->validate($request, $rules);
 

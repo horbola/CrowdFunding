@@ -50,7 +50,7 @@
         <!--this portion producers campaign tiles-->
         @foreach($campaigns as $campaign)
         <div class="col-12 col-lg-6 mt-4 pt-2">
-            @include('partial.campaign-tile')
+            @include('partial.campaign-tile', $campaign)
         </div><!--end col-->
         @endforeach
 

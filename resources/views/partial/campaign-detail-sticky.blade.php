@@ -33,7 +33,7 @@
                 <div class="progress-bar position-relative bg-primary" style="width:0%;">
                     <div class="progress-value d-block text-muted h6"></div>
                 </div>
-                <script>$('.progress-bar').css('width', '{{ $parcent }}%')</script>
+                <!--<script>$('.progress-bar').css('width', '{{ $parcent }}%')</script>-->
             </div>
         </div> 
         <ul class="list-unstyled d-flex justify-content-between mt-2 mb-0">
@@ -45,7 +45,7 @@
     <div class="col-12">
         <!--this is quick amount component. the style and script for this component is below-->
         <div class="donation-amount">
-            <form>
+            <form action="{{route('donation.createDialogues')}}" method="post">
                 @csrf
                 <div class="row">
                     <div class="col-12 mt-5">
@@ -56,39 +56,23 @@
                     <div class="col-12 my-2">
                         <div class="quick-amount">
                             <div class="wrapper">
-                                <span class="outer" onclick="enterAmount(this)"><span class="inner">50</span></span>
-                                <span class="outer" onclick="enterAmount(this)"><span class="inner">100</span></span>
-                                <span class="outer" onclick="enterAmount(this)"><span class="inner">200</span></span>
-                                <span class="outer" onclick="enterAmount(this)"><span class="inner">500</span></span>
-                                <span class="outer" onclick="enterAmount(this)"><span class="inner">1000</span></span>
+                                @foreach($campaign->parseAmountPrefilled() as $amount)
+                                <span class="outer" onclick="enterAmount(this)"><span class="inner">{{$amount}}</span></span>
+                                @endforeach
                             </div>
                         </div>
                     </div><!-- ends col -->
+                    @if(Auth::check())
+                    <input name="user_id" type="hidden" value="{{Auth::user()->id}}">
+                    @endif
+                    <input name="campaign_id" type="hidden" value="{{$campaign->id}}">
                     <div class="col-12">
                         <div class="d-grid">
-                            <button id="donation-model-btn" type="button" class="btn btn-pills btn-primary" onclick="f(this);">Donate</button>
+                            <button id="donation-model-btn" type="submit" class="btn btn-pills btn-primary">Donate</button>
                         </div>
                     </div><!-- ends col -->
                 </div>
             </form>
-            <script>
-                function f(thiss) {
-                    $(thiss).attr('disabled', 'disabled');
-                    var form_data = $(thiss).closest('form').serialize();
-                    $.ajax({
-                        url: "{{route('donation.createModel')}}",
-                        type: "get",
-                        data: form_data,
-                        success: function (data) {
-                            if (data.success === 1) {
-                                $(thiss).removeAttr('disabled');
-                                $('#amount').val(data.amount);
-                                $("#donation-model").modal('show');
-                            }
-                        }
-                    });
-                }
-            </script>
         </div>
     </div>
 

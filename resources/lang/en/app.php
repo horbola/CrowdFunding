@@ -25,19 +25,10 @@ return [
     'title'                     => 'Title',
     'short_description'         => 'Short Description',
     'description'               => 'Description',
-    'start_date'                => 'Start date',
-    'end_date'                  => 'End date',
-    'great_title_info'          => 'Keep your title within 255 charecter',
-    'description_info_text'     => 'It can be long text and describe why your campaign',
-    'recommended_amount'        => 'Recommended Amount',
-    'max_amount'                => 'Max Amount',
-    'min_amount'                => 'Min Amount',
-    'goal'                      => 'Goal',
-    'amount_prefilled'          => 'Amount prefilled',
-    'amount_prefilled_info_text'    => 'It will help fill amount box by click, place each amount by comma, ex: 10,20,30,40',
-    'video'                     => 'Video',
-    'video_info_text'           => 'Place YouTube or vimeo video url',
-    'submit_new_campaign'       => 'Submit new campaign',
+    
+    
+    
+    
     'campaign_created'          => 'Campaign has been created successfully',
     'something_went_wrong'      => 'Something went wrong, please try again',
     'campaign_home'             => 'Campaign Home',
@@ -151,7 +142,7 @@ return [
     'after_goal_achieve'    => 'After goal achieve',
     'after_end_date'        => 'After end date',
     'both_need'             => 'Both need to be complete',
-    'end_method_info_text'  => 'Determine how you want complete your campaigns',
+    
     'image_insert_limitation'  => 'Note: If you insert image by browse image, it may cannot save too much data and image may will be not saved due to image size and database column limitation. Instead it will be great if you insert image from Image URL. You can host image somewhere like dropbox, or others image hosting site, then insert image by url',
     'load_more'             => 'Load more...',
     'view_details'          => 'View Details',
@@ -321,5 +312,49 @@ return [
     'disqus_shortname_help_text'    => 'Your unique disqus shortname, ex: shortname.disqus.com',
     'comments'                  => 'Comments',
     'email_address_help_text'   => 'This address is used for admin purposes, like activities notification',
+    
+    
+    
+    
+    'amount_prefilled' => '10, 50, 100, 500, 1000',
+    'address' => 'Address',
+    'title' => 'Title',
+    'short_description' => 'Short Description',
+    'start_date' => 'Start Date',
+    'end_date' => 'End Date',
+    'recommended_amount'        => 'Recommended Amount',
+    'max_amount'                => 'Max Amount',
+    'min_amount'                => 'Min Amount',
+    'video'                     => 'Video',
+    'goal' => 'Goal',
+    'category' => 'Category',
+    'album' => 'Album',
+    'documents' => 'Documents',
+    'end_method' => 'End Method',
+    'end_date' => 'end_date',
+    
+    'address_info'   => 'Put the address of where the campaigner lives or works',
+    'title_info'   => 'Define a title in a single line',
+    'short_description_info'   => 'Write a description which only tells the purpose of this campaign',
+    'description_info'     => 'It can be long text and describe why your campaign',
+    'start_date_info'                => 'The date from which the campaign starts ',
+    'end_date_info'                  => 'The date from which the campaign ends',
+    'recommended_amount_info'        => 'You can recomment people an amount ',
+    'max_amount_info'                => 'The Maximun Amount anyone can donate in a single time',
+    'min_amount_info'                => 'The Minimun Amount anyone can donate in a single time',
+    'goal_info'                      => 'Goal is amount for which you want to run this campaign',
+    'amount_prefilled_info'    => 'It will help fill amount box by click, place each amount by comma, ex: 10, 50, 100, 500, 1000; You can define upto five figures',
+    'video_info'           => 'Place YouTube or vimeo video url',
+    'great_title_info'          => 'Keep your title within 255 charecter',
+    'category_info'   => 'Select a category for the campaign',
+    'album_info'   => 'Upload image in jpg, png, gif format. These images supplement the feature image',
+    'documents_info'   => 'You can select more than one file of type jpg, png, gif, pdf',
+    'end_method_info'  => 'Determine how you want complete your campaign to finish',
+    'end_date_info'   => '',
+    'min_amount_info'   => '',
+    'max_amount_info'   => '',
+    'recommended_amount_info'   => '',
+    
+    'submit_new_campaign'       => 'Submit new campaign',
 
 ];

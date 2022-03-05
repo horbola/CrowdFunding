@@ -41,19 +41,21 @@ class InvestigationController extends Controller
     }
     
     // renders my investigations campaigns
-    public function indexInvestigations() {
+    public function indexInvestigations(Request $request) {
         if(Auth::check()){
             $user = Auth::user();
             $investigations = Investigation::where('user_id', $user->id)->get();
             $campaigns = $investigations->map(function($investigation, $key){
                 return $investigation->campaign;
             });
-            return view('campaign.campaigns-list', compact('user', 'campaigns'));
+            return view('campaign.campaigns-list', compact('request', 'user', 'campaigns'));
         }
         return redirect()->route('campaign.indexGuestCampaign');
     }
     
-    // renders campaign list page to investigate
+    // renders campaign list page to investigate. after clicking on any
+    // campaign tile the detail page comes up. if clikcing on upload 
+    // ivestigation info then 'createInvestigationForm()' method will be callded.
     public function createInvestigation(Request $request, $categoryId=1) {
         $categories = Category::all();
         $active = $categoryId;
@@ -61,9 +63,10 @@ class InvestigationController extends Controller
         // this variable is difined to detect that the campaign detali page has come from 'investigate' button.
         // this variable is passed to the 'campaign-detail' page through the 'campaign-master' page.
         $request->request->add(['indexInvestigation' => true]);
-        return view('face.campaign-master')->with(compact('categories', 'active', 'campaigns'));
+        return view('face.campaign-master')->with(compact('request', 'categories', 'active', 'campaigns'));
     }
     
+    // brings the form by which investigation description and images could be uploaded.
     public function createInvestigationForm() {
         return view('investigation.investigation-create');
     }

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\SocialController;
 
 
 
@@ -13,8 +13,26 @@ Route::get('guest-campaign-search', 'CampaignController@indexSearchedCampaign')-
 Route::post('guest-campaign-filter', 'CampaignController@indexFilteredCampaign')->name('campaign.indexFilteredCampaign');
 Route::get('guest-campaign/{campaignId}', 'CampaignController@showGuestCampaign')->name('campaign.showGuestCampaign'); //return view('face.campaign-detail', compact('campaign'));
 
-Route::get('donation-create', 'DonationController@createModel')->name('donation.createModel'); //return ['success' => 1, 'msg' => trans('app.settings_saved_msg')];
-Route::post('donation/{campaignId}', 'DonationController@store')->name('donation.store');
+// Route::get('donation-create', 'DonationController@createModel')->name('donation.createModel'); //return ['success' => 1, 'msg' => trans('app.settings_saved_msg')];
+Route::post('donation-create', 'DonationController@createDialogues')->name('donation.createDialogues');
+Route::get('donation-create-payment-info', 'DonationController@createPaymentInfo')->name('donation.createPaymentInfo'); 
+Route::get('donation-create-payment-info-from-login', 'DonationController@createPaymentInfoFromLogin')->name('donation.createPaymentInfoFromLogin')->middleware('auth');
+Route::post('donation-store', 'DonationController@store')->name('donation.store');
+
+// SSLCOMMERZ Start
+Route::get('/example1', [App\Http\Controllers\SslCommerzPaymentController::class, 'exampleEasyCheckout']);
+Route::get('/example2', [App\Http\Controllers\SslCommerzPaymentController::class, 'exampleHostedCheckout']);
+
+Route::post('/pay', [App\Http\Controllers\SslCommerzPaymentController::class, 'index']);
+Route::post('/pay-via-ajax', [App\Http\Controllers\SslCommerzPaymentController::class, 'payViaAjax']);
+
+Route::post('/successs', [App\Http\Controllers\SslCommerzPaymentController::class, 'success']);
+Route::post('/fail', [App\Http\Controllers\SslCommerzPaymentController::class, 'fail']);
+Route::post('/cancel', [App\Http\Controllers\SslCommerzPaymentController::class, 'cancel']);
+
+Route::post('/ipn', [App\Http\Controllers\SslCommerzPaymentController::class, 'ipn']);
+// SSLCOMMERZ END
+
 Route::get('test', function(){
     return view('test.sticky-form');
 });
@@ -27,6 +45,11 @@ Route::post('store-comment', 'CommentController@store')->name('comment.store');
 
 
 Auth::routes(['verify' => true]);
+Route::get('login/facebook', [SocialController::class, 'facebookRedirect'])->name('login.facebook');
+Route::get('login/facebook/callback', [SocialController::class, 'loginWithFacebook']);
+Route::get('login/google', [SocialController::class, 'googleRedirect'])->name('login.google');
+Route::get('login/google/callback', [SocialController::class, 'loginWithGoogle']);
+
 Route::group(['prefix' => 'dashboard', 'middleware'=>'auth'], function(){
     // profile routes
     // this route serves two purpose. one is for admin user related operation
@@ -35,6 +58,10 @@ Route::group(['prefix' => 'dashboard', 'middleware'=>'auth'], function(){
     Route::get('profile/edit/{id?}', 'UserController@edit')->name('user.edit'); //return view('dashboard.profile-edit')->with(compact('user', 'countries'));
     Route::put('profile/update/{id?}', 'UserController@update')->name('user.update'); //return redirect(route('user.show', $user->id))->with('success', $req->profileItem.' has been updated');
     Route::put('profile/photo/{id?}', 'UserController@updatePhoto')->name('user.updatePhoto'); //return redirect(route('user.showProfile', $user->id))->with(['success' => $req->profileItem.' has been updated', 'user' => $user]);
+    Route::patch('profile/active-status/delete', 'UserController@updateDeletion')->name('user.updateDeletion');
+    // Route::patch('profile/active-status/retrieve', 'UserController@updateActivation')->name('user.updateRetrieval');
+    Route::patch('profile/active-status/pause', 'UserController@updatePausing')->name('user.updatePausing');
+    Route::patch('profile/active-status/resume', 'UserController@updateActivation')->name('user.updateResuming');
 
     Route::get('campaign/donated', 'CampaignController@indexDonatedCampaign')->name('campaign.indexDonatedCampaign'); 
     Route::get('campaign/supported', 'CampaignController@indexSupportedCampaign')->name('campaign.indexSupportedCampaign'); 

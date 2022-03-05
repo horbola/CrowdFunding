@@ -13,6 +13,7 @@
                         @method('put')
                         <legend class="text-center mb-5">@lang('app.campaign_info')</legend>
 
+                        <!--
                         <div class="form-group form-row {{ $errors->has('country_id')? 'has-error':'' }}">
                             <label for="country_id" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.country')<span class="text-danger">*</span></label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
@@ -27,6 +28,8 @@
                                 {!! $errors->has('country_id')? '<p class="help-block">'.$errors->first('country_id').'</p>':'' !!}
                             </div>
                         </div>
+                        -->
+                        
                         <div class="form-group form-row {{ $errors->has('address')? 'has-error':'' }}">
                             <label for="address" class="col-sm-12 col-md-3 form-label text-left text-md-right pt-md-2">@lang('app.address')</label>
                             <div class="col-sm-12 col-md-9 form-icon position-relative">
@@ -150,12 +153,13 @@
                                     <input type="radio" name="end_method"  value="1" @if(old('end_method') == 1) checked="checked" @endif > @lang('app.after_goal_achieve')
                                 </label> <br />
 
-                                {{--<label>
-                                <input type="radio" name="end_method" value="both"  @if($campaign->end_method == 'both') checked="checked" @endif > @lang('app.both_nee                                                            d')
-                                </label>--}}
+                                {{--
+                                <label>
+                                    <input type="radio" name="end_method" value="both"  @if($campaign->end_method == 'both') checked="checked" @endif > @lang('app.both_nee                                                            d')
+                                </label>
+                                --}}
 
                                 {!! $errors->has('end_method')? '<p class="help-block">'.$errors->first('end_method').'</p>':'' !!}
-
                                 <p class="text-info"> @lang('app.end_method_info_text')</p>
                             </div>
                         </div>

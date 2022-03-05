@@ -11,7 +11,8 @@
         <li class="nav-item m-1">
             <a class="nav-link py-2 px-5 rounded border border-1" id="document-info" data-bs-toggle="pill" href="#document" role="tab" aria-controls="additional" aria-selected="false">
                 <div class="text-center">
-                    <h6 class="mb-0">Documents</h6>
+                    <!--<h6 class="mb-0">Documents</h6>-->
+                    <h6 id="cus-font2" class="mb-0">ডকুমেন্ট</h6>
                 </div>
             </a><!--end nav link-->
         </li><!--end nav item-->
@@ -19,7 +20,8 @@
         <li class="nav-item m-1">
             <a class="nav-link py-2 px-5 rounded border border-1" id="update-number" data-bs-toggle="pill" href="#update" role="tab" aria-controls="review" aria-selected="false">
                 <div class="text-center">
-                    <h6 class="mb-0">Updates</h6>
+                    <!--<h6 class="mb-0">Updates</h6>-->
+                    <h6 class="mb-0">ডকুমেন্ট</h6>
                 </div>
             </a><!--end nav link-->
         </li><!--end nav item-->
@@ -269,10 +271,20 @@
         src: url('{{ asset('fonts/official-webfont.woff2') }}') format('woff2'),
              url('{{ asset('fonts/official-webfont.woff') }}') format('woff');
     }
+    @font-face {
+        font-family: 'bengali';
+        src: url('{{ asset('fonts/SolaimanLipi.ttf') }}') format('truetype'),
+    }
     #cus-font {
         font-family: 'officialregular';
         font-weight: normal;
         font-style: normal;
+    }
+    #cus-font2 {
+        font-family: 'bengali';
+        font-weight: normal;
+        font-style: normal;
+        unicode-range: U+0980-09FF;
     }
 </style>
 @endsection

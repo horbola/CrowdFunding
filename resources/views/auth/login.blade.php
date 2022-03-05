@@ -92,13 +92,13 @@
                                     <div class="row">
                                         <div class="col-6 mt-3">
                                             <div class="d-grid">
-                                                <a href="javascript:void(0)" class="btn btn-light"><i class="mdi mdi-facebook text-primary"></i> Facebook</a>
+                                                <a href="{{route('login.facebook')}}" class="btn btn-light"><i class="mdi mdi-facebook text-primary"></i> Facebook</a>
                                             </div>
                                         </div><!--end col-->
 
                                         <div class="col-6 mt-3">
                                             <div class="d-grid">
-                                                <a href="javascript:void(0)" class="btn btn-light"><i class="mdi mdi-google text-danger"></i> Google</a>
+                                                <a href="{{route('login.google')}}" class="btn btn-light"><i class="mdi mdi-google text-danger"></i> Google</a>
                                             </div>
                                         </div><!--end col-->
                                     </div>

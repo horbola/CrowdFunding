@@ -193,7 +193,7 @@ class UserController extends Controller {
         $user = Auth::user();
         // if there's an id means this request is coming from admin
         // else is coming from client.
-        if($id){
+        if($id && $user->id !== $id){
             $user = User::find($id);
         }
         $user->user_type = $user->roleDesc('super', 'staff', 'voluntier', 'campaigner', 'donor', 'guest');
@@ -230,27 +230,38 @@ class UserController extends Controller {
         if($id){
             $user = User::find($id);
         }
-        $inputs = Arr::except($req->input(), ['_token', 'photo']);
-        $user->name = $inputs['name'];
-        $user->gender = $inputs['gender'];
-        $user->address->phone = $inputs['phone'];
-        $user->address->website = $inputs['website'];
-        $user->address->country_id = $inputs['country_id'];
+        //* $inputs = Arr::except($req->input(), ['_token', 'photo']);
+        
+        $rules = [
+            'name' => 'string:255',
+            'gender' => 'String:10',
+            'phone' => 'numeric',
+            'website' => 'string:255',
+            'country_id' => 'numeric',
+        ];
+        $validated = $req->validate($rules);
+        
+        $user->name = $validated['name'];
+        $user->gender = $validated['gender'];
+        $user->address->phone = $validated['phone'];
+        $user->address->website = $validated['website'];
+        $user->address->country_id = $validated['country_id'];
         $saved = $user->push();
 
         // $req->user_panel_fraction = 'alls';
-        if($saved && $id){
-            // returns to users table in admin panel from this 'if block'
-            // the 'user_panel_fraction' is uploaded from user-panel blade
-            // so that after updating user information the admin can go to 
-            // the appropriate original section of user-panel.
-            return redirect('/dashboard/admin/users-panel/'.$req->user_panel_fraction)->with('success', $req->profileItem.' has been updated');
+        if($saved){
+            if(Auth::user()->id !== $id){
+                // returns to users table in admin panel from this 'if block'
+                // the 'user_panel_fraction' is uploaded from user-panel blade
+                // so that after updating user information the admin can go to 
+                // the appropriate original section of user-panel.
+                return redirect('/dashboard/admin/users-panel/' . $req->user_panel_fraction)->with('success', $req->profileItem . ' has been updated');
+            }
+            else {
+                // returns to client profile from this else block
+                return redirect(route('user.show'))->with('success', $req->profileItem . ' has been updated');
+            }
         }
-        else if($saved){
-            // returns to client profile from this else block
-            return redirect(route('user.show'))->with('success', $req->profileItem.' has been updated');
-        }
-        
         return back()->with('error', 'sorry the changes you are trying to make couldn\'t be possible');
     }
     
@@ -306,19 +317,39 @@ class UserController extends Controller {
     
     
     /*
-     * not used. remove latter
-    */
-    public function updatePrev(Request $req) {
+     * 0:pending, 1:active, 2:malicous, 3:blocked, 4:left, 5:paused
+     * active_status is set to 5. resuming means setting it back to 1
+     */
+    public function updateActivation(Request $request) {
         $user = Auth::user();
-        $data = [
-            $req->profileItem => $req->profileValue,
-        ];
-        $update = User::whereId($user->id)->update($data);
-        if($update){
-            return redirect(route('user.showProfile', $user->id))->with('success', $req->profileItem.'has been updated');
-        }
-        return back()->with('error', 'sorry the '.$req->editItem.' you are trying to update couldn\'t be possible');
+        $user->active_status = 1;
+        $user->update();
+        return redirect(route('home'));
     }
+    
+    /*
+     * pauses the account. because of this user can never retrieve the account
+     */
+    public function updateDeletion(Request $request) {
+        $user = Auth::user();
+        $user->active_status = 4;
+        $user->update();
+        Auth::logout();
+        return redirect('/');
+    }
+    
+    /*
+     * pauses the account. because of this user can retrieve the account latter
+     */
+    public function updatePausing(Request $request) {
+        $user = Auth::user();
+        $user->active_status = 5;
+        $user->update();
+        Auth::logout();
+        return redirect('/');
+    }
+    
+
     
     /**
      * admin deletes an user from database
