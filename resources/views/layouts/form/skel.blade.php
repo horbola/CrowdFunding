@@ -28,6 +28,7 @@
     @yield('page-style')
     
     <!-- Scripts -->
+    <script src="{{ asset('js/jquery.js') }}"></script>
     <script src="{{ asset('js/tiny-slider.js') }}" defer></script>
     <script src="{{ asset('js/tobii.min.js') }}" defer></script>
     <script src="{{ asset('js/feather.min.js') }}" defer></script>
@@ -39,6 +40,7 @@
     <script></script>
     <!-- native page scripts -->
     @yield('page-script')
+    <!-- page-script-init is down below -->
 </head>
 <body>
 <div id="app">
@@ -46,5 +48,6 @@
         @yield('content')
     </main><!-- end main content -->
 </div><!-- end app -->
+@yield('page-script-init')
 </body>
 </html>

@@ -34,7 +34,7 @@
     <div class="container-fluid px-0">
         <div class="row g-0 align-items-center">
             <div class="col-xl-2 col-lg-4 col-md-4">
-                <a href="{{ route('campaign.indexGuestCampaign', ['category' => 'medical']) }}">
+                <a href="{{ route('campaign.indexGuestCampaign', ['categoryId' => '1']) }}">
                     <div class="card features fea-primary text-center rounded-0 px-4 py-5 bg-light bg-gradient position-relative overflow-hidden border-0">
                         <span class="h2 icon2 text-primary">
                             <i class="uil uil-crosshair"></i>
@@ -48,7 +48,7 @@
             </div><!--end col-->
 
             <div class="col-xl-2 col-lg-4 col-md-4">
-                <a href="{{ route('campaign.indexGuestCampaign', ['category' => 'accident']) }}">
+                <a href="{{ route('campaign.indexGuestCampaign', 3) }}">
                     <div class="card features fea-primary text-center rounded-0 px-4 py-5 bg-light bg-gradient position-relative overflow-hidden border-0">
                         <span class="h2 icon2 text-primary">
                             <i class="uil uil-search"></i>
@@ -62,7 +62,7 @@
             </div><!--end col-->
 
             <div class="col-xl-2 col-lg-4 col-md-4">
-                <a href="{{ route('campaign.indexGuestCampaign', ['category' => 'cancer']) }}">
+                <a href="{{ route('campaign.indexGuestCampaign', 4) }}">
                     <div class="card features fea-primary text-center rounded-0 px-4 py-5 bg-light bg-gradient position-relative overflow-hidden border-0">
                         <span class="h2 icon2 text-primary">
                             <i class="uil uil-lightbulb-alt"></i>
@@ -76,7 +76,7 @@
             </div><!--end col-->
 
             <div class="col-xl-2 col-lg-4 col-md-4">
-                <a href="{{ route('campaign.indexGuestCampaign', ['category' => 'education']) }}">
+                <a href="{{ route('campaign.indexGuestCampaign', 5) }}">
                     <div class="card features fea-primary text-center rounded-0 px-4 py-5 bg-light bg-gradient position-relative overflow-hidden border-0">
                         <span class="h2 icon2 text-primary">
                             <i class="uil uil-usd-circle"></i>
@@ -104,7 +104,7 @@
             </div><!--end col-->
 
             <div class="col-xl-2 col-lg-4 col-md-4">
-                <a href="{{ route('campaign.indexGuestCampaign', ['category' => 'creative']) }}">
+                <a href="{{ route('campaign.indexGuestCampaign', 6) }}">
                     <div class="card features fea-primary text-center rounded-0 px-4 py-5 bg-light bg-gradient position-relative overflow-hidden border-0">
                         <span class="h2 icon2 text-primary">
                             <i class="uil uil-invoice"></i>

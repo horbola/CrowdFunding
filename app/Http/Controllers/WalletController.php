@@ -15,15 +15,18 @@ class WalletController extends Controller {
         
     }
 
+    /**
+     * indexes wallets of all users to admin panel
+     */
     public function index() {
-        
+        return view('admin.partial.dashboard.wallets');
     }
     
     /**
      * shows a campaigner's wallet
      */
-    public function showCampaignerWallet($userID) {
-        return view('partial.dashboard.wallet')->with('page', 'campaigners wallet');
+    public function showCampaignerWallet() {
+        return view('dashboard.wallet');
     }
     
     

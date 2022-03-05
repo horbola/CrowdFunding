@@ -20,7 +20,7 @@
     <link href="{{ asset('css/tobii.min.css') }}" rel="stylesheet" type="text/css" />
     <!-- native global styles-->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet"><!<!-- version-4 -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet" type="text/css" id="theme-opt" /><!--landrick provided-->
     <link href="{{ asset('css/colors/default.css') }}" rel="stylesheet" id="color-opt"><!--landrick provided-->
     <style></style>
@@ -40,6 +40,7 @@
     <script></script>
     <!-- native page scripts -->
     @yield('page-script')
+    <!-- page-script-init is down below -->
 </head>
 <body>
 <div id="app">
@@ -51,6 +52,8 @@
     <!-- Back to top -->
     <a href="#" onclick="topFunction()" id="back-to-top" class="btn btn-icon btn-primary back-to-top"><i data-feather="arrow-up" class="icons"></i></a>
 </div><!-- end app -->
+@yield('page-script-init')
+@yield('page-script-bottom')
 </body>
 </html>
 

@@ -20,7 +20,7 @@
             <div class="buy-button dropdown">
                 <a href="#" class="btn btn-icon btn-primary" data-toggle='dropdown'><i class="uil uil-user icons"></i></a>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="{{ route('dashboard.indexAdminDashB')}}">Dashboard</a>
+                    <a class="dropdown-item" href="{{ route('user.show')}}">Dashboard</a>
                     <button class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit()">Logout</button>
                 </div>
                 <form id="logout-form" class="d-none" action="{{ route('logout')}}" method="POST">@csrf</form>

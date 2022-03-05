@@ -16,10 +16,18 @@ class SettingsController extends Controller {
     }
     
     
-    public function showClientSettings() {
-        return view('partial.dashboard.settings')->with('page', 'clients settings');
+    
+    public function index(Request $request) {
+        return view('admin.settings')->with('page', 'admin settings', 'request');
     }
 
+
+    
+    public function showClientSettings(Request $request, $userID) {
+        return view('dashboard.settings')->with('page', 'clients settings', 'request');
+    }
+    
+    
     public function update() {
         
     }
