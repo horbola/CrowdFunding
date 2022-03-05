@@ -1,1 +1,0 @@
-validating image in campaignController store and update method.
