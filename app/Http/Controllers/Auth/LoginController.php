@@ -40,5 +40,17 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+    
+    
+    
+    protected function authenticated(Request $request, $user) {
+//        $user->generateTwoFactorCode();
+//        $user->notify(new TwoFactorCode());
+        
+//        return $this->authenticated($request, $this->guard()->user())
+//                ?: redirect()->intended($this->redirectPath());
+//        return redirect()->intended(route('campaign.indexGuestCampaign'));
+        return false;
+    }
 
 }

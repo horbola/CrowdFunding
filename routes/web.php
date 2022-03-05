@@ -13,6 +13,8 @@ Route::get('guest-campaign-search', 'CampaignController@indexSearchedCampaign')-
 Route::post('guest-campaign-filter', 'CampaignController@indexFilteredCampaign')->name('campaign.indexFilteredCampaign');
 Route::get('guest-campaign/{campaignId}', 'CampaignController@showGuestCampaign')->name('campaign.showGuestCampaign'); //return view('face.campaign-detail', compact('campaign'));
 
+Route::get('donation-create', 'DonationController@createModel')->name('donation.createModel'); //return ['success' => 1, 'msg' => trans('app.settings_saved_msg')];
+Route::post('donation/{campaignId}', 'DonationController@store')->name('donation.store');
 Route::get('test', function(){
     return view('test.sticky-form');
 });
@@ -25,7 +27,6 @@ Route::post('store-comment', 'CommentController@store')->name('comment.store');
 
 
 Auth::routes(['verify' => true]);
-
 Route::group(['prefix' => 'dashboard', 'middleware'=>'auth'], function(){
     // profile routes
     // this route serves two purpose. one is for admin user related operation

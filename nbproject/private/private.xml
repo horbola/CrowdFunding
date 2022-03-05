@@ -2,6 +2,23 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/resources/font/official-demo.html</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/resources/views/campaign/campaign-create.blade.php</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/resources/views/partial/campaign-tiles.blade.php</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/resources/font/stylesheet.css</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/resources/views/face/campaign-master.blade.php</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/resources/views/partial/campaign-detail-sticky.blade.php</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/resources/font/generator_config.txt</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/resources/views/partial/campaign-tile.blade.php</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/resources/views/campaign/campaign-edit.blade.php</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/app/Models/User.php</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/resources/views/partial/campaign-detail-tabs.blade.php</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/database/migrations/2021_08_01_052117_create_campaigns_table.php</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/resources/views/partial/menu-category.blade.php</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/app/Http/Controllers/CampaignController.php</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/app/Models/Campaign.php</file>
+            <file>file:/D:/Faysal/Self/Task/Job/RollenCloud/Code/PHP/Laravel/Oporajoy/OporajoyCF-3.1.1/routes/web.php</file>
+        </group>
     </open-files>
 </project-private>

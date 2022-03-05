@@ -34,7 +34,7 @@
                     
                     <!-- mobile status -->
                     <div class="col-12 d-md-none px-5">
-                        @include('partial.campaign-detail-sticky-orig')
+                        @include('partial.campaign-detail-sticky')
                     </div>
                     
                     <!--tabs starts-->

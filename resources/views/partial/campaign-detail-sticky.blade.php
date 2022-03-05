@@ -45,7 +45,7 @@
     <div class="col-12">
         <!--this is quick amount component. the style and script for this component is below-->
         <div class="donation-amount">
-            <form action="{{route('donation.createDialogues')}}" method="post">
+            <form>
                 @csrf
                 <div class="row">
                     <div class="col-12 mt-5">
@@ -64,17 +64,31 @@
                             </div>
                         </div>
                     </div><!-- ends col -->
-                    @if(Auth::check())
-                    <input name="user_id" type="hidden" value="{{$Auth::user()->id}}">
-                    @endif
-                    <input name="campaign_id" type="hidden" value="{{$campaign->id}}">
                     <div class="col-12">
                         <div class="d-grid">
-                            <button id="donation-model-btn" type="submit" class="btn btn-pills btn-primary">Donate</button>
+                            <button id="donation-model-btn" type="button" class="btn btn-pills btn-primary" onclick="f(this);">Donate</button>
                         </div>
                     </div><!-- ends col -->
                 </div>
             </form>
+            <script>
+                function f(thiss) {
+                    $(thiss).attr('disabled', 'disabled');
+                    var form_data = $(thiss).closest('form').serialize();
+                    $.ajax({
+                        url: "{{route('donation.createModel')}}",
+                        type: "get",
+                        data: form_data,
+                        success: function (data) {
+                            if (data.success === 1) {
+                                $(thiss).removeAttr('disabled');
+                                $('#amount').val(data.amount);
+                                $("#donation-model").modal('show');
+                            }
+                        }
+                    });
+                }
+            </script>
         </div>
     </div>
 

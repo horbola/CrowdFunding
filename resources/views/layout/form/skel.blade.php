@@ -41,7 +41,7 @@
 <body>
 <div id="app">
     <main class="mt-5">
-        @yield('form-content')
+        @yield('content')
     </main><!-- end main content -->
 </div><!-- end app -->
 @yield('page-script-bottom')
