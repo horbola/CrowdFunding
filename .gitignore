@@ -16,7 +16,6 @@ public_html/storage
 public_html/hot
 
 storage/*.key
-.env
 Homestead.yaml
 Homestead.json
 /.vagrant
@@ -25,3 +24,4 @@ docker-compose.override.yml
 /Spec/Oporajoy-before/nbproject/private/
 /Spec/Pondo-master/nbproject/private/
 /Spec/
+/resources/Vendor/
