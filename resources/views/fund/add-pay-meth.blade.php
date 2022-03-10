@@ -12,7 +12,7 @@
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">Payment Method Type</button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                         <li class="dropdown-item" id="bank-btn">Bank</li>
-                        <li class="dropdown-item" id="mobile-bank-btn">Mobile Bank</li>
+                        <li class="dropdown-item disabled" id="mobile-bank-btn">Mobile Bank</li>
                     </ul>
                 </div>
             </div>
@@ -132,6 +132,7 @@
             </div>
             </form>
             <script>
+                /*
                 $(function(){
                     function bootPayMeth(){
                         $('#add-pay-meth .new-bank').addClass('d-none');
@@ -151,6 +152,7 @@
                         $('#add-pay-meth #bank-info-title').text('Mobile Bank Information');
                     });
                 });
+                */
             </script>
         </div>
     </div>

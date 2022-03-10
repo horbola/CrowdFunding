@@ -177,6 +177,9 @@
         $('#share-btns .fa-twitter-square').unwrap().wrap(`<a href="https://twitter.com/share?url=${postUrl}&text=${postTitle}" id="gmail-btn"></a>`);
         $('#share-btns .fa-linkedin-square').unwrap().wrap(`<a href="https://www.linkedin.com/shareArticle?url=${postUrl}&title=${postTitle}" id="gmail-btn"></a>`);
         $('#share-btns .fa-whatsapp').unwrap().wrap(`<a href="https://wa.me/?text=${postTitle}$url=${postUrl}" id="gmail-btn"></a>`);
+//        var wAppUri = `https://wa.me/?text=${postTitle}&url=${postUrl}`;
+//        $('#share-btns .fa-whatsapp').unwrap().wrap(`<a href="${encodeURI(wAppUri)}" id="gmail-btn"></a>`);
+        
     }
 
     function isMobile(){

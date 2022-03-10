@@ -23,9 +23,9 @@
     <section>
         <div>
             @if($inv->is_verified === 'yes')
-                <p>Your investigation report for this campaign <a href="{{ route('campaign.showGuestCampaign', $inv->campaign->id) }}">'{{$inv->campaign->title}}'</a> is approved</p>
+                <p>Your investigation report for this campaign <a href="{{ route('campaign.showGuestCampaign', $inv->campaign->slug) }}">'{{$inv->campaign->title}}'</a> is approved</p>
             @elseif($inv->is_verified === 'no')
-                <p>Your investigation report for this campaign <a href="{{ route('campaign.showGuestCampaign', $inv->campaign->id) }}">'{{$inv->campaign->title}}'</a> is canceled</p>
+                <p>Your investigation report for this campaign <a href="{{ route('campaign.showGuestCampaign', $inv->campaign->slug) }}">'{{$inv->campaign->title}}'</a> is canceled</p>
             @endif
         </div>
     </section>

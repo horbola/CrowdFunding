@@ -18,7 +18,7 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                <p class="not-found text-center">Sorry no campaign is found</p>
+                <p class="not-found text-center">Sorry! no campaign is found</p>
             </div>
         </div>
     </div><!--end container-->

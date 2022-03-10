@@ -28,7 +28,7 @@
         @php
             $showInvAppCanBtn = $campaign->investigation
             && Auth::user()
-            && Auth::user()->is_admin === 1
+            && (int)Auth::user()->is_admin === 1
             && $campaign->investigation->postedInvReport()
             && $campaign->investigation->is_verified === 'no';
             $invId = $campaign->investigation? $campaign->investigation->id : 0;

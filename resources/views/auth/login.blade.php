@@ -87,6 +87,7 @@
                                     </div>
                                 </div><!--end col-->
 
+                                <!--
                                 <div class="col-lg-12 mt-4 text-center">
                                     <h6>Or Login With</h6>
                                     <div class="row">
@@ -94,15 +95,16 @@
                                             <div class="d-grid">
                                                 <a href="{{route('login.facebook')}}" class="btn btn-light"><i class="mdi mdi-facebook text-primary"></i> Facebook</a>
                                             </div>
-                                        </div><!--end col-->
+                                        </div><!--end col-
 
                                         <div class="col-6 mt-3">
                                             <div class="d-grid">
                                                 <a href="{{route('login.google')}}" class="btn btn-light"><i class="mdi mdi-google text-danger"></i> Google</a>
                                             </div>
-                                        </div><!--end col-->
+                                        </div><!--end col--
                                     </div>
-                                </div><!--end col-->
+                                </div><!--end col--
+                                -->
 
                                 <div class="col-12 text-center">
                                     <p class="mb-0 mt-3"><small class="text-dark me-2">Don't have an account ?</small> <a href="{{ route('register') }}" class="text-dark fw-bold">Sign Up</a></p>

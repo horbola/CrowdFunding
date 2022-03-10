@@ -346,7 +346,7 @@ class UserController extends Controller {
             // that origUrl.
             if($request->origUrl) return redirect($request->origUrl);
             
-            $isAdmin = (Auth::user()->is_admin === 1);
+            $isAdmin = ( (int)Auth::user()->is_admin === 1);
             if( $isAdmin && $request->id ){
                 // returns to users table in admin panel from this 'if block'
                 // the 'user_panel_fraction' is uploaded from user-panel blade
@@ -515,58 +515,77 @@ class UserController extends Controller {
     
     private function UpdInfoValidn($request) {
         $rules = [
-            'name' => 'string:30',
-            'birth_date' => 'date',
-            'gender' => 'string:10',
-            'phone' => 'string',
-            'nid' => 'unique:user_extras|numeric',
+            'name' => 'required|string:30',
+            'birth_date' => 'required|date',
+            'gender' => 'required|string:10',
+            'phone' => 'required|string',
+            'nid' => 'required|unique:user_extras|numeric',
             //'email' => 'email',
-            'facebook' => 'string:50',
+            'facebook' => 'nullable|string:50',
             'twitter' => 'nullable|string:50',
-            'about' => 'string:500',
-            'current_holding' => 'string:30',
-            'current_road' => 'string:30',
-            'current_post_code' => 'string:30',
-            'current_upazilla' => 'string:30',
-            'current_district' => 'string:30',
-            'current_country' => 'numeric',
-            'permanent_holding' => 'string:30',
-            'permanent_road' => 'string:30',
-            'permanent_post_code' => 'string:30',
-            'permanent_upazilla' => 'string:30',
-            'permanent_district' => 'string:30',
-            'permanent_country' => 'numeric',
-            'careof' => 'string:255',
-            'careof_phone' => 'string',
+            'about' => 'nullable|string:500',
+            'current_holding' => 'required|string:30',
+            'current_road' => 'required|string:30',
+            'current_post_code' => 'required|string:30',
+            'current_upazilla' => 'required|string:30',
+            'current_district' => 'required|string:30',
+            'current_country' => 'required|numeric',
+            'permanent_holding' => 'required|string:30',
+            'permanent_road' => 'required|string:30',
+            'permanent_post_code' => 'required|string:30',
+            'permanent_upazilla' => 'required|string:30',
+            'permanent_district' => 'required|string:30',
+            'permanent_country' => 'required|numeric',
+            'careof' => 'required|string:255',
+            'careof_phone' => 'required|string',
         ];
         return $request->validate($rules, $this->UpdInfoValidnMsg());
     }
     
     private function UpdInfoValidnMsg() {
         return $validnMsg = [
+            'name.required' => 'You have to provide your name',
             'name.string' => 'Name should be in characters and must be within 30 characters',
+            'birth_date.required' => 'You have to provide your birth date',
             'birth_date.date' => 'Birth date should look like a date',
+            'gender.required' => 'You have to specify your gender',
             'gender.string' => 'Gender code should be placed here',
+            'phone.required' => 'You have to provide your phone number',
             'phone.numeric' => 'Input your phone number in digits',
+            'nid.required' => 'You have to provide your National Identity card number',
             'nid.numeric' => 'Input your NID number in digits',
             'nid.unique' => 'You must provide your nid number. Please provide only your own nid number',
             'facebook.string' => 'Facebook address is in characters',
             'twitter.string' => 'Twitter address is in characters',
             'about.string' => 'To write about yourself use only characters and numbers (if needed)',
+            'current_holding.required' => 'You have to provide your current holding name',
             'current_holding.string' => 'Your current holding name can be in only numbers and characters',
+            'current_road.required' => 'You have to provide your current road name or number',
             'current_road.string' => 'Your current road can be in only numbers and characters',
+            'current_post_code.required' => 'You have to provide your current post code',
             'current_post_code.string' => 'Your current post code can be in only numbers and characters',
+            'current_upazilla.required' => 'You have to provide your current upazilla',
             'current_upazilla.string' => 'Your current upazila name can be in only numbers and characters',
+            'current_district.required' => 'You have to provide your current district name',
             'current_district.string' => 'Your current district can be in only numbers and characters',
+            'current_country.required' => 'You have to select your current country name',
             'current_country.numeric' => 'Select your country',
+            'permanent_holding.required' => 'You have to provide your permanent holding name',
             'permanent_holding.string' => 'Your permanent holding name can be in only numbers and characters',
+            'permanent_road.required' => 'You have to provide your permanent road name or number',
             'permanent_road.string' => 'Your permanent road can be in only numbers and characters',
+            'permanent_post_code.required' => 'You have to provide your permanent post code',
             'permanent_post_code.string' => 'Your permanent post code can be in only numbers and characters',
+            'permanent_upazilla.required' => 'You have to provide your permanent upazilla name',
             'permanent_upazilla.string' => 'Your permanent upazila name can be in only numbers and characters',
+            'permanent_district.required' => 'You have to provide your permanent district name',
             'permanent_district.string' => 'Your permanent district can be in only numbers and characters',
+            'permanent_country.required' => 'You have to select your permanent country name',
             'permanent_country.numeric' => 'Select your permanent country',
-            'cateof.string' => 'Name of the person who is at your care, must be in characters',
-            'cateof_phone.numeric' => 'Phone number of the person who is st your care, must be in digits',
+            'careof.required' => 'Name of the person who is at your care, don\'t leave it empty',
+            'careof.string' => 'Name of the person who is at your care, must be in characters',
+            'careof_phone.required' => 'Phone number of the person who is st your care, don\'t leave it empty',
+            'careof_phone.numeric' => 'Phone number of the person who is st your care, must be in digits',
         ];
     }
     

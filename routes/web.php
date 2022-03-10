@@ -95,7 +95,8 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'nullAuth', 'two
         Route::get('my-campaigns-panel/cancelled', 'CampaignController@indexMyCancelledCampaign')->name('campaign.indexMyCancelledCampaign');
         Route::get('my-campaigns-panel/blocked', 'CampaignController@indexMyBlockedCampaign')->name('campaign.indexMyBlockedCampaign');
         Route::get('my-campaigns-panel/declined', 'CampaignController@indexMyDeclinedCampaign')->name('campaign.indexMyDeclinedCampaign');
-        Route::patch('my-campaigns-panel/decline/{id}', 'CampaignController@updateStatusToDeclined')->name('campaign.updateStatusToDeclined');
+        Route::patch('my-campaigns-panel/cancel/{id}', 'CampaignController@updateStatusToCancel')->name('campaign.campaigner.updateStatusToCancelled');
+        Route::patch('my-campaigns-panel/decline/{id}', 'CampaignController@updateStatusToDeclined')->name('campaign.campaigner.updateStatusToDeclined');
         
         Route::get('create-campaign', 'CampaignController@create')->name('campaign.create');
         // Route::get('preview-campaign', 'CampaignController@preview')->name('campaign.preview');
@@ -125,8 +126,8 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'nullAuth', 'two
         Route::get('campaigner-fund-panel/notCamp', 'FundController@showNotFundedCampaigns')->name('fund.showNotFundedCampaigns');
         Route::get('campaigner-fund-panel/blockedCamp', 'FundController@showFundingBlockedCampaigns')->name('fund.showFundingBlockedCampaigns');
         
-        Route::get('campaigner-fund-panel/withdrawRequest/{id}', 'withdrawRequestController@show')->name('withdrawRequest.show');
-        Route::post('campaigner-fund-panel/withdrawRequest/store', 'withdrawRequestController@store')->name('withdrawRequest.store');
+        Route::get('campaigner-fund-panel/withdrawRequest/{id}', 'WithdrawRequestController@show')->name('withdrawRequest.show');
+        Route::post('campaigner-fund-panel/withdrawRequest/store', 'WithdrawRequestController@store')->name('withdrawRequest.store');
     });
 
     
@@ -190,10 +191,10 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'nullAuth', 'two
         Route::get('admin-fund-panel/notFundedCamp', 'FundController@indexNotFundedCampaigns')->name('fund.indexNotFundedCampaigns');
         Route::get('admin-fund-panel/fundingBlockedCamp', 'FundController@indexFundingBlockedCamps')->name('fund.indexFundingBlockedCamps');
         
-        Route::get('admin-fund-panel/withdrawRequestPend/{id}', 'withdrawRequestController@showPendingToAdmin')->name('withdrawRequest.showPendingToAdmin');
-        Route::get('admin-fund-panel/withdrawRequestComp/{id}', 'withdrawRequestController@showCompletedToAdmin')->name('withdrawRequest.showCompletedToAdmin');
-        Route::get('admin-fund-panel/withdrawRequestCan/{id}', 'withdrawRequestController@showCancelledToAdmin')->name('withdrawRequest.showCancelledToAdmin');
-        Route::post('admin-fund-panel/withdrawPayment/{id}', 'withdrawPaymentController@store')->name('withdrawPayment.store');
+        Route::get('admin-fund-panel/withdrawRequestPend/{id}', 'WithdrawRequestController@showPendingToAdmin')->name('withdrawRequest.showPendingToAdmin');
+        Route::get('admin-fund-panel/withdrawRequestComp/{id}', 'WithdrawRequestController@showCompletedToAdmin')->name('withdrawRequest.showCompletedToAdmin');
+        Route::get('admin-fund-panel/withdrawRequestCan/{id}', 'WithdrawRequestController@showCancelledToAdmin')->name('withdrawRequest.showCancelledToAdmin');
+        Route::post('admin-fund-panel/withdrawPayment/{id}', 'WithdrawPaymentController@store')->name('withdrawPayment.store');
         
         Route::get('platform-panel', 'PlatformController@indexPlatformPanel')->name('platform.indexPlatformPanel');
         Route::get('platform-panel/settings', 'PlatformController@indexPlatformSettings')->name('platform.indexPlatformSettings');

@@ -322,6 +322,7 @@ class User extends Authenticatable implements MustVerifyEmail
         // use this in the live server in case, typical way of getting the public_html doesn't work.
         // use $root in place of public_path()
 //        $root = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", "", $_SERVER['SCRIPT_FILENAME']);
+//        if( $this->photo && file_exists($root.$this->photo) )
         if( $this->photo && file_exists(public_path().$this->photo) )
             return $this->photo;
         else {

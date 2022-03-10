@@ -82,7 +82,7 @@
                 </div>
             </div> 
             <ul class="list-unstyled d-flex justify-content-between border-top mt-3 pt-3 mb-0">
-                <li class="text-bold small d-flex align-items-center"><i data-feather="book" class="fea icon-sm text-info me-1"></i> {{$campaign->daysLeft()}}</li>
+                <li class="text-bold small d-flex align-items-center"><i data-feather="book" class="fea icon-sm text-info me-1"></i> {{$campaign->completionStatus()}}</li>
                 <li class="text-bold small d-flex align-items-center"><i data-feather="clock" class="fea icon-sm text-warning me-1"></i>{{$campaign->donorsCount()}} Donors</li>
             </ul>
         </div>

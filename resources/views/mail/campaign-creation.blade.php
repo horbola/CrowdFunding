@@ -22,11 +22,11 @@
 <main>
     <section>
         <div>
-            @if($campaign->status === 1)
-            <p>The Campaign <a href="{{ route('campaign.showGuestCampaign', $campaign->id) }}">'{{ $campaign->title }}'</a> you have created is approved and now ready to take donation</p>
-            @elseif($campaign->status === 2)
+            @if( (int)$campaign->status === 1 )
+            <p>The Campaign <a href="{{ route('campaign.showGuestCampaign', $campaign->slug) }}">'{{ $campaign->title }}'</a> you have created is approved and now ready to take donation</p>
+            @elseif( (int)$campaign->status === 2 )
                 <p>The Campaign '{{ $campaign->title }}' you have created is canceled</p>
-            @elseif($user->is_volunteer === 3)
+            @elseif( (int)$user->is_volunteer === 3 )
                 <p>The Campaign '{{ $campaign->title }}'  is blocked</p>
             @endif
         </div>

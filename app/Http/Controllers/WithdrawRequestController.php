@@ -71,7 +71,7 @@ class WithdrawRequestController extends Controller
                 $skipped = true;
                 continue;
             }
-            $reqAmount = $reqItem->request_amount;
+            $reqAmount = (int)$reqItem->request_amount;
             $raised = Campaign::find( $reqItem->campaign_id )->totalSuccessfulDonation();
             $totalPaid = Campaign::find( $reqItem->campaign_id )->totalPaidFund();
 
@@ -79,7 +79,7 @@ class WithdrawRequestController extends Controller
                 $reqAmount = $raised - $totalPaid;
             }
 
-            if( ($reqItem->request_check === 1 || $reqItem->request_check === true) && (int)$reqItem->request_amount ){
+            if( ((int)$reqItem->request_check === 1 || $reqItem->request_check === true) && (int)$reqItem->request_amount ){
                 $wReqItem = WithdrawRequestItem::create([
                     'withdraw_request_id' => $wRequest->id,
                     'campaign_id' => $reqItem->campaign_id,

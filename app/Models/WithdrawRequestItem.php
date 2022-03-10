@@ -32,19 +32,19 @@ class WithdrawRequestItem extends Model
 
     // statuses -------------------------------------------------
     public function isPending() {
-        return $this->status === 1;
+        return (int)$this->status === 1;
     }
     
     public function isFunded() {
-        return $this->status === 2;
+        return (int)$this->status === 2;
     }
     
     public function isBlocked() {
-        return $this->status === 3;
+        return (int)$this->status === 3;
     }
     
     public function isCurrentlyBlocked() {
-        return $this->currently_blocked;
+        return (int)$this->currently_blocked;
     }
     
     // setters --------
