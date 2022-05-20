@@ -135,7 +135,7 @@ class Campaign extends Model
     }
     
     // detects whether a any investigation report has been posted. if any investigation entry is present in investigation table but is_verified is no
-    // then this means that some investigation report has been just posted but that's not verified yet.
+    // then this means that some investigation report has been just posted but not verified yet.
     public function isPostedToVerify() {
         return $this->investigation;
     }

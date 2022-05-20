@@ -45,7 +45,7 @@
                 if route condition is not set then volunteer and volunteer requests are shown every type of
                 user pages where there are any volunteer or volunteer requests
                 -->
-                @if( ($panelFrac === 'volunteer-request') && ($user->is_volunteer === 1) )
+                @if( ($panelFrac === 'volunteer-request') && ( (int)$user->is_volunteer === 1 ) )
                 <span>
                     <form class="d-inline" action="{{ route('user.updateVolunteer') }}" method="post">
                         @csrf
@@ -64,7 +64,7 @@
                         <button type="submit" class="btn btn-primary">Cancel Volunteer Reqeust</button>
                     </form>
                 </span>
-                @elseif( ($panelFrac === 'volunteer') && ($user->is_volunteer === 2) )
+                @elseif( ($panelFrac === 'volunteer') && ( (int)$user->is_volunteer === 2 ) )
                 <span>
                     <form class="d-inline" action="{{ route('user.updateVolunteer') }}" method="post">
                         @csrf
@@ -79,7 +79,7 @@
             
             <!--buttons for active status-->
             <div class="mt-1">
-                @if( $actStat === 3 && ($panelFrac === 'blocked' && (!($panelFrac === 'volunteer-request'))) )
+                @if( (int)$actStat === 3 && ($panelFrac === 'blocked' && (!($panelFrac === 'volunteer-request'))) )
                 <span>
                     <form class="d-inline" action="{{ route('user.updateActiveStatus') }}" method="post">
                         @csrf
@@ -102,7 +102,7 @@
                 @endif
                 
                 
-                @if( $actStat === 2 && ($panelFrac === 'malicous') )
+                @if( (int)$actStat === 2 && ($panelFrac === 'malicous') )
                 <span>
                     <form class="d-inline" action="{{ route('user.updateActiveStatus') }}" method="post">
                         @csrf

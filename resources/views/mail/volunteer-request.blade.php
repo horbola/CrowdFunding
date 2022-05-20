@@ -22,11 +22,11 @@
 <main>
     <section>
         <div>
-            @if($user->is_volunteer === 0)
+            @if( (int)$user->is_volunteer === 0 )
                 <p>Your volunteer request is canceled</p>
-            @elseif($user->is_volunteer === 2)
+            @elseif( (int)$user->is_volunteer === 2 )
                 <p>Your volunteer request is approved</p>
-            @elseif($user->is_volunteer === 3)
+            @elseif( (int)$user->is_volunteer === 3 )
                 <p>Your volunteer request is revoked</p>
             @endif
         </div>

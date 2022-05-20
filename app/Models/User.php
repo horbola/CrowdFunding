@@ -64,111 +64,111 @@ class User extends Authenticatable implements MustVerifyEmail
     
     // statuses ------------------------------------------------------------------------------
     public function isPending() {
-        return $this->active_status === 0;
+        return (int)$this->active_status === 0;
     }
     
     public function isActive() {
-        return $this->active_status === 1;
+        return (int)$this->active_status === 1;
     }
     
     public function isMalicous() {
-        return $this->active_status === 2;
+        return (int)$this->active_status === 2;
     }
     
     public function isBlocked() {
-        return $this->active_status === 3;
+        return (int)$this->active_status === 3;
     }
     
     public function isLeft() {
-        return $this->active_status === 4;
+        return (int)$this->active_status === 4;
     }
     
     public function isPaused() {
-        return $this->active_status === 5;
+        return (int)$this->active_status === 5;
     }
     
     // setters------------------
     public function setPending() {
-        $this->active_status = 0;
+        (int)$this->active_status = 0;
     }
     
     public function setActive() {
-        $this->active_status = 1;
+        (int)$this->active_status = 1;
     }
     
     public function setMalicous() {
-        $this->active_status = 2;
+        (int)$this->active_status = 2;
     }
     
     public function setBlocked() {
-        $this->active_status = 3;
+        (int)$this->active_status = 3;
     }
     
     public function setLeft() {
-        $this->active_status = 4;
+        (int)$this->active_status = 4;
     }
     
     public function setPaused() {
-        $this->active_status = 5;
+        (int)$this->active_status = 5;
     }
     
     // volunteer -----------------
     public function isVolunteer() {
-        return $this->is_volunteer === 2;
+        return (int)$this->is_volunteer === 2;
     }
     
     public function isVolRequested() {
-        return $this->is_volunteer === 1;
+        return (int)$this->is_volunteer === 1;
     }
     
     public function isVolRemoved() {
-        return $this->is_volunteer === 3;
+        return (int)$this->is_volunteer === 3;
     }
     
     public function isVolRejected() {
-        return $this->is_volunteer === 4;
+        return (int)$this->is_volunteer === 4;
     }
     
     // volunteer setters ------------------
     public function setVolunteer() {
-        $this->is_volunteer = 2;
+        (int)$this->is_volunteer = 2;
     }
     
     public function setVolRequested() {
-        $this->is_volunteer = 1;
+        (int)$this->is_volunteer = 1;
     }
     
     public function setVolRemoved() {
-        $this->is_volunteer = 3;
+        (int)$this->is_volunteer = 3;
     }
     
     public function setVolRejected() {
-        $this->is_volunteer = 4;
+        (int)$this->is_volunteer = 4;
     }
     
     // admin ---------------
     public function isAdmin() {
-        return $this->is_admin === 1;
+        return (int)$this->is_admin === 1;
     }
     
     public function isAdminRejected() {
-        return $this->is_admin === 2;
+        return (int)$this->is_admin === 2;
     }
     
     public function isResigned() {
-        return $this->is_admin === 3;
+        return (int)$this->is_admin === 3;
     }
     // admin setters--------------------
     public function setAdmin() {
-        $this->is_admin = 1;
+        (int)$this->is_admin = 1;
     }
     
     public function setAdminRejected() {
-        $this->is_admin = 2;
+        (int)$this->is_admin = 2;
     }
     
     public function setResigned() {
-        $this->is_admin = 3;
+        (int)$this->is_admin = 3;
     }
     // statuses end ------------------------------------------------------------------------------
     
@@ -204,7 +204,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $mobileBank = $this->currentMobileBank();
         // if any one bank is available as currrent bank, that's enough.
         $current = collect([$bank, $mobileBank])->filter(function($item){
-            return $item && $item->status === 1? true : false;
+            return $item && (int)$item->status === 1? true : false;
         })->first();
         return $current;
     }
@@ -217,13 +217,13 @@ class User extends Authenticatable implements MustVerifyEmail
     public function makeAllPayMethPast() {
         $banks = Bank::whereUserId($this->id)->get();
         foreach ($banks as $bank) {
-            $bank->status = 2;
+            (int)$bank->status = 2;
             $bank->save();
         }
         
         $mobileBanks = MobileBank::whereUserId($this->id)->get();
         foreach ($mobileBanks as $bank) {
-            $bank->status = 2;
+            (int)$bank->status = 2;
             $bank->save();
         }
     }
@@ -322,6 +322,7 @@ class User extends Authenticatable implements MustVerifyEmail
         // use this in the live server in case, typical way of getting the public_html doesn't work.
         // use $root in place of public_path()
 //        $root = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", "", $_SERVER['SCRIPT_FILENAME']);
+//        if( $this->photo && file_exists($root.$this->photo) )
         if( $this->photo && file_exists(public_path().$this->photo) )
             return $this->photo;
         else {
@@ -469,7 +470,7 @@ class User extends Authenticatable implements MustVerifyEmail
     
     public function totalUserFundableCampaigns() {
         return $this->campaign->filter(function($aCampaign){
-            switch($aCampaign->status){
+            switch((int)$aCampaign->status){
                 case 1:
                 case 3:
                 case 4:
@@ -482,7 +483,7 @@ class User extends Authenticatable implements MustVerifyEmail
     
     public function totalUserPendingCampaigns() {
         return $this->campaign->filter(function($aCampaign){
-            switch($aCampaign->status){
+            switch((int)$aCampaign->status){
                 case 1:
                 case 3:
                 case 4:
@@ -495,7 +496,7 @@ class User extends Authenticatable implements MustVerifyEmail
     
     public function totalUserCompletelyFundedCampaigns() {
         return $this->campaign->filter(function($aCampaign){
-            switch($aCampaign->status){
+            switch((int)$aCampaign->status){
                 case 1:
                 case 3:
                 case 4:
@@ -508,7 +509,7 @@ class User extends Authenticatable implements MustVerifyEmail
     
     public function totalUserPartlyFundedCampaigns() {
         return $this->campaign->filter(function($aCampaign){
-            switch($aCampaign->status){
+            switch((int)$aCampaign->status){
                 case 1:
                 case 3:
                 case 4:
@@ -521,7 +522,7 @@ class User extends Authenticatable implements MustVerifyEmail
     
     public function totalUserNotFundedCampaigns() {
         return $this->campaign->filter(function($aCampaign){
-            switch($aCampaign->status){
+            switch((int)$aCampaign->status){
                 case 1:
                 case 3:
                 case 4:
@@ -534,7 +535,7 @@ class User extends Authenticatable implements MustVerifyEmail
     
     public function totalUserFundingBlockedCampaigns() {
         return $this->campaign->filter(function($aCampaign){
-            switch($aCampaign->status){
+            switch((int)$aCampaign->status){
                 case 1:
                 case 3:
                 case 4:

@@ -1,3 +1,6 @@
 
 
-withdraw requests
+a donor can see only active camp
+a user can see eny type of his own camp
+an investigator can only see pending camp
+an admin can see any camp

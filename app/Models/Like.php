@@ -16,6 +16,11 @@ class Like extends Model
         return $this->belongsTo(User::class);
     }
     
+    public function campaign() {
+        return $this->belongsTo(Campaign::class);
+    }
+    
+    
     public function comment() {
         return $this->belongsTo(Comment::class);
     }

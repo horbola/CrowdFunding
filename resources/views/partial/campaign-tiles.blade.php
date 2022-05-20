@@ -92,9 +92,11 @@
             </div><!--end col-->
         @else
             @foreach($campaigns as $campaign)
-            <div class="col-12 col-lg-6 mt-4 pt-2">
-                @include('partial.campaign-tile', $campaign)
-            </div><!--end col-->
+                @if($campaign)
+                    <div class="col-12 col-lg-6 mt-4 pt-2">
+                        @include('partial.campaign-tile', $campaign)
+                    </div><!--end col-->
+                @endif
             @endforeach
             <style>
                 .btn-soft-danger {

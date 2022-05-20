@@ -75,8 +75,7 @@ class CampaignController extends Controller {
     public function showGuestCampaign($campaignSlug){
         session(['adminCampaignsUrl' => URL::previous()]);
         $campaign = Campaign::where('slug', $campaignSlug)->first();
-        $title = 'Oporajoy - ' . $campaign->title;
-        if($campaign){
+        if($campaign && $this->authorizeShowing($campaign)){
             // every show of any campaign is recoreded by this portion.
             // but recorded only if the visitor is logged in and not campaign creator himself.
             if (Auth::check() && (Auth::user()->id !== $campaign->user_id && !$campaign->isCampPending())) {
@@ -87,10 +86,38 @@ class CampaignController extends Controller {
                 View::create($data);
             }
             
+            $title = 'Oporajoy - ' . $campaign->title;
             return view('face.camp-offerus', compact('campaign', 'title'));
         }
         else {
-            return view('face.camp-not-found', 'title');
+            return view('face.camp-not-found');
+        }
+    }
+    
+    private function authorizeShowing($camp){
+        // anyone can see active campaign
+        $showToGuest = $camp->isActive();
+        // campaigner can see his own campaign in any status
+        $showToCampr = Auth::check() && (Auth::user()->id === $camp->user_id);
+        // investigator can see only pending campaign
+        $showToInv = Auth::check() && ((int)Auth::user()->is_volunteer === 2) && $camp->isCampPending();
+        // admin can see any campaign
+        $showToAdmin = Auth::check() && ((int)Auth::user()->is_admin === 1);
+        return $showToGuest || $showToCampr || $showToInv || $showToAdmin;
+    }
+    
+    private function authorizeShowingV2($camp){
+        $isAdmin = Auth::check() && ((int)Auth::user()->isAdmin === 1);
+        $isInv = Auth::check() && ((int)Auth::user()->isVolunteer === 1);
+        $isCampr = Auth::check() && (Auth::user()->id === $campaign->user_id);
+        if($camp->isActive() || $isAdmin){
+            return true;
+        }
+        else if( $camp->isCampPending() || $isInv){
+            return true;
+        }
+        else if($isCampr){
+            return true;
         }
     }
     
@@ -873,19 +900,20 @@ class CampaignController extends Controller {
         $updated = $campaign->update();
         if($updated){
             $campaign->refresh();
-            Mail::to($campaign->campaigner)->send(new CampaignCreation($campaign));
+            Mail::to($campaign->campaigner)->send(new CampaignCreation($campaign, $campaign->campaigner));
             return back()->with(['success' => 'The campaign has been approved', 'campaing' => $campaign]);
         }
         return back()->with(['error' => 'The action couldn\'t be performed', 'campaing' => $campaign]);
     }
     
+    // handles both admin and campaigner request
     public function updateStatusToCancel($id) {
         $campaign = Campaign::find($id);
         // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
         $campaign->status = 2;
         $updated = $campaign->update();
         if($updated){
-            Mail::to($campaign->campaigner)->send(new CampaignCreation($campaign));
+            Mail::to($campaign->campaigner)->send(new CampaignCreation($campaign, $campaign->campaigner));
             return back()->with(['success' => 'The campaign has been approved', 'campaing' => $campaign]);
         }
         return back()->with(['error' => 'The action couldn\'t be performed', 'campaing' => $campaign]);
@@ -903,6 +931,7 @@ class CampaignController extends Controller {
         return back()->with(['error' => 'The action couldn\'t be performed', 'campaing' => $campaign]);
     }
     
+    // handles both admin and campaigner request
     public function updateStatusToDeclined($id) {
         $campaign = Campaign::find($id);
         // 0:pending, 1:approved, 2:cancelled, 3:blocked, 4:declined
@@ -1021,12 +1050,12 @@ class CampaignController extends Controller {
             'documents' => 'array',
 //            'documents' => 'nullable|mimes:jpeg,jpg,png',
             // 'feature_video' => 'required|file',
-            'goal' => 'required|numeric',
+            'goal' => 'required|numeric|min:10000|max:10000000',
             'end_method' => 'required|numeric',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'min_amount' => 'nullable|numeric',
-            'max_amount' => 'nullable|numeric',
+            'min_amount' => 'nullable|numeric|min:2',
+            'max_amount' => 'nullable|numeric|max:10000000',
             'recommended_amount' => 'nullable|numeric',
             'amount_prefilled' => 'nullable|string:255',
         ];
@@ -1043,6 +1072,8 @@ class CampaignController extends Controller {
             'feature_image.required' => 'You didn\'t set a feature image. Don\'t leave it empty',
             'goal.required' => 'You didn\'t set a goal. Don\'t leave it empty',
             'goal.numeric' => 'You can put just number in setting a goal.',
+            'goal.min' => 'You can only define goal of minimum of 10,000 taka and maximum of one crore (10,000,000) taka',
+            'goal.max' => 'You can only define goal of minimum of 1 taka and maximum of one crore (10,000,000) taka',
             'end_method.required' => 'You didn\'t decide what end method should be. Don\'t leave it empty',
             'end_method.numeric' => 'You did\'t select any end method.',
             'start_date.required' => 'You didn\'t set when this campaign will start. Please Select a date',
@@ -1050,7 +1081,9 @@ class CampaignController extends Controller {
             'end_date.required' => 'You didn\'t set when this campaign will end. Please Select a date',
             'end_date.date' => 'The input you\ve entered isn\'t a date. Please Select a date',
             'min_amount.numeric' => 'You can put just number in setting a minimum amount.',
+            'min_amount.min' => 'You have to set minumum amount to at least 10 taka.',
             'max_amount.numeric' => 'You can put just number in setting a maximum amount.',
+            'max_amount.max' => 'You have to set maximum amount to the your goal amount at most.',
             'recommended_amount.numeric' => 'You can put just number in setting recommended amount.',
             'amount_prefilled.string' => 'Write these numbers separating by commas.',
         ];

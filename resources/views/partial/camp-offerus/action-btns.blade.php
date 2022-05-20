@@ -14,23 +14,23 @@
     @if($showCampBtns)
     <div class="row mb-5 text-right">
         <div class="col">
-            <span><a class="btn btn-primary {{$campaign->status !== 0 ? 'disabled' : ''}}" href="{{route('campaign.edit', [$campaign->id])}}">Edit</a></span>
+            <span><a class="btn btn-primary {{ (int)$campaign->status !== 0 ? 'disabled' : '' }}" href="{{route('campaign.edit', [$campaign->id])}}">Edit</a></span>
             <span><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#campaignUpdateModel" {{$campaign->isCompleted() ? 'disabled' : ''}}>Update</button></span>
             <!-- cancel button will appear only before a campaign been active -->
-            @if($campaign->status === 0)
+            @if( (int)$campaign->status === 0 )
             <span>
-                <form class="d-inline" action="{{route('campaign.updateStatusToCancel', [$campaign->id])}}" method="post">
+                <form class="d-inline" action="{{route('campaign.campaigner.updateStatusToCancelled', [$campaign->id])}}" method="post">
                     @csrf
                     @method('patch')
-                    <button type="submit" class="btn btn-primary" {{$campaign->status !== 0 ? 'disabled' : ''}}>Cancel</button>
+                    <button type="submit" class="btn btn-primary" {{ (int)$campaign->status !== 0 ? 'disabled' : '' }}>Cancel</button>
                 </form>
             </span>
             @endif
             
             <!-- decline button will appear only after a campaign been active -->
-            @if($campaign->status !== 0)
+            @if( (int)$campaign->status !== 0 )
             <span>
-                <form class="d-inline" action="{{route('campaign.updateStatusToDeclined', [$campaign->id])}}" method="post">
+                <form class="d-inline" action="{{route('campaign.campaigner.updateStatusToDeclined', [$campaign->id])}}" method="post">
                     @csrf
                     @method('patch')
                     <button type="submit" class="btn btn-primary" {{!$campaign->isActive() ? 'disabled' : ''}}>Decline</button>
@@ -50,7 +50,7 @@
         $isPosted = $campaign->investigation && $campaign->investigation->postedInvReport();
         $isInvestigated = $campaign->investigation && $campaign->investigation->isInvestigated();
         $showUpInvRepBtn = Auth::check() 
-        && Auth::user()->is_volunteer 
+        && (int)Auth::user()->is_volunteer 
         && request()->indexInvestigation
         && !$isInvestigated;
     @endphp
@@ -74,13 +74,13 @@
     <!--------- admin buttons ------------------------------------------------------------------------------------------------------->
     @php
         $showAdminBtns = Auth::check()
-        && Auth::user()->is_admin
+        && (int)Auth::user()->is_admin
         && ( ($uri_segments[3] ?? '') === 'admin-campaign-panel' || session('approving') || request()->editing ); //request()->approving === 'yes' (doesn't work, but is valid)
     @endphp
     @if($showAdminBtns)
     <div class="row mb-5 text-right">
         <div class="col">
-            @if($campaign->status === 0 | $campaign->isActive())
+            @if( (int)$campaign->status === 0 | $campaign->isActive() )
             <span>
                 <form class="d-inline" action="{{route('campaign.edit', ['id' => $campaign->id])}}" method="get">
                     @csrf
@@ -90,7 +90,7 @@
             </span>
             @endif
             
-            @if($campaign->status === 0)
+            @if( (int)$campaign->status === 0 )
             <span>
                 <form class="d-inline" action="{{route('campaign.updateStatusToApproved', [$campaign->id])}}" method="post">
                     @csrf
@@ -121,7 +121,7 @@
                     <button type="submit" class="btn btn-primary">Block</button>
                 </form>
             </span>
-                @if(!$campaign->is_picked)
+                @if( !(int)$campaign->is_picked )
                 <span>
                     <form class="d-inline" action="{{ route('campaign.updatePickedCampaign', $campaign->id) }}" method="post">
                         @csrf
@@ -133,7 +133,7 @@
             @endif
             
             <!-- delete button will appear only after a campaign been active -->
-            @if($campaign->status !== 0)
+            @if( (int)$campaign->status !== 0 )
             <span>
                 <form class="d-inline" action="{{route('campaign.delete', [$campaign->id])}}" method="post">
                     @csrf

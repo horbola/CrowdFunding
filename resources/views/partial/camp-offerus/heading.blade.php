@@ -34,7 +34,7 @@
             <div class="link d-flex justify-content-between align-items-center">
                 <div class="position-relative" id="copy-text">
                     <div class="link d-flex justify-content-between align-items-center">
-                        <p class="text-to-copy pe-2" onclick="copyText(this);">{{ route('campaign.shortLink', $campaign->id) }}</p>
+                        <p class="text-to-copy pe-2" onclick="copyText(this);">{{ route('campaign.shortLink', $campaign->slug) }}</p>
                         <span><img src="/images/icons/copy.png" alt=""></span>
                     </div>
                     <span class="invisible copied">Link copied to clipboard</span>
@@ -49,7 +49,10 @@
                     </script>
                     <style>
                         #copy-text .text-to-copy {
-                            
+                            width: 100px;
+                            overflow: hidden;
+                            white-space: nowrap;
+                            text-overflow: ellipsis;
                         }
                         
                         #copy-text .copied {

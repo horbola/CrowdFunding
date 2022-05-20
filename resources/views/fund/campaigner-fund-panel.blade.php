@@ -80,6 +80,7 @@
     <div class="row">
         <!--<div class="col-lg-6 col-md-12 mt-4 pt-2">-->
         <div class="col-12 mt-4 pt-2">
+            <hr />
             @php $notCount = Auth::user()->totalUserNotFundedCampaigns()->count() @endphp
             <a href="{{ route('fund.showNotFundedCampaigns') }}">
                 <div class="d-flex key-feature p-3 rounded shadow">
@@ -111,7 +112,7 @@
                     <div class="flex-1">
                         <h4 class="title mb-0">Withdraw Rest Of The Money From These Campaigns</h4>
                         <div class="foot-note">
-                            This category includes the campaigns from which you have withdrawn money partially, but still there are money within this campaigns. 
+                            This category includes the campaigns from which you have withdrawn money partially, and still there is money within this campaigns. 
                             Campaigns from this category are also included in total category.
                         </div>
                     </div>
@@ -120,18 +121,20 @@
                     </div>
                 </div>
             </a>
+            <hr />
         </div>
         
+        <!--
         <div class="col-12 mt-4 pt-2">
             @php $fundableCount = Auth::user()->totalUserFundableCampaigns()->count() @endphp
-            <!--<a href="{{ route('fund.showFundableCampaigns') }}" style="{{ !$fundableCount ? 'pointer-events: none;' : '' }}">-->
+            <!--<a href="{{ route('fund.showFundableCampaigns') }}" style="{{ !$fundableCount ? 'pointer-events: none;' : '' }}">
             <a href="{{ route('fund.showFundableCampaigns') }}">
                 <div class="d-flex key-feature p-3 rounded shadow">
                     <div class="icon text-center rounded-circle me-3">
                         <i data-feather="monitor" class="fea icon-ex-md text-primary"></i>
                     </div>
                     <div class="flex-1">
-                        <h4 class="title mb-0">Withdraw Fund From These Total Campaigns</h4>
+                        <h4 class="title mb-0">Total Campaigns From which you can Withdraw Fund</h4>
                         <div class="foot-note">This category includes total campaigns from which you have withdrawn money partially or not withdrawn at all</div>
                     </div>
                     <div class="">
@@ -140,8 +143,10 @@
                 </div>
             </a>
         </div>
+        -->
         
         <div class="col-12 mt-4 pt-2">
+            <hr />
             @php $pendCount = Auth::user()->totalUserPendingCampaigns()->count() @endphp
             <a href="{{ route('fund.showFundingPendedCampaigns') }}">
                 <div class="d-flex key-feature p-3 rounded shadow">

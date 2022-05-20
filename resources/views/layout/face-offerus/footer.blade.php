@@ -75,5 +75,5 @@
 
 
 <section class="live-chat">
-    <i class="fab fa-whatsapp"></i>
+    <a href=https://wa.me/[+8801873334000]"><i class="fab fa-whatsapp"></i></a>
 </section>

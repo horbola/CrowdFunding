@@ -36,8 +36,8 @@
         purpose. but after all this she can edit any profile as an admin.
         -->
         @php
-            $isAdmin = Auth::user()->is_admin === 1;
-            $isSuper = Auth::user()->is_super === 1;
+            $isAdmin = (int)Auth::user()->is_admin === 1;
+            $isSuper = (int)Auth::user()->is_super === 1;
             $hasCampaign = DB::table('campaigns')->where('user_id', Auth::user()->id )->get()->count();
             $show = !$hasCampaign || $isAdmin || $isSuper;
         @endphp
@@ -99,6 +99,7 @@
                         <label class="form-check-label" for="gender3">Others</label>
                     </div>
                 </div>
+                {!! $errors->has('gender')? '<p class="help-block text-bold text-danger">'.$errors->first('gender').'</p>' : '' !!}
             </div>
         </div>
         @endif
@@ -285,7 +286,7 @@
             <div class="col-sm-12 col-md-9 form-icon position-relative">
                 <i data-feather="smartphone" class="fea icon-sm icons"></i>
                 @php $careofPhone = $uExtra? ($uExtra->careof_phone? $uExtra->careof_phone : '') : ''; @endphp
-                <input type="text" class="form-control ps-5 {{ $errors->has('careof_phone')? 'error-border' : '' }}" id="careof_phone" value="{{ old('careof_phone', $careofPhone ?? '') }}" name="careof_phone" placeholder="Care-Of Phonne" maxlength="255">
+                <input type="text" class="form-control ps-5 {{ $errors->has('careof_phone')? 'error-border' : '' }}" id="careof_phone" value="{{ old('careof_phone', $careofPhone ?? '') }}" name="careof_phone" placeholder="Care-Of Phone" maxlength="255">
                 {!! $errors->has('careof_phone')? '<p class="help-block text-bold text-danger">'.$errors->first('careof_phone').'</p>' : '' !!}
             </div>
         </div>

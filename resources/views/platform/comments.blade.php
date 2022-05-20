@@ -53,7 +53,7 @@
                             <td>{{$serial}}</td>
                             <td><a href="{{ route('user.show', $comment->commentor->id) }}">{{$comment->commentor->name}}</a></td>
                             <td>{{ $comment->body }}</td>
-                            <td><a href="{{ route('campaign.showGuestCampaign', $comment->campaign_id) }}">{{$comment->campaign->title}}</a></td>
+                            <td><a href="{{ route('campaign.showGuestCampaign', $comment->campaign->slug) }}">{{$comment->campaign->title}}</a></td>
                             <td>{{ App\Library\Helper::formattedTime($comment->created_at) }}</td>
                             <td>{{ $comment->isShowing() }}</td>
                             <td style="min-width: 100px;">

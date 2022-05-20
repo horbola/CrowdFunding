@@ -16,7 +16,7 @@ class WithdrawPaymentController extends Controller
 {
     public function store(Request $request) {
         if(!$request->trans_id){
-            return back()->with('error', 'You didn\'t provide any transaction key. Provide a random number or string or mix of both to mark this transaction as unique');
+            return back()->with('error', 'You didn\'t provide any transaction key. Provide this trax with the tranx id which is provied by the bank to mark this transaction as unique');
         }
         $withdraw_request = json_decode($request->withdraw_request);
         $withReq = WithdrawRequest::find($request->withdraw_request_id);

@@ -23,10 +23,12 @@ class CampaignCreation extends Mailable implements ShouldQueue
      */
     
     public $campaign;
+    public $user;
     
-    public function __construct(Campaign $campaign)
+    public function __construct(Campaign $campaign, $user)
     {
         $this->campaign = $campaign;
+        $this->user = $user;
     }
 
     /**
